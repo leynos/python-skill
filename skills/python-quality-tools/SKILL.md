@@ -62,14 +62,19 @@ output.
 ## pyscn quick-start
 
 ```bash
-uvx pyscn@latest analyze .                   # everything
-uvx pyscn@latest analyze . --json > pyscn.json
-uvx pyscn@latest analyze . --check deadcode
-uvx pyscn@latest analyze . --check clones --min-similarity 0.85
+uvx pyscn@latest analyze .                            # everything
+uvx pyscn@latest analyze --json .                     # JSON report
+uvx pyscn@latest analyze --select deadcode .          # one report
+uvx pyscn@latest analyze --select clones,complexity . # several reports
+uvx pyscn@latest check .                              # pass/fail gate
+uvx pyscn@latest check --max-complexity 15 .          # custom threshold
 ```
 
-Outputs are table, JSON, and SARIF. The MCP server integration is
-useful in editor-side reviews; CLI is enough for CI.
+`analyze` produces full reports (table, JSON, or SARIF). `check` is a
+separate quality-gate subcommand that returns pass/fail against
+configurable thresholds; use it from CI when the build should fail on
+regressions. The MCP server is useful for editor-side reviews; the CLI
+is enough for CI.
 
 ## Pyinstrument quick-start
 

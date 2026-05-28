@@ -73,12 +73,18 @@ What pyscn reports:
 Useful invocations:
 
 ```bash
-uvx pyscn@latest analyze .                            # everything
-uvx pyscn@latest analyze . --check deadcode           # one report
-uvx pyscn@latest analyze . --check clones --min-similarity 0.9
-uvx pyscn@latest analyze . --json > pyscn.json
-uvx pyscn@latest analyze . --sarif > pyscn.sarif
+uvx pyscn@latest analyze .                                # everything
+uvx pyscn@latest analyze --select deadcode .              # one report
+uvx pyscn@latest analyze --select clones,complexity .     # several reports
+uvx pyscn@latest analyze --json .                         # JSON output
+uvx pyscn@latest check .                                  # quality gate
+uvx pyscn@latest check --max-complexity 15 --select complexity .
 ```
+
+`analyze` is the report command; `check` is the separate quality-gate
+command that returns pass/fail against thresholds. Both accept
+`--select` to narrow the analyses (`complexity`, `deps`, `deadcode`,
+`clones`, `cbo`).
 
 The MCP server (built-in) lets editor-side agents query the analysis
 on demand:
@@ -103,7 +109,7 @@ uvx pyscn@latest mcp
 
 ```bash
 uv tool run deadcode . --no-color > deadcode.txt
-uvx pyscn@latest analyze . --check deadcode --json > pyscn.json
+uvx pyscn@latest analyze --select deadcode --json . > pyscn.json
 ```
 
 `deadcode.txt` lists the unused names; `pyscn.json` lists the
@@ -116,7 +122,8 @@ by both is a strong candidate for deletion.
   `--include` if available; otherwise `deadcode src/...`). The cost
   is small.
 - **Weekly**: run `pyscn analyze .` on `main`; publish the JSON or
-  SARIF artefact.
+  SARIF artefact. Wire `pyscn check .` into the merge gate when the
+  thresholds are agreed.
 - **Pre-release**: review the survivor list and triage.
 
 ## Common mistakes

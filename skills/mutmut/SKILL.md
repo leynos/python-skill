@@ -47,8 +47,8 @@ On Windows, mutmut v3 uses WSL; on POSIX it forks per mutant.
 
 ```toml
 [tool.mutmut]
-paths_to_mutate = "src/"
-tests_dir = "tests/"
+paths_to_mutate = ["src/"]
+pytest_add_cli_args_test_selection = ["tests/"]
 runner = "uv run pytest -x --no-header -q"
 do_not_mutate = [
   "src/mypkg/_version.py",
@@ -58,6 +58,11 @@ also_copy = [
   "src/mypkg/data/*.json",
 ]
 ```
+
+In `pyproject.toml`, mutmut v3 requires path-shaped settings to be
+arrays. `paths_to_mutate = "src/"` (a scalar string) is accepted in
+`setup.cfg` but rejected or silently ignored under `[tool.mutmut]`;
+keep the brackets.
 
 `runner` is the suite invocation. `-x` and `-q` speed the per-mutant
 run. `do_not_mutate` skips generated code, version files, and

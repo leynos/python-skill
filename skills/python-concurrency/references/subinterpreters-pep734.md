@@ -12,8 +12,8 @@ the fork or pickle cost of `multiprocessing`.
   modules, its own globals, and its own GIL.
 - Python objects are not shared. Anything crossing the boundary is
   serialised and reconstructed on the other side.
-- Communication uses queues (channels): `concurrent.interpreters.create_channel`
-  returns a connected send/receive pair.
+- Communication uses queues: `concurrent.interpreters.create_queue()`
+  returns a cross-interpreter `queue.Queue` implementation.
 - Start-up cost is real (a fresh interpreter must import its modules);
   amortise it via a pool, not per-task spin-up.
 
@@ -35,26 +35,28 @@ with InterpreterPoolExecutor(max_workers=4) as pool:
 callable must be importable in the worker (top-level function in a
 module), and the arguments must be encodable across the boundary.
 
-## Channels
+## Queues
 
 ```python
-from concurrent.interpreters import create, create_channel
+from concurrent.interpreters import create, create_queue
 
 interp = create()
-send, recv = create_channel()
+requests = create_queue()
+results = create_queue()
 
+interp.prepare_main(requests=requests, results=results)
 interp.exec(
     "from work import worker_main\n"
-    "worker_main(send, recv)",
-    globals={"send": send, "recv": recv},
+    "worker_main(requests, results)"
 )
 
-send.send({"task": "compute", "n": 100})
-result = recv.recv()
+requests.put({"task": "compute", "n": 100})
+result = results.get()
 ```
 
-Channels are the right abstraction when futures do not fit (long-running
-workers, streaming results, fan-in/fan-out).
+`create_queue()` returns a `queue.Queue` implementation that is safe to
+share across interpreters. Use queues when futures do not fit
+(long-running workers, streaming results, fan-in/fan-out).
 
 ## What does and does not work
 
@@ -88,7 +90,7 @@ Pick subinterpreters when:
 - the work is pure Python or uses C extensions that opt in,
 - start-up cost matters (no fork, no pickle roundtrip per task),
 - the workers share read-only inputs that are easy to ship via
-  channels.
+  the cross-interpreter queue.
 
 Pick processes when:
 
@@ -102,7 +104,8 @@ Pick processes when:
 
 - Submitting a closure or a `lambda` to the pool. Workers must
   import the callable; top-level module functions only.
-- Treating channels like shared memory. Channels copy.
+- Treating the cross-interpreter queue like shared memory. Items are
+  serialised across the boundary.
 - Mixing `asyncio` with `InterpreterPoolExecutor` by awaiting a
   future inside a coroutine without `asyncio.run_in_executor` or the
   `loop.run_in_executor` bridge.

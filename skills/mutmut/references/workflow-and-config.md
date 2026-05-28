@@ -13,8 +13,8 @@ dev = [
 ]
 
 [tool.mutmut]
-paths_to_mutate = "src/"
-tests_dir = "tests/"
+paths_to_mutate = ["src/"]
+pytest_add_cli_args_test_selection = ["tests/"]
 runner = "uv run pytest -x --no-header -q -p no:cacheprovider"
 do_not_mutate = [
   "src/mypkg/_version.py",
@@ -26,10 +26,12 @@ also_copy = ["src/mypkg/data/*.json"]
 
 What each option buys:
 
-- `paths_to_mutate` — restrict mutation to your code, not vendored
-  dependencies.
-- `tests_dir` — mutmut still discovers tests via pytest; this is for
-  exclusion when copying files.
+- `paths_to_mutate` (array) — restrict mutation to your code, not
+  vendored dependencies. Must be a TOML array under `[tool.mutmut]`;
+  a scalar string is silently rejected.
+- `pytest_add_cli_args_test_selection` (array) — extra arguments
+  passed through to the runner to narrow test discovery. Also an
+  array under `[tool.mutmut]`.
 - `runner` — the suite invocation. `-x` aborts on the first failure
   (a killed mutant); `-q` reduces noise.
 - `-p no:cacheprovider` avoids contaminating the pytest cache across

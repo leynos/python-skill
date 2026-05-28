@@ -40,7 +40,7 @@ and how to keep state safe across it.
 - **PEP 734 subinterpreters (Python 3.14+)**: CPU-bound pure Python
   without the fork cost. `concurrent.interpreters` and
   `InterpreterPoolExecutor` give a per-interpreter GIL with a single
-  process and shared memory via explicit channels.
+  process and an explicit cross-interpreter `queue.Queue`.
 - **Free-threaded CPython (PEP 703)**: experimental in 3.13, supported
   in 3.14. One interpreter, no GIL. Useful when C extensions are
   thread-safe and the build is acceptable to operators.
@@ -61,8 +61,9 @@ What changes versus a thread pool:
   Python scales.
 - No Python objects are shared. Arguments are serialised across the
   boundary; return values likewise.
-- Channels (`concurrent.interpreters.create_channel`) handle queue
-  communication when futures are not enough.
+- `concurrent.interpreters.create_queue()` returns a cross-interpreter
+  `queue.Queue` implementation for streaming or fan-in/fan-out work
+  when futures are not enough.
 - C extensions must opt in to per-interpreter GIL support
   (`Py_mod_multiple_interpreters`); pure-Python work always works.
 
