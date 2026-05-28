@@ -20,7 +20,7 @@ the fork or pickle cost of `multiprocessing`.
 ## Pool executor
 
 ```python
-from concurrent.interpreters import InterpreterPoolExecutor
+from concurrent.futures import InterpreterPoolExecutor
 
 def heavy(x: int) -> int:
     # pure-Python CPU work

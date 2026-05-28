@@ -15,7 +15,8 @@ ______________________________________________________________________
 ## Subinterpreters and PEP 734 — Core
 
 Python 3.13 added a working C-level subinterpreter API; Python 3.14 ships the
-high-level `interpreters` module and `concurrent.interpreters.InterpreterPoolExecutor`.
+high-level `concurrent.interpreters` module and
+`concurrent.futures.InterpreterPoolExecutor`.
 Each subinterpreter has its own GIL, so CPU-bound work in pure Python scales
 across cores without the free-threaded build.
 

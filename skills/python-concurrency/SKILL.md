@@ -48,7 +48,7 @@ and how to keep state safe across it.
 ## PEP 734 in practice
 
 ```python
-from concurrent.interpreters import InterpreterPoolExecutor
+from concurrent.futures import InterpreterPoolExecutor
 
 with InterpreterPoolExecutor(max_workers=4) as pool:
     futures = [pool.submit(compute, n) for n in inputs]
