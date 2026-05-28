@@ -44,7 +44,7 @@ deep dive.
 
 ## What none of them detect
 
-- Race conditions and ordering bugs — use thread sanitisers or
+- Race conditions and ordering bugs — use thread sanitizers or
   scheduler-pinning tools.
 - Resource leaks under load — use load tests and OS-level profilers.
 - Bugs in C extensions — Hypothesis and mutmut see the Python

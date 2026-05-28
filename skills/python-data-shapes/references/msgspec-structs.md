@@ -3,7 +3,7 @@
 `msgspec.Struct` is a fast, slotted, schema-validating data type that
 encodes and decodes JSON, MessagePack, YAML, and TOML. The decode path
 checks types and constraints; the encode path is a direct C-level
-serialiser.
+serializer.
 
 ## Anatomy
 
@@ -48,7 +48,7 @@ parsed = msgspec.json.decode(raw, type=Order)
 ```
 
 `msgspec.json.Decoder(type=Order)` is the right shape inside a hot loop;
-constructing the decoder once amortises the per-decode setup.
+constructing the decoder once amortizes the per-decode setup.
 
 ## Array-shaped structs
 

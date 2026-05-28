@@ -1,13 +1,13 @@
 ---
 name: python-testing
-description: Use for advanced pytest usage — fixture scopes, parametrisation, marks, plugins, snapshot and approval tests, async tests, and the boundary between fast unit, behavioural, and verification testing.
+description: Use for advanced pytest usage — fixture scopes, parametrization, marks, plugins, snapshot and approval tests, async tests, and the boundary between fast unit, behavioural, and verification testing.
 globs: ["**/tests/**/*.py", "**/test_*.py", "**/conftest.py"]
 ---
 
 # Python Testing (pytest)
 
 Use this when the question is how to structure a test suite, design
-fixtures, parametrise inputs, or pick the right plugin. For property,
+fixtures, parametrize inputs, or pick the right plugin. For property,
 symbolic, and mutation testing, load `python-verification` and the
 relevant deep dive instead.
 
@@ -54,7 +54,7 @@ relevant deep dive instead.
 
 ## Plugins worth knowing
 
-- `pytest-xdist` — parallelise across cores; requires test
+- `pytest-xdist` — parallelize across cores; requires test
   independence.
 - `pytest-asyncio` — `@pytest.mark.asyncio` and an `event_loop`
   fixture.
@@ -64,7 +64,7 @@ relevant deep dive instead.
   pair with `python-quality-tools` for system-level profiling.
 - `syrupy` or `pytest-insta` — snapshot/approval testing for
   rendered output (HTML, JSON, golden files).
-- `pytest-randomly` — randomise test order; surfaces hidden
+- `pytest-randomly` — randomize test order; surfaces hidden
   dependencies.
 - `pytest-pyinstrument` — drop-in profiler; see
   `python-quality-tools`.

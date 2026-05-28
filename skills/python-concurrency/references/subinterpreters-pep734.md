@@ -1,6 +1,6 @@
 # Subinterpreters (PEP 734)
 
-Python 3.13 stabilised the C-level subinterpreter API; Python 3.14 ships
+Python 3.13 stabilized the C-level subinterpreter API; Python 3.14 ships
 the high-level `concurrent.interpreters` module and
 `concurrent.futures.InterpreterPoolExecutor`. Each subinterpreter has
 its own GIL, so CPU-bound pure-Python work scales across cores without
@@ -11,11 +11,11 @@ the fork or pickle cost of `multiprocessing`.
 - One process, many interpreters. Each interpreter has its own
   modules, its own globals, and its own GIL.
 - Python objects are not shared. Anything crossing the boundary is
-  serialised and reconstructed on the other side.
+  serialized and reconstructed on the other side.
 - Communication uses queues: `concurrent.interpreters.create_queue()`
   returns a cross-interpreter `queue.Queue` implementation.
 - Start-up cost is real (a fresh interpreter must import its modules);
-  amortise it via a pool, not per-task spin-up.
+  amortize it via a pool, not per-task spin-up.
 
 ## Pool executor
 
@@ -94,7 +94,7 @@ Pick subinterpreters when:
 
 Pick processes when:
 
-- the C extensions you depend on do not support per-interpreter GIL,
+- the relevant C extensions do not support a per-interpreter GIL,
 - a worker crash must not bring down the parent (each subprocess is
   an isolation boundary; subinterpreters share the process and OS
   resources),
@@ -105,7 +105,7 @@ Pick processes when:
 - Submitting a closure or a `lambda` to the pool. Workers must
   import the callable; top-level module functions only.
 - Treating the cross-interpreter queue like shared memory. Items are
-  serialised across the boundary.
+  serialized across the boundary.
 - Mixing `asyncio` with `InterpreterPoolExecutor` by awaiting a
   future inside a coroutine without `asyncio.run_in_executor` or the
   `loop.run_in_executor` bridge.

@@ -73,7 +73,7 @@ class Result[T, E = Exception]:
     err: E | None
 ```
 
-Defaults are useful when a generic is parameterised on a "usually
+Defaults are useful when a generic is parameterized on a "usually
 `Exception`" knob and most callers should not need to spell it.
 
 ## Bounds and constraints

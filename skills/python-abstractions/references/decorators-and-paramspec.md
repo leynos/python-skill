@@ -1,7 +1,7 @@
 # Decorators with ParamSpec
 
 A decorator is useful when a cross-cutting concern (logging, retry,
-caching, transactions, authorisation) wraps many functions with the
+caching, transactions, authorization) wraps many functions with the
 same shape. The two failures to avoid are (1) erasing the wrapped
 signature so the type checker stops helping, and (2) hiding control
 flow that callers needed to see.

@@ -71,7 +71,7 @@ Every test that uses `db` now runs twice — once per backend. Used
 deliberately, this is the cheapest way to verify a contract across
 implementations.
 
-## Indirect parametrisation
+## Indirect parametrization
 
 ```python
 @pytest.fixture
@@ -133,7 +133,7 @@ Unregistered markers warn or fail depending on configuration.
   the real collaborator or test the contract elsewhere.
 - A `module`-scope fixture that mutates state. The next test in the
   module sees the mutation; flakes follow.
-- Parametrising over inputs that share a fixture's setup, in
-  which case the fixture should be parametrised, not the test.
+- Parametrizing over inputs that share a fixture's setup, in
+  which case the fixture should be parametrized, not the test.
 - Asserting on the fixture inside the fixture body. Fixtures
   prepare; tests assert.

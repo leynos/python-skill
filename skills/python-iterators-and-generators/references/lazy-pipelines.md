@@ -9,7 +9,7 @@ input can be infinite.
 `itertools` carries most of the everyday operators:
 
 - `chain(a, b, c)` — concatenate.
-- `islice(it, start, stop)` — slice without materialising.
+- `islice(it, start, stop)` — slice without materializing.
 - `groupby(it, key=...)` — adjacent grouping; sort first if non-adjacent
   groups need merging.
 - `accumulate(it, func)` — running totals or folds.
@@ -48,9 +48,9 @@ processes the smallest prefix that produces five active users.
 ## When laziness costs more than it gives
 
 - The intermediate stage needs random access (sorting, sampling without
-  replacement, percentile). Materialise that stage explicitly.
+  replacement, percentile). Materialize that stage explicitly.
 - A consumer reads the iterator twice. Either restart the producer or
-  materialise once into a `tuple`/`list`.
+  materialize once into a `tuple`/`list`.
 - The pipeline crosses a process boundary; pickle-able items must be
   produced eagerly per batch.
 
@@ -85,7 +85,7 @@ Async generators compose with `async for` and pair well with
 ## Common mistakes
 
 - Calling `len(it)` on a generator. Generators do not have a length;
-  materialise or count separately if a length is required.
+  materialize or count separately if a length is required.
 - Building a generator and then returning `list(gen)` from the same
   function. Either return the generator or write a `list` directly.
 - Holding two `itertools.tee` outputs alive in different threads.

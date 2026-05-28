@@ -22,7 +22,7 @@ follows from the work's shape, not from convenience.
   blocking work to a thread via `asyncio.to_thread` or
   `loop.run_in_executor`.
 - **`ThreadPoolExecutor` for CPU-bound pure Python.** The GIL
-  serialises bytecode execution; extra workers add scheduling
+  serializes bytecode execution; extra workers add scheduling
   overhead without throughput. Use a process or interpreter pool.
 - **`ProcessPoolExecutor` for tasks shorter than the fork cost.**
   Forking and pickling per task can cost more than the work. Batch

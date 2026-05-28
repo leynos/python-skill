@@ -18,7 +18,7 @@ idempotence, ordering, conservation), when a parser or codec must
 round-trip across all valid inputs, when an oracle is available
 (reference implementation, invariant predicate, prior version), or
 when a unit-test corpus keeps growing because each new bug needs
-another hand-written case.
+another handwritten case.
 
 Do not apply when the property requires exhaustive coverage of a
 bounded space (use CrossHair), when the bug is a scheduling artefact
@@ -83,7 +83,7 @@ Stateful testing has its own write-up in
 `assume(cond)` and `.filter(pred)` use rejection sampling. The runner
 aborts once the rejection budget is exhausted, and shrinking interacts
 badly with rejection: a shrunk candidate that gets rejected cannot
-tell the runner whether to keep shrinking, so the minimised
+tell the runner whether to keep shrinking, so the minimized
 counter-example is larger than it needs to be.
 
 The fix is to construct only valid values from the seed. Replace

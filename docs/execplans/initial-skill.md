@@ -31,7 +31,7 @@ Language skills:
 - `python-types-and-apis` — typing, generics (PEP 695), `TypeVar`,
   `ParamSpec`, `TypeIs`/`TypeGuard`, `NewType`, overloads, typed kwargs.
 - `python-errors-and-logging` — exception hierarchies, narrow `except`,
-  EM-style messages, parameterised logging, `logger.exception`.
+  EM-style messages, parameterized logging, `logger.exception`.
 - `python-abstractions` — decorators, descriptors, metaclasses, context
   managers (function and class form), multiple dispatch.
 - `python-iterators-and-generators` — iterators, generators, lazy pipelines,
@@ -43,7 +43,7 @@ Language skills:
 
 Domain and quality skills:
 
-- `python-testing` — pytest at depth: fixtures, parametrisation, marks,
+- `python-testing` — pytest at depth: fixtures, parametrization, marks,
   plugin ecosystem, snapshot testing, async tests.
 - `python-verification` — selector between Hypothesis, CrossHair, mutmut.
 - `python-quality-tools` — deadcode, pyscn, Pyinstrument.

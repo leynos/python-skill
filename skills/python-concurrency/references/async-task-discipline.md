@@ -36,9 +36,10 @@ make it the wrong default:
   coroutine is allowed to fail independently and the caller decides
   what to do with the failures.
 
-Reach for `gather` when tolerant fan-out is what you want; otherwise
-use `TaskGroup`. Never write `await gather(*coros)` and expect
-structured-concurrency semantics — the leak on first failure is real.
+Reach for `gather` when tolerant fan-out is the requirement; otherwise
+use `TaskGroup`. Writing `await gather(*coros)` and expecting
+structured-concurrency semantics is a mistake — the leak on first
+failure is real.
 
 ## Cancellation discipline
 

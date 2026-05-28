@@ -86,7 +86,7 @@ uv run pyinstrument --renderer=html -o report.html script.py
 
 Inside a pytest run:
 
-```
+```console
 uv run pytest --pyinstrument tests/test_hot.py
 ```
 

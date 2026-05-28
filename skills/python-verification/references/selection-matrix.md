@@ -11,7 +11,7 @@ question each one answers best.
 | Catches                                  | Property violations         | Reachable assertion failures       | Test-suite blind spots       |
 | Best on                                  | Pure functions, state machines | Small pure functions, branchy code | Suite quality                |
 | Worst on                                 | C extensions, scheduling   | Floats, strings, heap-heavy code   | Slow suites                  |
-| Time per run (typical)                   | Seconds to minutes          | Seconds to hours                   | Hours (parallelise nightly)  |
+| Time per run (typical)                   | Seconds to minutes          | Seconds to hours                   | Hours (parallelize nightly)  |
 | Counter-example shape                    | Shrunk minimal input        | Concrete satisfying assignment     | Diff of surviving mutant     |
 | Pairs naturally with                     | mutmut                      | Hypothesis                         | Hypothesis, pytest suites    |
 
@@ -33,7 +33,7 @@ question each one answers best.
 ## When to escalate beyond the three
 
 - **Concurrency**: race-detector tools (Helgrind, ThreadSanitizer on
-  C extensions), or specialised libraries like
+  C extensions), or specialized libraries like
   [`pytest-trio`/`pytest-anyio`] for async; the three tools here do
   not search the scheduling space.
 - **Performance**: benchmarks plus profilers (`python-quality-tools`),

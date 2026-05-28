@@ -22,7 +22,7 @@ def handle(x: int | str) -> None:
         reveal_type(x)   # int
 ```
 
-Prefer `TypeIs` whenever the predicate genuinely characterises membership
+Prefer `TypeIs` whenever the predicate genuinely characterizes membership
 in a type (`isinstance` checks, schema validators that return the parsed
 value, structural sniffs that cover the entire union).
 

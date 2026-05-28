@@ -7,7 +7,7 @@ earn their keep in most production codebases.
 
 `pytest-xdist`:
 
-```
+```console
 uv run pytest -n auto
 ```
 
@@ -41,7 +41,7 @@ isolated.
 
 `pytest-cov`:
 
-```
+```console
 uv run pytest --cov=src --cov-branch --cov-report=term-missing
 ```
 
@@ -73,7 +73,7 @@ def test_renders(snapshot):
 Snapshots live next to the test; `--snapshot-update` rewrites them.
 Review the diff like any other code change.
 
-## Order randomisation
+## Order randomization
 
 `pytest-randomly`:
 
@@ -82,14 +82,14 @@ Review the diff like any other code change.
 addopts = "-p pytest_randomly"
 ```
 
-Randomises test order and seeds RNG. Use the seed reported on
+Randomizes test order and seeds RNG. Use the seed reported on
 failure (`pytest --randomly-seed=12345`) to reproduce.
 
 ## Profile a slow test
 
 `pytest-pyinstrument`:
 
-```
+```console
 uv run pytest --pyinstrument tests/test_hot.py
 ```
 

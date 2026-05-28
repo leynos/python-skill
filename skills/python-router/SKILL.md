@@ -25,7 +25,7 @@ follow-on skill.
 
 - Generics, `TypeVar`, `ParamSpec`, `TypeIs`, `TypeGuard`, `NewType`,
   overloads, typed kwargs, or public API typing: `python-types-and-apis`
-- Exception hierarchy, `raise … from …`, narrow `except`, parameterised
+- Exception hierarchy, `raise … from …`, narrow `except`, parameterized
   logging, or `logger.exception` discipline: `python-errors-and-logging`
 - Decorators, descriptors, context managers, metaclasses, or multiple
   dispatch: `python-abstractions`
@@ -35,7 +35,7 @@ follow-on skill.
   typed kwargs payloads: `python-data-shapes`
 - Threads, `asyncio`, `multiprocessing`, or PEP 734 subinterpreters:
   `python-concurrency`
-- pytest at depth: fixtures, parametrisation, marks, plugins, snapshots,
+- pytest at depth: fixtures, parametrization, marks, plugins, snapshots,
   async tests: `python-testing`
 - Selecting between Hypothesis, CrossHair, and mutmut: `python-verification`;
   deep dives in `hypothesis`, `crosshair`, `mutmut`

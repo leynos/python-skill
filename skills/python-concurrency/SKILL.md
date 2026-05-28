@@ -59,7 +59,7 @@ What changes versus a thread pool:
 
 - Each worker has its own interpreter and its own GIL; CPU-bound pure
   Python scales.
-- No Python objects are shared. Arguments are serialised across the
+- No Python objects are shared. Arguments are serialized across the
   boundary; return values likewise.
 - `concurrent.interpreters.create_queue()` returns a cross-interpreter
   `queue.Queue` implementation for streaming or fan-in/fan-out work

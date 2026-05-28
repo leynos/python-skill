@@ -28,7 +28,7 @@ def changed_users(snapshots: Iterable[Snapshot]) -> Iterator[User]:
                 yield user
 ```
 
-The producer is now lazy, the caller chooses whether to materialise it,
+The producer is now lazy, the caller chooses whether to materialize it,
 and the function name names what it yields rather than how it loops.
 
 ### When the iterator has internal state
@@ -81,7 +81,7 @@ hold the `with`. Worked example lives in
 ## Send, throw, and close
 
 Generators are coroutines: callers can push values via `gen.send(x)`,
-raise via `gen.throw(exc)`, or finalise via `gen.close()`. The everyday
+raise via `gen.throw(exc)`, or finalize via `gen.close()`. The everyday
 producer ignores all of this; the patterns are worth remembering when
 implementing trampolines, simulated time, or pre-3.4-style async.
 
@@ -90,9 +90,9 @@ which is why it is preferred to a hand-rolled `for x in inner: yield x`.
 
 ## Common mistakes
 
-- Materialising the iterator at the end of the producer (`return
+- Materializing the iterator at the end of the producer (`return
   list(out)`) defeats the point. Return the generator and let the
-  caller materialise if needed.
+  caller materialize if needed.
 - Returning a generator from a function that should have returned a
   value. If the body has exactly one `yield` at the end, it is a
   function in disguise.

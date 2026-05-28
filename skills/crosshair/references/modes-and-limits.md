@@ -32,7 +32,7 @@ uv run crosshair cover mypkg.parse --coverage_type opcode
 
 CrossHair reports inputs that drive `parse` through previously
 uncovered opcodes. The output is a sequence of suggested example
-inputs; copy them into a parametrised test:
+inputs; copy them into a parametrized test:
 
 ```python
 @pytest.mark.parametrize("payload", [

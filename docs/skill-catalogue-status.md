@@ -18,7 +18,7 @@ input or supporting material.
   `generics-and-newtypes.md`,
   `overloads-and-typed-kwargs.md`.
 - `python-errors-and-logging` — exception hierarchies, narrow `except`,
-  parameterised logging, Ruff TRY/BLE/EM/LOG/N818/PERF203/B017.
+  parameterized logging, Ruff TRY/BLE/EM/LOG/N818/PERF203/B017.
   References: `ruff-rule-map.md`, `logging-recipes.md`.
 - `python-abstractions` — decorators, descriptors, context managers,
   metaclasses, multiple dispatch.
@@ -41,7 +41,7 @@ input or supporting material.
 ### Domain and quality
 
 - `python-testing` — advanced pytest patterns, async tests,
-  parametrisation, plugins.
+  parametrization, plugins.
   References: `fixtures-and-parametrize.md`, `pytest-plugins.md`.
 - `python-verification` — selector between Hypothesis, CrossHair,
   and mutmut.

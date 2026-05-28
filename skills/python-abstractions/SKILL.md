@@ -22,7 +22,7 @@ cutting concern.
 - Descriptors belong on classes whose attributes need consistent
   validation, lazy computation, or per-instance bookkeeping; never use
   them when a `@property` suffices.
-- Metaclasses are a last resort. Most "I want to customise class creation"
+- Metaclasses are a last resort. Most "I want to customize class creation"
   problems are solved by `__init_subclass__`, decorators, or
   `dataclass_transform`.
 - For multi-argument dispatch, prefer `functools.singledispatch` for the

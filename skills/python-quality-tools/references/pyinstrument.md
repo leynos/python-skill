@@ -112,7 +112,7 @@ picture; Pyinstrument keeps the coroutine view intact.
 
 - Reading a profile in isolation. The number is meaningful relative
   to a baseline; collect both before and after.
-- Optimising the function with the highest percentage without
+- Optimizing the function with the highest percentage without
   checking whether the workload is representative. A profile of a
   small input is a profile of a small input.
 - Treating Pyinstrument as a benchmarker. The same code can show

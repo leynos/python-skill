@@ -27,7 +27,7 @@ points to an eager `list` that should be lazy.
 ## Decision surface
 
 - **Generator function (`def f(): yield`)**: a producer with internal
-  state — pagination, decompression, tokenisation, simulated time.
+  state — pagination, decompression, tokenization, simulated time.
 - **Generator expression (`(x for x in xs)`)**: a single-step
   transformation; passable directly to `sum`, `any`, `min`,
   `"".join`.
@@ -53,14 +53,14 @@ points to an eager `list` that should be lazy.
   and a cursor should not also be the place where the caller commits
   or rolls back. Wrap the resource in a context manager and let the
   generator be a pure producer.
-- **Replace materialisation with iteration**: an intermediate
+- **Replace materialization with iteration**: an intermediate
   `list(...)` between two transformations is usually wrong; the
   pipeline can be lazy from end to end unless one stage needs random
   access.
 
 ## Red flags
 
-- a generator function whose body is mostly book-keeping and a single
+- a generator function whose body is mostly bookkeeping and a single
   `yield value` at the end (call it a function and return the value),
 - `tee` used to feed two independent consumers (one rewinds the
   source; consider a real reader),

@@ -84,7 +84,7 @@ def test_sort_matches_python(xs: list[int]) -> None:
 ```
 
 A structurally different oracle (`sorted` is implemented in C and
-optimised differently from `custom_sort`) catches semantic
+optimized differently from `custom_sort`) catches semantic
 disagreement.
 
 ## `from_type` and registered strategies
@@ -105,7 +105,7 @@ generation rule lives in one place.
 ## Targeted property generation
 
 `hypothesis.target(value)` tells the runner to bias the search toward
-inputs that maximise `value`. Useful for "find the input that maximises
+inputs that maximize `value`. Useful for "find the input that maximizes
 memory" or "find the input that produces the longest output".
 
 ## Common mistakes

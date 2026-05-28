@@ -77,7 +77,7 @@ What each piece does:
 
 The runner prints a trace like:
 
-```
+```python
 state = CacheTest()
 v1 = state.add_key(k='a')
 state.set_value(k=v1, v=0)

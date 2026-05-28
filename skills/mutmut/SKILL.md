@@ -14,7 +14,7 @@ is to use the survivor list as a worklist for the test suite.
 
 Apply when:
 
-- the suite passes consistently and is fast enough to amortise
+- the suite passes consistently and is fast enough to amortize
   mutation runs (single-digit seconds is comfortable; minutes scales
   badly),
 - coverage is already high and the question has shifted from "is the
@@ -133,7 +133,7 @@ regressed.
   survivor count.
 - **Pre-release**: run mutmut on the modules touched in the release.
 
-Pair with `pytest-xdist` to parallelise the suite each mutant runs.
+Pair with `pytest-xdist` to parallelize the suite each mutant runs.
 
 ## Hard-won lessons
 

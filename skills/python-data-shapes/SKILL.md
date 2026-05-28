@@ -14,7 +14,7 @@ domain data and how it should cross wire boundaries.
 - Pick the lightest container that carries the invariants you need.
 - Domain objects belong in immutable, slotted containers; wire payloads
   belong in validated schema types; dictionaries belong only at
-  serialisation boundaries.
+  serialization boundaries.
 - Treat construction as the only place where invariants are checked;
   trust the type elsewhere.
 - For JSON/MessagePack/YAML/TOML, parse to a schema type at the
@@ -22,7 +22,7 @@ domain data and how it should cross wire boundaries.
 
 ## Decision surface
 
-- **`msgspec.Struct`**: high-throughput serialisation (HTTP APIs, RPC,
+- **`msgspec.Struct`**: high-throughput serialization (HTTP APIs, RPC,
   queues). Slots by default, validation on decode, tagged unions via
   `tag`/`tag_field`, `kw_only=True`, `frozen=True`, `array_like=True`,
   `rename="camel"`, `forbid_unknown_fields=True`. Use when the type
@@ -69,7 +69,7 @@ variants when `forbid_unknown_fields=True`.
 
 - a `dict[str, object]` flowing more than one layer into the codebase
   (parse to a schema type at the boundary),
-- a dataclass that is rebuilt on every serialisation and parse (use
+- a dataclass that is rebuilt on every serialization and parse (use
   `msgspec.Struct`),
 - a mutable domain object passed across thread or coroutine boundaries
   (freeze it or hand a copy),

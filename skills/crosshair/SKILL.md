@@ -119,7 +119,7 @@ time. Use sparingly.
 - **Async, threads, I/O**: not supported. Symbolic execution requires
   determinism CrossHair can reason about.
 - **Performance**: each path costs SMT time. Budget per function;
-  parallelise across functions in CI.
+  parallelize across functions in CI.
 
 ## Project integration
 
