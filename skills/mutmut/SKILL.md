@@ -1,6 +1,6 @@
 ---
 name: mutmut
-description: Configure and run mutmut v3 for Python mutation testing — fork-based execution, `[tool.mutmut]` in `pyproject.toml`, the `mutmut browse` TUI, `# pragma: no mutate` suppression, and the discipline of promoting surviving mutants to new tests. Use after `python-verification` confirms mutmut is the right adversary.
+description: "Configure and run mutmut v3 for Python mutation testing — fork-based execution, `[tool.mutmut]` in `pyproject.toml`, the `mutmut browse` TUI, `# pragma: no mutate` suppression, and the discipline of promoting surviving mutants to new tests. Use after `python-verification` confirms mutmut is the right adversary."
 ---
 
 # mutmut mutation testing for Python
