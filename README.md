@@ -1,5 +1,8 @@
 # python-skill
 
+[![Ask DeepWiki](https://deepwiki.com/badge.svg)](
+https://deepwiki.com/leynos/python-skill)
+
 *A compact Python skill catalogue for Codex, shaped to help with real Python
 work without drowning out the work itself.*
 
