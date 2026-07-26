@@ -52,6 +52,7 @@ The router asks a short question list and resolves to a single skill:
 - *Verification adversary selection* → `python-verification`, then load
   one of `hypothesis`, `crosshair`, or `mutmut`.
 - *Dead code, clones, profiling* → `python-quality-tools`.
+- *Ruff configuration, defaults, suppression, or upgrade* → `ruff-016`.
 
 Pairing rules:
 
@@ -91,6 +92,28 @@ cadences.
 - **Pyinstrument** — when a request or test is slow and the question
   is "where does the time go?". Use to find hot paths; use
   `pytest-benchmark` to regression-test them.
+
+## When to reach for the Ruff skill
+
+`ruff-016` covers Ruff as a tool rather than any one rule family.
+
+- **Upgrading.** Ruff 0.16.0 raised the default rule set from 59 to
+  413, started formatting Python blocks in Markdown files, and made
+  fields in the JSON output nullable. An upgrade needs a plan, not a
+  version bump.
+- **Configuration review.** Whether `select`, `ignore`, and
+  `per-file-ignores` still say what the project means under the new
+  defaults, and which of the settings added since 0.14.0 apply.
+- **Suppression.** `ruff: ignore`, `ruff: file-ignore`, and
+  `ruff: disable`/`enable` versus `noqa`, plus `--add-ignore` and the
+  `RUF100`–`RUF106` hygiene rules.
+- **"Does this rule exist yet?"** The reference tables record what
+  stabilised in 0.15.0 and 0.16.0 and what is still preview — material
+  that postdates most models' training data.
+
+Rule-level questions about exceptions and logging stay with
+`python-errors-and-logging`; its `ruff-rule-map.md` reference is the
+decision surface for TRY, BLE, EM, LOG, `N818`, and `PERF203`.
 
 ## Common pitfalls
 

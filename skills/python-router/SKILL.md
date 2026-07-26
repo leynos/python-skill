@@ -41,6 +41,8 @@ follow-on skill.
   deep dives in `hypothesis`, `crosshair`, `mutmut`
 - Dead-code detection, clone and complexity scans, or profiling:
   `python-quality-tools`
+- Ruff configuration, rule selection, suppression comments, the 0.16
+  default rule set, or an upgrade from 0.14/0.15: `ruff-016`
 
 ## Pairing rules
 
@@ -53,6 +55,9 @@ follow-on skill.
   `python-iterators-and-generators` with `python-types-and-apis`.
 - Verification work loads `python-verification` first to choose the tool,
   then exactly one of `hypothesis`, `crosshair`, or `mutmut`.
+- Ruff rule questions about exceptions and logging (TRY, BLE, EM, LOG)
+  belong to `python-errors-and-logging`; `ruff-016` covers configuration,
+  defaults, suppression, and version deltas.
 
 ## Escalate when
 

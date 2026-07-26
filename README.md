@@ -54,7 +54,7 @@ ______________________________________________________________________
 
 ## Features
 
-- One router, six language skills, and four domain or quality skills.
+- One router, six language skills, and five domain or quality skills.
 - Short `SKILL.md` files, with references for the longer comparison material.
 - Coverage for typing (PEP 612, PEP 695, PEP 696, PEP 698, PEP 742),
   exceptions and logging (Ruff TRY/BLE/EM/LOG/N818/PERF203/B017),
@@ -64,6 +64,9 @@ ______________________________________________________________________
 - Verification skills covering selection plus deep dives for
   `hypothesis`, `crosshair`, and `mutmut`.
 - Quality-tool skill for `deadcode`, `pyscn`, and Pyinstrument.
+- Ruff 0.16 skill covering the 413-rule default set, `ruff: ignore`
+  suppression comments, Markdown formatting, and every settings, CLI,
+  and rule change since 0.14.0 — the material most models predate.
 
 ______________________________________________________________________
 
@@ -78,6 +81,8 @@ ______________________________________________________________________
 - [Python router](skills/python-router/SKILL.md) — the main entry point.
 - [Types and APIs](skills/python-types-and-apis/SKILL.md) — generics,
   `TypeVar`, `ParamSpec`, `TypeIs`, overloads, typed kwargs.
+- [Ruff 0.16](skills/ruff-016/SKILL.md) — default rule set, suppression
+  comments, Markdown formatting, settings and rule deltas.
 
 ______________________________________________________________________
 
@@ -93,7 +98,10 @@ of [Hypothesis](https://github.com/HypothesisWorks/hypothesis),
 [mutmut](https://github.com/boxed/mutmut); the quality-tool skill leans
 on [`deadcode`](https://github.com/albertas/deadcode),
 [`pyscn`](https://github.com/ludo-technologies/pyscn), and
-[Pyinstrument](https://github.com/joerick/pyinstrument).
+[Pyinstrument](https://github.com/joerick/pyinstrument). The Ruff skill
+draws on the [v0.16.0 release notes](https://astral.sh/blog/ruff-v0.16.0)
+and the changelogs, settings schema, and rule registry in
+[`astral-sh/ruff`](https://github.com/astral-sh/ruff).
 
 ______________________________________________________________________
 

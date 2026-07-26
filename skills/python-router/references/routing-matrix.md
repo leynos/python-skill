@@ -21,6 +21,10 @@ Use this when the router's question list does not resolve to one skill.
 | Tests pass but mutants survive                 | `mutmut`                            | `python-testing`                |
 | Unused symbols and unreachable branches        | `python-quality-tools`              | —                               |
 | Hot loop too slow                              | `python-quality-tools`              | `python-iterators-and-generators` |
+| Ruff upgrade floods CI with new diagnostics    | `ruff-016`                          | —                               |
+| `select` / `ignore` list needs a rewrite       | `ruff-016`                          | `python-errors-and-logging`     |
+| `noqa` vs `ruff: ignore` in new code           | `ruff-016`                          | —                               |
+| `ruff format` reflowed Markdown unexpectedly   | `ruff-016`                          | —                               |
 
 ## Anti-routing
 
@@ -31,3 +35,6 @@ Use this when the router's question list does not resolve to one skill.
   surface dominates.
 - Do not load any deep dive without first reading the relevant selector
   skill (`python-verification`).
+- Do not load `ruff-016` to explain a single diagnostic whose family is
+  already covered by a language skill; load it when the question is about
+  Ruff itself — configuration, defaults, suppression, or a version delta.
