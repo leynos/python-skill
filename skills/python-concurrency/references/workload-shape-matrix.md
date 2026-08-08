@@ -5,15 +5,15 @@ follows from the work's shape, not from convenience.
 
 ## The matrix
 
-| Workload                                              | Recommended model                       | Notes                                                  |
-| ----------------------------------------------------- | --------------------------------------- | ------------------------------------------------------ |
-| HTTP/RPC fan-out, mostly waiting on responses         | `asyncio` + `TaskGroup`                 | Hundreds of concurrent calls per process              |
-| Blocking driver (psycopg2, paramiko) that has no async API | `ThreadPoolExecutor`              | Bound the pool; queue overflows are operational signals |
-| CPU-bound pure-Python (parsing, codegen, simulation)  | `InterpreterPoolExecutor` (3.14+)       | Fall back to `ProcessPoolExecutor` on 3.13 or earlier  |
-| CPU-bound with heavy NumPy/SciPy                      | `ThreadPoolExecutor`                    | NumPy releases the GIL; threads scale                  |
-| Mixed CPU + I/O in one task                           | Split: async wrapper, pool worker       | Do not run CPU work on the event loop                  |
-| One long worker, many requests                        | Async or threading + queue              | Pick by whether requests are awaitable                 |
-| Crash isolation needed                                | `multiprocessing` (separate processes)  | Subinterpreters share the OS process                   |
+| Workload                                                   | Recommended model                      | Notes                                                   |
+| ---------------------------------------------------------- | -------------------------------------- | ------------------------------------------------------- |
+| HTTP/RPC fan-out, mostly waiting on responses              | `asyncio` + `TaskGroup`                | Hundreds of concurrent calls per process                |
+| Blocking driver (psycopg2, paramiko) that has no async API | `ThreadPoolExecutor`                   | Bound the pool; queue overflows are operational signals |
+| CPU-bound pure-Python (parsing, codegen, simulation)       | `InterpreterPoolExecutor` (3.14+)      | Fall back to `ProcessPoolExecutor` on 3.13 or earlier   |
+| CPU-bound with heavy NumPy/SciPy                           | `ThreadPoolExecutor`                   | NumPy releases the GIL; threads scale                   |
+| Mixed CPU + I/O in one task                                | Split: async wrapper, pool worker      | Do not run CPU work on the event loop                   |
+| One long worker, many requests                             | Async or threading + queue             | Pick by whether requests are awaitable                  |
+| Crash isolation needed                                     | `multiprocessing` (separate processes) | Subinterpreters share the OS process                    |
 
 ## Anti-patterns by shape
 

@@ -69,14 +69,14 @@ Use `browse` to triage survivors interactively. The terminal output of
 
 ## Triage cheat sheet
 
-| Survivor diff                                     | Likely cause                | Action                                  |
-| ------------------------------------------------- | --------------------------- | --------------------------------------- |
-| `+ 0`, `* 1`, `- 0`, `// 1`                       | Equivalent mutant            | `# pragma: no mutate` with a one-liner  |
-| `return True` → `return False` on a getter        | Tests asserted only one branch | Add the other-branch test            |
-| Boolean operator flipped (`and` → `or`)           | Test exercised the easy path | Add a case where the operator matters  |
-| `>` → `>=`                                        | Boundary case missing        | Add a boundary test                    |
-| `raise FooError` → `raise BarError`               | Tests asserted exception group, not type | Use `pytest.raises(FooError)`  |
-| Constants changed (e.g. `42` → `43`)              | Constants not tested         | Add a test that pins the constant      |
+| Survivor diff                              | Likely cause                             | Action                                 |
+| ------------------------------------------ | ---------------------------------------- | -------------------------------------- |
+| `+ 0`, `* 1`, `- 0`, `// 1`                | Equivalent mutant                        | `# pragma: no mutate` with a one-liner |
+| `return True` → `return False` on a getter | Tests asserted only one branch           | Add the other-branch test              |
+| Boolean operator flipped (`and` → `or`)    | Test exercised the easy path             | Add a case where the operator matters  |
+| `>` → `>=`                                 | Boundary case missing                    | Add a boundary test                    |
+| `raise FooError` → `raise BarError`        | Tests asserted exception group, not type | Use `pytest.raises(FooError)`          |
+| Constants changed (e.g. `42` → `43`)       | Constants not tested                     | Add a test that pins the constant      |
 
 ## Type-checker filtering
 

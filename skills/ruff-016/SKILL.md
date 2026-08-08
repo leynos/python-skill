@@ -1,7 +1,7 @@
 ---
 name: ruff-016
 description: "Use for Ruff 0.16 — the 413-rule default set, `ruff: ignore` and `ruff: file-ignore` suppression comments, Markdown code-block formatting, and the settings, CLI, and rule changes introduced across 0.14.x, 0.15.x, and 0.16.0. Load when upgrading Ruff, writing or reviewing `[tool.ruff]` configuration, or when a Ruff behaviour looks unfamiliar."
-globs: ["**/pyproject.toml", "**/ruff.toml", "**/.ruff.toml", "**/*.py", "**/*.pyi"]
+globs: ["**/pyproject.toml", "**/ruff.toml", "**/.ruff.toml", "**/*.py", "**/*.pyi", "**/*.md"]
 ---
 
 # Ruff 0.16
@@ -105,16 +105,16 @@ preview-only. See
 
 ## Settings added since 0.14
 
-| Setting                                  | Purpose                                          |
-| ---------------------------------------- | ------------------------------------------------ |
-| `extension`                              | Map extensions to `python`/`pyi`/`ipynb`/`markdown` |
-| `format.nested-string-quote-style`       | `alternating` (default) or `preferred` inside f-strings |
-| `lint.isort.import-heading`              | Section heading comments, per isort               |
-| `lint.flake8-tidy-imports.ban-lazy`      | Forbid `lazy import` for named modules (3.15+)    |
-| `lint.flake8-tidy-imports.require-lazy`  | Require `lazy import` where legal (3.15+)         |
-| `lint.pylint.max-statements-in-try`      | Threshold for `PLW0717`                           |
-| `lint.ruff.strictly-empty-init-modules`  | `RUF067` strictness                               |
-| `analyze.type-checking-imports`          | Include `TYPE_CHECKING` imports in the graph      |
+| Setting                                 | Purpose                                                 |
+| --------------------------------------- | ------------------------------------------------------- |
+| `extension`                             | Map extensions to `python`/`pyi`/`ipynb`/`markdown`     |
+| `format.nested-string-quote-style`      | `alternating` (default) or `preferred` inside f-strings |
+| `lint.isort.import-heading`             | Section heading comments, per isort                     |
+| `lint.flake8-tidy-imports.ban-lazy`     | Forbid `lazy import` for named modules (3.15+)          |
+| `lint.flake8-tidy-imports.require-lazy` | Require `lazy import` where legal (3.15+)               |
+| `lint.pylint.max-statements-in-try`     | Threshold for `PLW0717`                                 |
+| `lint.ruff.strictly-empty-init-modules` | `RUF067` strictness                                     |
+| `analyze.type-checking-imports`         | Include `TYPE_CHECKING` imports in the graph            |
 
 Details, defaults, and the CLI additions are in
 [settings-and-cli.md](references/settings-and-cli.md).
@@ -132,5 +132,5 @@ Details, defaults, and the CLI additions are in
   one that expects Markdown to be formatted without `types_or` including
   `markdown`.
 - Advice citing a rule as "preview" or "stable" without checking:
-  twelve rules stabilised in 0.16 and fifteen in 0.15. See
+  twelve rules stabilized in 0.16 and fifteen in 0.15. See
   [rule-and-version-delta.md](references/rule-and-version-delta.md).

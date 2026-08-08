@@ -102,9 +102,9 @@ line.
 ## Inserting and cleaning up
 
 ```console
-$ ruff check path/ --add-noqa          # insert `# noqa: CODE`
-$ ruff check path/ --add-ignore        # insert `# ruff: ignore[CODE]`
-$ ruff check path/ --extend-select RUF100 --fix   # remove dead ones
+ruff check path/ --add-noqa          # insert `# noqa: CODE`
+ruff check path/ --add-ignore        # insert `# ruff: ignore[CODE]`
+ruff check path/ --extend-select RUF100 --fix   # remove dead ones
 ```
 
 - `--add-ignore` is new in 0.16.0 (preview in 0.15.21). With
@@ -118,16 +118,16 @@ $ ruff check path/ --extend-select RUF100 --fix   # remove dead ones
 These fire on suppression comments themselves and are worth selecting
 on any project that uses them heavily:
 
-| Code     | Name                            | Status in 0.16      |
-| -------- | ------------------------------- | ------------------- |
-| `RUF100` | `unused-noqa`                   | stable, default-on  |
-| `RUF101` | `redirected-noqa`               | stable, default-on  |
-| `RUF102` | `invalid-rule-code`             | stable (0.15.0)     |
-| `RUF103` | `invalid-suppression-comment`   | stable (0.15.0)     |
-| `RUF104` | `unmatched-suppression-comment` | stable (0.15.0)     |
-| `RUF105` | `noqa-comments`                 | preview             |
-| `RUF106` | `rule-codes-in-suppression-comments` | preview        |
-| `RUF201` | `rule-codes-in-selectors`       | preview             |
+| Code     | Name                                 | Status in 0.16     |
+| -------- | ------------------------------------ | ------------------ |
+| `RUF100` | `unused-noqa`                        | stable, default-on |
+| `RUF101` | `redirected-noqa`                    | stable, default-on |
+| `RUF102` | `invalid-rule-code`                  | stable (0.15.0)    |
+| `RUF103` | `invalid-suppression-comment`        | stable (0.15.0)    |
+| `RUF104` | `unmatched-suppression-comment`      | stable (0.15.0)    |
+| `RUF105` | `noqa-comments`                      | preview            |
+| `RUF106` | `rule-codes-in-suppression-comments` | preview            |
+| `RUF201` | `rule-codes-in-selectors`            | preview            |
 
 Since 0.15.3, `RUF100` ignores unknown rule codes and `RUF102` reports
 them instead. `RUF105` rewrites `noqa` to `ruff: ignore`; `RUF106` and

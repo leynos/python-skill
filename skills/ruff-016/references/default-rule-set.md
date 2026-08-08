@@ -122,6 +122,6 @@ recommends and what the release notes publish.
 ## Preview history
 
 The expanded default set landed in **preview** in 0.15.2 (412 rules)
-and was trimmed slightly in 0.15.6 before stabilising at 413 in 0.16.0.
+and was trimmed slightly in 0.15.6 before stabilizing at 413 in 0.16.0.
 A project that ran 0.15.x with `preview = true` has already absorbed
 this change; one that did not will meet all of it at once.

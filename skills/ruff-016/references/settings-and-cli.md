@@ -142,15 +142,15 @@ The LSP formats Markdown too, since 0.15.1.
 
 ## CLI
 
-| Version  | Change                                                        |
-| -------- | ------------------------------------------------------------- |
-| 0.14.5   | `--add-noqa` accepts a reason; `--help` is colourised          |
-| 0.14.6   | `ruff analyze` can skip `TYPE_CHECKING` imports; clickable diagnostic links |
-| 0.14.7   | Partial-fixability indicator in `--statistics`                 |
-| 0.15.0   | `--color` to force colour; `--output-format` respected in `--watch` (now defaulting to `full`) |
-| 0.15.17  | `ruff rule` accepts rule names, not just codes                 |
-| 0.15.21  | `ruff format --extend-exclude`                                 |
-| 0.16.0   | `--add-ignore`; `check` and `format --check` render fix diffs inline; `format --check` supports every linter output format, including `github` and `gitlab` |
+| Version | Change                                                                                                                                                      |
+| ------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 0.14.5  | `--add-noqa` accepts a reason; `--help` is colourized                                                                                                       |
+| 0.14.6  | `ruff analyze` can skip `TYPE_CHECKING` imports; clickable diagnostic links                                                                                 |
+| 0.14.7  | Partial-fixability indicator in `--statistics`                                                                                                              |
+| 0.15.0  | `--color` to force colour; `--output-format` respected in `--watch` (now defaulting to `full`)                                                              |
+| 0.15.17 | `ruff rule` accepts rule names, not just codes                                                                                                              |
+| 0.15.21 | `ruff format --extend-exclude`                                                                                                                              |
+| 0.16.0  | `--add-ignore`; `check` and `format --check` render fix diffs inline; `format --check` supports every linter output format, including `github` and `gitlab` |
 
 ### JSON output is now nullable
 

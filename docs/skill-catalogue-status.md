@@ -70,6 +70,9 @@ input or supporting material.
 - [Users' guide](users-guide.md) — invocation and routing.
 - [Initial-skill execplan](execplans/initial-skill.md) — design,
   rationale, and the living progress log.
+- [ADR 0001](adr/0001-ruff-skill-routing-boundary.md) — why the Ruff
+  skill is version-pinned and where its boundary with
+  `python-errors-and-logging` sits.
 - [Research notes](research/topic-notes.md) — consolidated firecrawl
   findings on each requested topic with relevance weighting.
 
@@ -86,7 +89,7 @@ input or supporting material.
 ## Maintenance
 
 - `ruff-016` is version-pinned material. Revisit it when Ruff 0.17
-  ships: check the default rule count, which preview rules stabilised,
+  ships: check the default rule count, which preview rules stabilized,
   and whether new settings appeared in `ruff.schema.json`. The counts
   in `default-rule-set.md` were taken from the published default-rules
   page for 0.16.0.
