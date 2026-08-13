@@ -39,7 +39,7 @@ Comments stack; intervening comments do not break the association:
 ```python
 # ruff: ignore[E741]
 # ruff: ignore[F841]
-# I know what I'm doing.
+# Intentional local name.
 i = 1
 ```
 

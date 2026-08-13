@@ -26,27 +26,25 @@ boundary sits between it and `python-errors-and-logging`.
 
 ## Decision
 
-In the context of adding Ruff coverage to the catalogue,
+The catalogue gains a version-pinned skill named `ruff-016`, scoped to
+Ruff itself. `ruff-016` covers Ruff's tool-level concerns —
+configuration, defaults, suppression, and version deltas — while the
+semantics of exception and logging rules remain the responsibility of
+`python-errors-and-logging`.
 
-facing the risk that a generic `ruff` skill silently rots as releases
-land, and that two skills both claim rule-level questions,
+Two alternatives were considered and rejected: a generic `ruff` skill
+updated in place, and folding the material into
+`python-quality-tools`.
 
-we decided for a version-pinned skill named `ruff-016`, scoped to Ruff
-itself — configuration, defaults, suppression, and version deltas — with
-rule-level questions about exceptions and logging left to
-`python-errors-and-logging`,
+The version-pinned skill was chosen for two reasons: it makes an
+honest scope claim, since the content is a snapshot of one release and
+its delta and says so, and it gives each kind of question a single
+owner.
 
-and neglected a generic `ruff` skill updated in place, and folding the
-material into `python-quality-tools`,
-
-to achieve an honest scope claim (the content is a snapshot of one
-release and its delta, and says so) and a single owner for each kind of
-question,
-
-accepting that a later release needs its own skill or a deliberate
-rename rather than a silent rewrite, and that the router and routing
-matrix must both carry the boundary so it is enforced at routing time
-rather than discovered by contradiction.
+This decision accepts a trade-off. A later release needs its own
+skill or a deliberate rename rather than a silent rewrite, and the
+router and routing matrix must both carry the boundary so it is
+enforced at routing time rather than discovered by contradiction.
 
 ## Consequences
 

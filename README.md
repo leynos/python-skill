@@ -121,9 +121,7 @@ of [Hypothesis](https://github.com/HypothesisWorks/hypothesis),
 on [`deadcode`](https://github.com/albertas/deadcode),
 [`pyscn`](https://github.com/ludo-technologies/pyscn), and
 [Pyinstrument](https://github.com/joerick/pyinstrument). The Ruff skill
-draws on the [v0.16.0 release notes](https://astral.sh/blog/ruff-v0.16.0)
-and the changelogs, settings schema, and rule registry in
-[`astral-sh/ruff`](https://github.com/astral-sh/ruff).
+draws on [Ruff](https://github.com/astral-sh/ruff).
 
 ______________________________________________________________________
 

@@ -98,15 +98,21 @@ Style and opinion families stay off: `ANN` (annotations required),
 `D1xx`, `ERA` (commented-out code), `T20` (`print`), `TD`/`FIX`
 (TODOs), `EM` (exception message strings), `TRY003`, `SLF001`,
 `FBT` (boolean traps), `A` (builtin shadowing), `C901` complexity,
-`PLR0913` argument counts, `PLR2004` magic values, and the `E711`–`E743`
-comparison and ambiguity rules that a type checker covers better.
+`PLR0913` argument counts, `PLR2004` magic values, and `E711`, `E712`,
+`E713`, `E714`, `E721`, `E731`, `E741`, `E742`, `E743`, the comparison
+and ambiguity rules that a type checker covers better.
 `E401`/`E402` (import placement) and `F403`/`F405`/`F406` (star imports)
 are out as well.
 
-If a project wants those, they are `extend-select`, and each needs a
-reason. `EM`, `TRY003`, `TRY300`, `BLE001`, `LOG`, `PERF203`, and
-`N818` in particular are the errors-and-logging surface — see the
-`python-errors-and-logging` skill rather than enabling them blind.
+`BLE001` and `LOG001`, `LOG002`, `LOG009`, `LOG014`, `LOG015` are
+already on by default, so the question for those is how to satisfy
+them, not whether to `extend-select` them.
+
+If a project wants the rest, they are `extend-select`, and each needs
+a reason. `EM`, `TRY003`, `TRY300`, `PERF203`, and `N818` in
+particular are opt-in examples on the errors-and-logging surface —
+see the `python-errors-and-logging` skill rather than enabling them
+blind.
 
 ## Restoring the old behaviour
 

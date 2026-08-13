@@ -27,7 +27,9 @@ over recollection.
 - Do not paper over the new defaults with a blanket `ignore` list. Pick
   either the old selectors or the new defaults, deliberately.
 - Prefer `ruff: ignore[RULE]` over `noqa: RULE` in new code on 0.16;
-  it is Ruff-specific, covers logical lines, and carries a reason.
+  it is Ruff-specific, and an own-line comment placed above a statement
+  covers the whole logical line — trailing or mid-construct comments
+  cover only their own physical line. A reason is optional.
 - Never invent rule codes. If unsure a code exists, run
   `ruff rule <code>` (0.15.17+ also accepts rule names).
 
@@ -37,9 +39,10 @@ over recollection.
    spanning 34 linters, including `I001` (import sorting), `F401`,
    `UP006`/`UP007`/`UP045` (PEP 585/604 annotation rewrites), `B008`,
    `SIM102`, `RUF012`, and `RUF013`. Notably *absent*: `E501`, the
-   `E711`–`E743` comparison and ambiguity rules, `D1xx` docstring
-   requirements, `ANN`, `ARG`, `S101`, `TRY003`, `EM101`, `COM812`,
-   `Q000`, and `PLR0913`.
+   `E711`, `E712`, `E713`, `E714`, `E721`, `E731`, `E741`, `E742`, and
+   `E743` comparison and ambiguity rules, `D1xx` docstring requirements,
+   `ANN`, `ARG`, `S101`, `TRY003`, `EM101`, `COM812`, `Q000`, and
+   `PLR0913`. `E722` (bare `except`) remains in the default set.
    See [default-rule-set.md](references/default-rule-set.md).
 2. **`ruff format` formats Markdown.** Python code blocks in `.md`
    files are formatted by default, and `.md` files are discovered by
@@ -99,8 +102,9 @@ l = 1
 - `--add-ignore` inserts `ruff: ignore` comments the way `--add-noqa`
   inserts `noqa`. In preview it writes human-readable rule names.
 
-Codes are stable; rule *names* in suppression comments and selectors are
-preview-only. See
+Prefer rule *codes* for stable-mode usage; individual codes may still be
+withdrawn in later Ruff releases. Rule *names* in suppression comments
+and selectors remain preview-only. See
 [suppression-comments.md](references/suppression-comments.md).
 
 ## Settings added since 0.14

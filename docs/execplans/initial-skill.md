@@ -162,11 +162,11 @@ Update this plan after each milestone with:
 - 2026-07-26: `ruff-016` added as a fourth domain-and-quality skill
   (`skills/ruff-016/SKILL.md` plus `default-rule-set.md`,
   `suppression-comments.md`, `settings-and-cli.md`, and
-  `rule-and-version-delta.md`). Drift from the original topology, and
-  justified: Ruff 0.16.0 changed the default rule set from 59 rules to
-  413, began formatting Markdown code blocks, and added native
-  `ruff: ignore` suppression, all after the training cut-off of current
-  models. Routing boundary recorded in
+  `rule-and-version-delta.md`). This departs from the original topology,
+  and the departure is justified: Ruff 0.16.0 changed the default rule
+  set from 59 rules to 413, began formatting Markdown code blocks, and
+  added native `ruff: ignore` suppression, all after the training
+  cut-off of current models. Routing boundary recorded in
   [ADR 0001](../adr/0001-ruff-skill-routing-boundary.md). Every factual
   claim was sourced from upstream artefacts (the `astral-sh/ruff`
   changelogs, a `ruff.schema.json` diff across the 0.14.0/0.15.0/0.16.0
