@@ -54,7 +54,7 @@ ______________________________________________________________________
 
 ## Features
 
-- One router, six language skills, and four domain or quality skills.
+- One router, six language skills, and five domain or quality skills.
 - Short `SKILL.md` files, with references for the longer comparison material.
 - Coverage for typing (PEP 612, PEP 695, PEP 696, PEP 698, PEP 742),
   exceptions and logging (Ruff TRY/BLE/EM/LOG/N818/PERF203/B017),
