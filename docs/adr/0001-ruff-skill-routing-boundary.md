@@ -36,10 +36,10 @@ Two alternatives were considered and rejected: a generic `ruff` skill
 updated in place, and folding the material into
 `python-quality-tools`.
 
-The version-pinned skill was chosen for two reasons: it makes an
-honest scope claim, since the content is a snapshot of one release and
-its delta and says so, and it gives each kind of question a single
-owner.
+The version-pinned skill was chosen for two reasons. It makes an honest
+scope claim: the skill documents one release, Ruff 0.16.0, together
+with the deltas from 0.14.0 onwards, and it names that scope
+explicitly. It also gives each kind of question a single owner.
 
 This decision accepts a trade-off. A later release needs its own
 skill or a deliberate rename rather than a silent rewrite, and the

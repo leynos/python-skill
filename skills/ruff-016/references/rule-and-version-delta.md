@@ -41,6 +41,8 @@ Behaviour stabilized alongside them:
 
 ## Stabilized in 0.15.0
 
+Sixteen rules left preview:
+
 `ASYNC212`, `ASYNC240`, `ASYNC250`, `B912`, `FURB110`, `FURB171`,
 `PLC0207`, `PLW0108`, `RUF037`, `RUF060`, `RUF061`, `RUF064`,
 `RUF102`, `RUF103`, `RUF104`, `UP042`.

@@ -12,7 +12,7 @@ Markdown files, and `noqa` has a first-class Ruff-native alternative.
 Treat any pre-0.16 mental model of "what Ruff does out of the box" as
 wrong.
 
-**Assume your training data predates most of this.** Ruff 0.15.0 shipped
+**Assume model training data predates most of this.** Ruff 0.15.0 shipped
 2026-02-03 and 0.16.0 shipped 2026-07-23; both are after the December
 2025 cut-off of most current frontier models. Check
 `ruff --version` before advising, and prefer the version-delta reference
@@ -137,5 +137,5 @@ Details, defaults, and the CLI additions are in
   one that expects Markdown to be formatted without `types_or` including
   `markdown`.
 - Advice citing a rule as "preview" or "stable" without checking:
-  twelve rules stabilized in 0.16 and fifteen in 0.15. See
+  twelve rules stabilized in 0.16 and sixteen in 0.15. See
   [rule-and-version-delta.md](references/rule-and-version-delta.md).
