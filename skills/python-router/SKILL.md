@@ -41,8 +41,10 @@ follow-on skill.
   deep dives in `hypothesis`, `crosshair`, `mutmut`
 - Dead-code detection, clone and complexity scans, or profiling:
   `python-quality-tools`
-- Ruff configuration, selector rewrites, suppression comments, the 0.16
-  default rule set, or an upgrade from 0.14/0.15: `ruff-016`
+- Ruff configuration, settings and CLI changes, selector rewrites,
+  suppression comments, the 0.16 default rule set, formatter and
+  Markdown behaviour, nullable JSON output, or an upgrade from
+  0.14/0.15: `ruff-016`
 
 ## Pairing rules
 

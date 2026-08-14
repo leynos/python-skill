@@ -98,9 +98,10 @@ Style and opinion families stay off: `ANN` (annotations required),
 `D1xx`, `ERA` (commented-out code), `T20` (`print`), `TD`/`FIX`
 (TODOs), `EM` (exception message strings), `TRY003`, `SLF001`,
 `FBT` (boolean traps), `A` (builtin shadowing), `C901` complexity,
-`PLR0913` argument counts, `PLR2004` magic values, and `E711`, `E712`,
-`E713`, `E714`, `E721`, `E731`, `E741`, `E742`, `E743`, the comparison
-and ambiguity rules that a type checker covers better.
+`PLR0913` argument counts, `PLR2004` magic values, the `E711`, `E712`,
+`E713`, `E714`, and `E721` comparison rules that a type checker covers
+better, the `E741`, `E742`, and `E743` ambiguous-name rules, and `E731`
+(lambda assignment).
 `E401`/`E402` (import placement) and `F403`/`F405`/`F406` (star imports)
 are out as well.
 

@@ -39,10 +39,11 @@ over recollection.
    spanning 34 linters, including `I001` (import sorting), `F401`,
    `UP006`/`UP007`/`UP045` (PEP 585/604 annotation rewrites), `B008`,
    `SIM102`, `RUF012`, and `RUF013`. Notably *absent*: `E501`, the
-   `E711`, `E712`, `E713`, `E714`, `E721`, `E731`, `E741`, `E742`, and
-   `E743` comparison and ambiguity rules, `D1xx` docstring requirements,
-   `ANN`, `ARG`, `S101`, `TRY003`, `EM101`, `COM812`, `Q000`, and
-   `PLR0913`. `E722` (bare `except`) remains in the default set.
+   `E711`, `E712`, `E713`, `E714`, and `E721` comparison rules, the
+   `E741`, `E742`, and `E743` ambiguous-name rules, `E731` (lambda
+   assignment), `D1xx` docstring requirements, `ANN`, `ARG`, `S101`,
+   `TRY003`, `EM101`, `COM812`, `Q000`, and `PLR0913`. `E722` (bare
+   `except`) remains in the default set.
    See [default-rule-set.md](references/default-rule-set.md).
 2. **`ruff format` formats Markdown.** Python code blocks in `.md`
    files are formatted by default, and `.md` files are discovered by
