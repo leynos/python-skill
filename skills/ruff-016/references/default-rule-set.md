@@ -68,6 +68,10 @@ because the *family* being on says nothing about which rule is on:
   migration rules.
 - `TC` is **`TC004`, `TC005`, `TC007`, `TC010`** — the correctness
   rules, not `TC001`–`TC003` which move imports into `TYPE_CHECKING`.
+- `LOG` is **`LOG001`, `LOG002`, `LOG009`, `LOG014`, `LOG015`** — five
+  of the seven; `LOG004` and `LOG007` are not enabled. The logging
+  surface is partly on by default, so it is not an `extend-select`
+  decision from scratch.
 - `PT` is six rules; `PGH` is `PGH005`; `RET` is `RET501`; `ISC` is
   `ISC004`; `BLE` is `BLE001`; `T10` is `T100`; `FLY` is `FLY002`.
 
@@ -105,15 +109,15 @@ better, the `E741`, `E742`, and `E743` ambiguous-name rules, and `E731`
 `E401`/`E402` (import placement) and `F403`/`F405`/`F406` (star imports)
 are out as well.
 
-`BLE001` and `LOG001`, `LOG002`, `LOG009`, `LOG014`, `LOG015` are
-already on by default, so the question for those is how to satisfy
-them, not whether to `extend-select` them.
+If a project wants any of those, they go in `extend-select`, and each
+needs a reason. `EM`, `TRY003`, `TRY300`, `PERF203`, and `N818` are the
+opt-in examples on the errors-and-logging surface — see the
+`python-errors-and-logging` skill rather than enabling them blind.
 
-If a project wants the rest, they are `extend-select`, and each needs
-a reason. `EM`, `TRY003`, `TRY300`, `PERF203`, and `N818` in
-particular are opt-in examples on the errors-and-logging surface —
-see the `python-errors-and-logging` skill rather than enabling them
-blind.
+Do not reach for `extend-select` across the whole of that surface,
+though. `BLE001`, `LOG001`, `LOG002`, `LOG009`, `LOG014`, and `LOG015`
+are already on by default, so the question for those is how to satisfy
+them, not whether to enable them.
 
 ## Restoring the old behaviour
 
