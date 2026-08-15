@@ -1,5 +1,10 @@
 .DEFAULT_GOAL := check
 
+# A pipeline reports only its last command's status by default, so a failing
+# `git ls-files` would be masked by a successful `xargs`. pipefail propagates it.
+SHELL := /bin/bash
+.SHELLFLAGS := -eu -o pipefail -c
+
 MD_GLOB := **/*.md
 
 .PHONY: help fmt markdownlint nixie lint check check-fmt typecheck test
@@ -11,7 +16,7 @@ help: ## Show this help
 fmt: ## Reflow Markdown tables and apply markdownlint fixes in place
 	git ls-files -z '*.md' '*.markdown' \
 	  | xargs -0 --no-run-if-empty \
-	    mdtablefix --wrap --renumber --breaks --ellipsis --fences --in-place
+	    mdtablefix --wrap --renumber --breaks --ellipsis --fences --in-place --
 	markdownlint --fix '$(MD_GLOB)'
 
 markdownlint: ## Lint every Markdown file

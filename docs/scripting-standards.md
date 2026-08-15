@@ -2,8 +2,11 @@
 
 *Imported from
 [`agent-template-python`](https://github.com/leynos/agent-template-python/blob/main/template/docs/scripting-standards.md).
-One deliberate divergence from upstream: the baseline for new scripts here is
-Python 3.14, not 3.13. Preserve that when re-importing.*
+Deliberate divergences from upstream, to preserve when re-importing: the
+baseline for new scripts here is Python 3.14, not 3.13; the tag-creation
+guard checks `exit_code` on both the lookup and the creation call rather
+than discarding the result; and the mocking example uses
+`mocker.patch.object`, not the nonexistent `mocker.patch_object`.*
 
 Project scripts must prioritize clarity, reproducibility, and testability.
 
@@ -478,7 +481,20 @@ def main(
     if not dry_run:
         with sh.scoped(CATALOGUE):
             git = sh.make("git")
-            git("tag", f"v{version}", cwd=project_root).run_sync()
+            tag_name = f"v{version}"
+
+            lookup = git(
+                "tag", "--list", tag_name, cwd=project_root
+            ).run_sync()
+            if lookup.exit_code != 0:
+                message = f"tag lookup failed: {lookup.stderr}"
+                raise RuntimeError(message)
+
+            if tag_name not in lookup.stdout:
+                result = git("tag", tag_name, cwd=project_root).run_sync()
+                if result.exit_code != 0:
+                    message = f"tag creation failed: {result.stderr}"
+                    raise RuntimeError(message)
 
     print({
         "bin_name": bin_name,
@@ -532,7 +548,7 @@ def test_patch_python_dependency(mocker):
     # Example: patch a helper function used by the script
     from scripts import helpers
 
-    mocker.patch_object(helpers, "compute_checksum", return_value="deadbeef")
+    mocker.patch.object(helpers, "compute_checksum", return_value="deadbeef")
     assert helpers.compute_checksum(b"abc") == "deadbeef"
 ```
 

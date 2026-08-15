@@ -52,7 +52,7 @@ considers `typing.Optional`; `SIM905` fixes with `maxsplit` alone;
 `SIM910` handles more key expressions; `UP008` has a safe fix when no
 comments are lost; `UP043` applies to `.pyi` below Python 3.13.
 
-## New rules, still in preview at 0.16.0
+## Preview rules present in 0.16.0
 
 Enable with `preview = true`; expect them to stabilize in a later
 release.
