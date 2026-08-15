@@ -39,7 +39,10 @@ updated in place, and folding the material into
 The version-pinned skill was chosen for two reasons. It makes an honest
 scope claim: the skill documents one release, Ruff 0.16.0, together
 with the deltas from 0.14.0 onwards, and it names that scope
-explicitly. It also gives each kind of question a single owner.
+explicitly. It also gives each concern a clear owner: questions that
+mix tool-level and rule-level concerns are handled by pairing
+`ruff-016` with `python-errors-and-logging`, so both skills load
+together rather than one being chosen over the other.
 
 This decision accepts a trade-off. A later release needs its own
 skill or a deliberate rename rather than a silent rewrite, and the

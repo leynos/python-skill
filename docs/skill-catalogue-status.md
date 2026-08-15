@@ -75,6 +75,9 @@ input or supporting material.
   `python-errors-and-logging` sits.
 - [Research notes](research/topic-notes.md) — consolidated firecrawl
   findings on each requested topic with relevance weighting.
+- [Scripting standards](scripting-standards.md) — imported scripting
+  conventions for any Python added to this repository; the local
+  baseline is Python 3.14.
 
 ## Inputs (not part of the active catalogue)
 

@@ -91,8 +91,9 @@ ______________________________________________________________________
 
 ## Development
 
-The catalogue is Markdown only, so the gates are Markdown gates. Run them
-through the `Makefile` rather than invoking the tools directly:
+The catalogue combines Markdown content with a small Python test suite.
+Run the gates through the `Makefile` rather than invoking the tools
+directly:
 
 | Target              | What it does                               |
 | ------------------- | ------------------------------------------ |
@@ -100,11 +101,15 @@ through the `Makefile` rather than invoking the tools directly:
 | `make markdownlint` | Lint every Markdown file                   |
 | `make nixie`        | Validate every Mermaid diagram             |
 | `make lint`         | Both of the above                          |
+| `make test`         | Run the pytest suite via `uv`              |
+| `make typecheck`    | Run mypy via `uv`                          |
 | `make check`        | Default goal; the full commit gate         |
 
-`make check-fmt`, `make typecheck`, and `make test` exist so the standard
-gate names resolve. There is no typed or executable source here, so the
-last two are no-ops that say so.
+`make test` and `make typecheck` require `uv`; the `dev` dependency
+group in `pyproject.toml` supplies pytest, `cmd-mox`, and mypy. The
+test suite stubs the external Markdown tools with `cmd-mox`. See
+[Scripting standards](docs/scripting-standards.md) for the conventions
+the tests follow.
 
 ______________________________________________________________________
 
