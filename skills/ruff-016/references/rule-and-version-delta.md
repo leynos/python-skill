@@ -52,10 +52,15 @@ considers `typing.Optional`; `SIM905` fixes with `maxsplit` alone;
 `SIM910` handles more key expressions; `UP008` has a safe fix when no
 comments are lost; `UP043` applies to `.pyi` below Python 3.13.
 
-## Preview rules present in 0.16.0
+## Preview rules added in 0.14.x-0.15.x
 
-Enable with `preview = true`; expect them to stabilize in a later
-release.
+Rules predating 0.14.0, such as `PLC2701`, are out of scope here; see
+the rule index under "Sources" for the complete list.
+
+Enable lint preview rules with `preview = true` under
+`[tool.ruff.lint]`, or `ruff check --preview` on the command line.
+Formatter preview is a separate setting, so enabling one does not
+enable the other. Expect these rules to stabilize in a later release.
 
 | Code       | Name                                          | Added   |
 | ---------- | --------------------------------------------- | ------- |

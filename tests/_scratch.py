@@ -122,6 +122,7 @@ class ScratchRepo:
         )
 
     def _git(self, *args: str) -> None:
+        """Run a git command in the repository, raising on a non-zero exit."""
         subprocess.run(  # noqa: S603 - fixed argv, no shell
             ["git", *args], cwd=self.path, check=True, capture_output=True
         )

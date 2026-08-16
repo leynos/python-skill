@@ -91,7 +91,7 @@ def test_lint_fails_when_a_tool_fails(
     result = scratch_repo.make("lint")
 
     cmd_mox.verify()
-    assert result.returncode != 0
+    assert result.returncode != 0, f"a failing {failing} did not fail the gate"
 
 
 def test_lint_passes_when_both_tools_pass(
@@ -202,7 +202,8 @@ def test_fmt_passes_leading_hyphen_filenames_as_paths(
     (invocation,) = spy.invocations
     assert "--" in invocation.args, "option parsing is never terminated"
     terminator = invocation.args.index("--")
-    assert hyphenated in invocation.args[terminator + 1 :]
+    paths = invocation.args[terminator + 1 :]
+    assert hyphenated in paths, f"{hyphenated!r} absent after `--`; got {paths}"
 
 
 def test_fmt_fails_when_file_discovery_fails(
@@ -309,11 +310,13 @@ def test_fmt_preserves_arbitrary_tracked_markdown_names(
 
     assert result.returncode == 0, result.stderr
 
-    delivered: set[str] = set()
+    # A list, not a set: delivering the same path twice would still be wrong,
+    # and a set would quietly absorb it.
+    delivered: list[str] = []
     for argv in recorded_argv(record):
         if argv[0] != "mdtablefix":
             continue
-        delivered.update(argv[argv.index("--") + 1 :])
+        delivered.extend(argv[argv.index("--") + 1 :])
 
-    assert delivered == expected
+    assert sorted(delivered) == sorted(expected)
     assert {p.name for p in root.iterdir()} == before, "a filename was executed"

@@ -5,8 +5,11 @@
 Deliberate divergences from upstream, to preserve when re-importing: the
 baseline for new scripts here is Python 3.14, not 3.13; the tag-creation
 guard checks `exit_code` on both the lookup and the creation call rather
-than discarding the result; and the mocking example uses
-`mocker.patch.object`, not the nonexistent `mocker.patch_object`.*
+than discarding the result, and the cmd-mox tests mock both calls to
+match; the mocking example uses `mocker.patch.object`, not the
+nonexistent `mocker.patch_object`; the Cyclopts test uses
+`app.parse_args`, since `cyclopts.testing` does not exist; and the Async
+subsections sit at heading level 3 so no heading level is skipped.*
 
 Project scripts must prioritize clarity, reproducibility, and testability.
 
@@ -289,7 +292,7 @@ async def run_checks():
 asyncio.run(run_checks())
 ```
 
-#### Task lifetime and `asyncio.gather`
+### Task lifetime and `asyncio.gather`
 
 When multiple async commands run concurrently, each task's lifetime must be
 bounded by the enclosing coroutine. Await the tasks with `asyncio.gather`, or
@@ -317,7 +320,7 @@ async def run_all():
 `return_exceptions=True` prevents a single task failure from cancelling sibling
 tasks. Callers must inspect each result individually.
 
-#### Cancellation handling
+### Cancellation handling
 
 `asyncio.CancelledError` is not suppressed by Cuprum. If a task running `run()`
 is cancelled, for example by a timeout or external signal, the coroutine raises
@@ -337,7 +340,7 @@ async def check_with_timeout():
     return result
 ```
 
-#### Error propagation
+### Error propagation
 
 `run()` returns a `CommandResult` and does not raise on non-zero exit codes.
 Subprocess errors are propagated as field values such as `exit_code` and
@@ -346,7 +349,7 @@ The exceptions raised are those from the Python event loop itself, such as
 `CancelledError` and `TimeoutError`, or from catalogue violations such as
 `UnknownProgramError`.
 
-#### Catalogue safety across concurrent tasks
+### Catalogue safety across concurrent tasks
 
 A `Catalogue` instance is safe to share across concurrent tasks because it is
 read-only after construction. `sh.scoped(CATALOGUE)` is a context manager that
@@ -354,7 +357,7 @@ binds the catalogue for the current execution scope. Authors must not mutate
 the catalogue inside a concurrent task. Construct the catalogue once at module
 level and re-use it.
 
-#### Concurrent testing patterns with cmd-mox
+### Concurrent testing patterns with cmd-mox
 
 Concurrent async script paths use the same catalogue and scoped context in
 tests as they do in production code. `cmd-mox` intercepts at the catalogue
@@ -526,7 +529,6 @@ if __name__ == "__main__":
 ```python
 import os
 from pathlib import Path
-from cyclopts.testing import invoke
 from scripts.package import app
 
 
@@ -536,12 +538,14 @@ def test_reads_env_and_defaults(monkeypatch, tmp_path):
     monkeypatch.setenv("INPUT_VERSION", "1.2.3")
     monkeypatch.setenv("INPUT_FORMATS", "deb rpm")  # whitespace or newlines
 
-    # Exercise
-    result = invoke(app, [])
+    # Exercise: parse without executing, so the binding can be inspected.
+    # parse_args returns (command, bound_arguments, unused_kwargs).
+    parsed = app.parse_args([])
+    bound = parsed[1]
 
     # Assert
-    assert result.exit_code == 0
-    assert '"version": "1.2.3"' in result.stdout
+    assert bound.arguments["version"] == "1.2.3"
+    assert bound.arguments["bin_name"] == "demo"
 
 
 def test_patch_python_dependency(mocker):
@@ -569,24 +573,38 @@ CATALOGUE = Catalogue.from_programs("git")
 def test_git_tag_happy_path(cmd_mox, monkeypatch, tmp_path):
     monkeypatch.chdir(tmp_path)
 
-    # Mock external command behaviour
+    # Mock every command the guard issues, in order. Empty stdout from the
+    # lookup means the tag does not exist yet, so creation goes ahead. A mock
+    # that is never called fails verify(), so the lookup cannot be omitted.
+    cmd_mox.mock("git").with_args("tag", "--list", "v1.2.3").returns(
+        exit_code=0, stdout=""
+    )
     cmd_mox.mock("git").with_args("tag", "v1.2.3").returns(exit_code=0)
 
     # Run the code under test while shims are active
     cmd_mox.replay()
     with sh.scoped(CATALOGUE):
-        sh.make("git")("tag", "v1.2.3").run_sync()
+        git = sh.make("git")
+        lookup = git("tag", "--list", "v1.2.3").run_sync()
+        if "v1.2.3" not in lookup.stdout:
+            git("tag", "v1.2.3").run_sync()
     cmd_mox.verify()
 
 
 def test_git_tag_failure_surface_error(cmd_mox, monkeypatch, tmp_path):
     monkeypatch.chdir(tmp_path)
 
+    cmd_mox.mock("git").with_args("tag", "--list", "v1.2.3").returns(
+        exit_code=0, stdout=""
+    )
     cmd_mox.mock("git").with_args("tag", "v1.2.3").returns(exit_code=1, stderr="denied")
 
     cmd_mox.replay()
     with sh.scoped(CATALOGUE):
-        result = sh.make("git")("tag", "v1.2.3").run_sync()
+        git = sh.make("git")
+        lookup = git("tag", "--list", "v1.2.3").run_sync()
+        assert "v1.2.3" not in lookup.stdout
+        result = git("tag", "v1.2.3").run_sync()
         assert result.exit_code == 1
         assert "denied" in result.stderr
     cmd_mox.verify()

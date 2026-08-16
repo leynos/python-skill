@@ -15,6 +15,7 @@ from __future__ import annotations
 import re
 from collections.abc import Iterable
 from pathlib import Path
+from typing import Literal
 
 import pytest
 
@@ -38,19 +39,32 @@ def _section(text: str, heading: str) -> str:
     return body[1].split("\n## ", 1)[0]
 
 
+def _classify(line: str, *, in_bullet: bool) -> Literal["bullet", "wrap", "other"]:
+    """Say whether a line opens a list item, continues one, or ends one.
+
+    Continuation depends on context, not just indentation: an indented line
+    with no item open belongs to no bullet, so it counts as "other".
+    """
+    if line.startswith("- "):
+        return "bullet"
+    if in_bullet and line.startswith("  "):
+        return "wrap"
+    return "other"
+
+
 def _bullets(section: str) -> Iterable[str]:
     """Yield each top-level list item, with continuation lines folded in."""
     current: list[str] = []
     for line in section.splitlines():
-        if line.startswith("- "):
-            if current:
-                yield " ".join(current)
-            current = [line[2:].strip()]
-        elif current and line.startswith("  "):
+        kind = _classify(line, in_bullet=bool(current))
+        if kind == "wrap":
             current.append(line.strip())
-        elif current:
+            continue
+        if current:
             yield " ".join(current)
             current = []
+        if kind == "bullet":
+            current = [line[2:].strip()]
     if current:
         yield " ".join(current)
 
@@ -141,7 +155,10 @@ def test_deep_dive_skills_are_routed_to(routed_names: frozenset[str]) -> None:
     colon. If the parser regresses to taking one token per entry they vanish
     silently, and every other assertion here still passes.
     """
-    assert {"hypothesis", "crosshair", "mutmut"} <= routed_names
+    deep_dives = {"hypothesis", "crosshair", "mutmut"}
+    missing = sorted(deep_dives - routed_names)
+
+    assert not missing, f"deep dives no route reaches: {missing}"
 
 
 def test_catalogue_status_lists_every_skill(
