@@ -177,6 +177,20 @@ Update this plan after each milestone with:
   Maintenance trigger for Ruff 0.17 is recorded in
   `docs/skill-catalogue-status.md`.
 
+- 2026-08-16: the repository gained `pyproject.toml`, `uv.lock`, a
+  `tests/` suite (pytest, cmd-mox, hypothesis, mypy strict), and a
+  `Makefile` wiring the lint, format, type-check, and test gates
+  together. `typecheck` and `test` were previously no-op targets and
+  now run real tools. `docs/scripting-standards.md` was imported from
+  `agent-template-python`, with the local baseline set to Python 3.14.
+  This is drift from the original Markdown-only topology, and the
+  drift is justified: the `Makefile`'s own behaviour — file selection
+  via `git ls-files`, failure propagation through `pipefail`, and
+  `--` option-terminator handling before `mdtablefix` — was carrying
+  real defects that only tests could catch. New documentation:
+  `docs/developers-guide.md`, covering the gates and the test suite
+  for anyone working on this repository rather than using the skills.
+
 ## Open follow-up (deferred)
 
 - A `python-pyproject` skill mirroring `arch-crate-design` (the

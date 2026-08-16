@@ -75,6 +75,9 @@ ______________________________________________________________________
 
 - [Users' guide](docs/users-guide.md) — installation, invocation, routing,
   and when to reach for the verification or quality-tool skills.
+- [Developers' guide](docs/developers-guide.md) — working on this
+  repository: prerequisites, the `Makefile` gates, and what the test
+  suite covers.
 - [Skill catalogue status](docs/skill-catalogue-status.md) — what is
   active and what is research input.
 - [Initial-skill execplan](docs/execplans/initial-skill.md) — design,
@@ -106,10 +109,11 @@ directly:
 | `make check`        | Default goal; the full commit gate         |
 
 `make test` and `make typecheck` require `uv`; the `dev` dependency
-group in `pyproject.toml` supplies pytest, `cmd-mox`, and mypy. The
-test suite stubs the external Markdown tools with `cmd-mox`. See
-[Scripting standards](docs/scripting-standards.md) for the conventions
-the tests follow.
+group in `pyproject.toml` supplies pytest, `cmd-mox`, mypy, and
+Hypothesis. The test suite stubs the external Markdown tools with
+`cmd-mox`. The [developers' guide](docs/developers-guide.md) covers the
+gates in full, and [scripting standards](docs/scripting-standards.md)
+gives the conventions any new Python must follow.
 
 ______________________________________________________________________
 

@@ -13,9 +13,10 @@ _RECORDER = """#!/usr/bin/env python3
 import json
 import os
 import sys
+from pathlib import Path
 
 with open(os.environ["{env}"], "a", encoding="utf-8") as handle:
-    handle.write(json.dumps([os.path.basename(sys.argv[0]), *sys.argv[1:]]) + "\\n")
+    handle.write(json.dumps([Path(sys.argv[0]).name, *sys.argv[1:]]) + "\\n")
 """
 
 

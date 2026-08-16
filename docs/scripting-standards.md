@@ -4,9 +4,10 @@
 [`agent-template-python`](https://github.com/leynos/agent-template-python/blob/main/template/docs/scripting-standards.md).
 Deliberate divergences from upstream, to preserve when re-importing: the
 baseline for new scripts here is Python 3.14, not 3.13; the tag-creation
-guard checks `exit_code` on both the lookup and the creation call rather
-than discarding the result, and the cmd-mox tests mock both calls to
-match; the mocking example uses `mocker.patch.object`, not the
+guard is an extracted `ensure_tag` function that checks `exit_code` on
+both the lookup and the creation call rather than discarding the result,
+and the cmd-mox tests call it rather than restating its commands; the
+mocking example uses `mocker.patch.object`, not the
 nonexistent `mocker.patch_object`; the Cyclopts test uses
 `app.parse_args`, since `cyclopts.testing` does not exist; and the Async
 subsections sit at heading level 3 so no heading level is skipped.*
@@ -468,6 +469,31 @@ CATALOGUE = Catalogue.from_programs("git")
 
 app = App(config=cyclopts.config.Env("INPUT_", command=False))
 
+
+def ensure_tag(version: str, *, cwd: Path) -> None:
+    """Create the release tag unless it already exists.
+
+    Kept separate from the CLI entry point so tests can exercise it
+    without supplying every CLI parameter or triggering its side effects.
+    """
+    with sh.scoped(CATALOGUE):
+        git = sh.make("git")
+        tag_name = f"v{version}"
+
+        lookup = git("tag", "--list", tag_name, cwd=cwd).run_sync()
+        if lookup.exit_code != 0:
+            message = f"tag lookup failed: {lookup.stderr}"
+            raise RuntimeError(message)
+
+        if tag_name in lookup.stdout:
+            return
+
+        result = git("tag", tag_name, cwd=cwd).run_sync()
+        if result.exit_code != 0:
+            message = f"tag creation failed: {result.stderr}"
+            raise RuntimeError(message)
+
+
 @app.default
 def main(
     *,
@@ -482,22 +508,7 @@ def main(
     dist.mkdir(parents=True, exist_ok=True)
 
     if not dry_run:
-        with sh.scoped(CATALOGUE):
-            git = sh.make("git")
-            tag_name = f"v{version}"
-
-            lookup = git(
-                "tag", "--list", tag_name, cwd=project_root
-            ).run_sync()
-            if lookup.exit_code != 0:
-                message = f"tag lookup failed: {lookup.stderr}"
-                raise RuntimeError(message)
-
-            if tag_name not in lookup.stdout:
-                result = git("tag", tag_name, cwd=project_root).run_sync()
-                if result.exit_code != 0:
-                    message = f"tag creation failed: {result.stderr}"
-                    raise RuntimeError(message)
+        ensure_tag(version, cwd=project_root)
 
     print({
         "bin_name": bin_name,
@@ -565,14 +576,12 @@ pytest_plugins = ("cmd_mox.pytest_plugin",)
 ```
 
 ```python
-from cuprum import Catalogue, sh
+import pytest
 
-CATALOGUE = Catalogue.from_programs("git")
+from scripts.package import ensure_tag
 
 
-def test_git_tag_happy_path(cmd_mox, monkeypatch, tmp_path):
-    monkeypatch.chdir(tmp_path)
-
+def test_git_tag_happy_path(cmd_mox, tmp_path):
     # Mock every command the guard issues, in order. Empty stdout from the
     # lookup means the tag does not exist yet, so creation goes ahead. A mock
     # that is never called fails verify(), so the lookup cannot be omitted.
@@ -581,32 +590,22 @@ def test_git_tag_happy_path(cmd_mox, monkeypatch, tmp_path):
     )
     cmd_mox.mock("git").with_args("tag", "v1.2.3").returns(exit_code=0)
 
-    # Run the code under test while shims are active
+    # Exercise the documented function, not a copy of its command sequence
     cmd_mox.replay()
-    with sh.scoped(CATALOGUE):
-        git = sh.make("git")
-        lookup = git("tag", "--list", "v1.2.3").run_sync()
-        if "v1.2.3" not in lookup.stdout:
-            git("tag", "v1.2.3").run_sync()
+    ensure_tag("1.2.3", cwd=tmp_path)
     cmd_mox.verify()
 
 
-def test_git_tag_failure_surface_error(cmd_mox, monkeypatch, tmp_path):
-    monkeypatch.chdir(tmp_path)
-
+def test_git_tag_failure_surface_error(cmd_mox, tmp_path):
     cmd_mox.mock("git").with_args("tag", "--list", "v1.2.3").returns(
         exit_code=0, stdout=""
     )
     cmd_mox.mock("git").with_args("tag", "v1.2.3").returns(exit_code=1, stderr="denied")
 
     cmd_mox.replay()
-    with sh.scoped(CATALOGUE):
-        git = sh.make("git")
-        lookup = git("tag", "--list", "v1.2.3").run_sync()
-        assert "v1.2.3" not in lookup.stdout
-        result = git("tag", "v1.2.3").run_sync()
-        assert result.exit_code == 1
-        assert "denied" in result.stderr
+    # Assert on the failure the guard raises, not on the raw CommandResult
+    with pytest.raises(RuntimeError, match="denied"):
+        ensure_tag("1.2.3", cwd=tmp_path)
     cmd_mox.verify()
 ```
 

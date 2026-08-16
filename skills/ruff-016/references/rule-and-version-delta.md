@@ -126,11 +126,11 @@ Worth knowing because they change fixes, not just diagnostics:
 - With no explicit `target-version` and no inferable `requires-python`,
   Ruff defaults `target-version` to `py310`.
 - `py315` is accepted as a target from 0.14.11 (preview).
-- Lazy imports (Python 3.15) parse from 0.15.6, with isort preserving
-  the `lazy` keyword and semantic-syntax errors reported for illegal
-  placements.
-- PEP 798 star-unpacking in comprehensions parses from 0.15.6.
-- `frozendict` is recognized as a builtin on 3.15+ (0.15.8).
+- Lazy imports (Python 3.15) parse from 0.15.6 (preview), with isort
+  preserving the `lazy` keyword and semantic-syntax errors reported for
+  illegal placements.
+- PEP 798 star-unpacking in comprehensions parses from 0.15.6 (preview).
+- `frozendict` is recognized as a builtin on 3.15+ (0.15.8, preview).
 
 ## Sources
 

@@ -68,6 +68,8 @@ input or supporting material.
 
 - [README](../README.md) — installation and quick-start.
 - [Users' guide](users-guide.md) — invocation and routing.
+- [Developers' guide](developers-guide.md) — prerequisites, the
+  `Makefile` gates, and what the test suite covers.
 - [Initial-skill execplan](execplans/initial-skill.md) — design,
   rationale, and the living progress log.
 - [ADR 0001](adr/0001-ruff-skill-routing-boundary.md) — why the Ruff
