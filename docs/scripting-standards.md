@@ -9,8 +9,10 @@ both the lookup and the creation call rather than discarding the result,
 and the cmd-mox tests call it rather than restating its commands; the
 mocking example uses `mocker.patch.object`, not the
 nonexistent `mocker.patch_object`; the Cyclopts test uses
-`app.parse_args`, since `cyclopts.testing` does not exist; and the Async
-subsections sit at heading level 3 so no heading level is skipped.*
+`app.parse_args`, since `cyclopts.testing` does not exist; the Async
+subsections sit at heading level 3 so no heading level is skipped; and
+the example test functions carry type annotations and their assertions
+carry failure messages, where upstream's do not.*
 
 Project scripts must prioritize clarity, reproducibility, and testability.
 
@@ -375,7 +377,7 @@ async def test_concurrent_commands_all_succeed(mock_catalogue):
 
     results = await run_all()  # function under test
 
-    assert all(r.exit_code == 0 for r in results)
+    assert all(r.exit_code == 0 for r in results), "one or more concurrent commands failed"
 
 
 @pytest.mark.asyncio
@@ -386,8 +388,8 @@ async def test_gather_continues_after_one_failure(mock_catalogue):
     results = await run_all()
 
     exit_codes = [r.exit_code for r in results]
-    assert 1 in exit_codes
-    assert 0 in exit_codes
+    assert 1 in exit_codes, "the failing command did not report its failure"
+    assert 0 in exit_codes, "the succeeding command did not report success"
 ```
 
 The `mock_catalogue` fixture replaces the real `CATALOGUE`. Authors must inject
@@ -538,12 +540,17 @@ if __name__ == "__main__":
 ### Mocking Python dependencies (pytest-mock) and environment (monkeypatch)
 
 ```python
-import os
 from pathlib import Path
+
+import pytest
+from pytest_mock import MockerFixture
+
 from scripts.package import app
 
 
-def test_reads_env_and_defaults(monkeypatch, tmp_path):
+def test_reads_env_and_defaults(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
     # Arrange env for Cyclopts
     monkeypatch.setenv("INPUT_BIN_NAME", "demo")
     monkeypatch.setenv("INPUT_VERSION", "1.2.3")
@@ -555,16 +562,18 @@ def test_reads_env_and_defaults(monkeypatch, tmp_path):
     bound = parsed[1]
 
     # Assert
-    assert bound.arguments["version"] == "1.2.3"
-    assert bound.arguments["bin_name"] == "demo"
+    assert bound.arguments["version"] == "1.2.3", "version input not bound"
+    assert bound.arguments["bin_name"] == "demo", "bin_name input not bound"
 
 
-def test_patch_python_dependency(mocker):
+def test_patch_python_dependency(mocker: MockerFixture) -> None:
     # Example: patch a helper function used by the script
     from scripts import helpers
 
     mocker.patch.object(helpers, "compute_checksum", return_value="deadbeef")
-    assert helpers.compute_checksum(b"abc") == "deadbeef"
+    assert helpers.compute_checksum(b"abc") == "deadbeef", (
+        "the checksum helper was not patched"
+    )
 ```
 
 ### Mocking external executables with cmd-mox (record → replay → verify)
@@ -576,12 +585,15 @@ pytest_plugins = ("cmd_mox.pytest_plugin",)
 ```
 
 ```python
+from pathlib import Path
+
 import pytest
+from cmd_mox import CmdMox
 
 from scripts.package import ensure_tag
 
 
-def test_git_tag_happy_path(cmd_mox, tmp_path):
+def test_git_tag_happy_path(cmd_mox: CmdMox, tmp_path: Path) -> None:
     # Mock every command the guard issues, in order. Empty stdout from the
     # lookup means the tag does not exist yet, so creation goes ahead. A mock
     # that is never called fails verify(), so the lookup cannot be omitted.
@@ -596,7 +608,7 @@ def test_git_tag_happy_path(cmd_mox, tmp_path):
     cmd_mox.verify()
 
 
-def test_git_tag_failure_surface_error(cmd_mox, tmp_path):
+def test_git_tag_failure_surface_error(cmd_mox: CmdMox, tmp_path: Path) -> None:
     cmd_mox.mock("git").with_args("tag", "--list", "v1.2.3").returns(
         exit_code=0, stdout=""
     )
@@ -607,17 +619,58 @@ def test_git_tag_failure_surface_error(cmd_mox, tmp_path):
     with pytest.raises(RuntimeError, match="denied"):
         ensure_tag("1.2.3", cwd=tmp_path)
     cmd_mox.verify()
+
+
+def test_git_tag_skips_creation_when_tag_exists(
+    cmd_mox: CmdMox, tmp_path: Path
+) -> None:
+    # The lookup reports the tag, so the guard returns before creating it.
+    # Only the lookup is recorded: a creation call would match nothing, and
+    # the recorded lookup must be consumed, so verify() pins both halves.
+    lookup = cmd_mox.mock("git").with_args("tag", "--list", "v1.2.3").returns(
+        exit_code=0, stdout="v1.2.3\n"
+    )
+
+    cmd_mox.replay()
+    ensure_tag("1.2.3", cwd=tmp_path)
+    cmd_mox.verify()
+
+    # call_count works on any double; assert_called/assert_not_called are
+    # spy-only and raise AssertionError if used on a mock.
+    assert lookup.call_count == 1, "the guard skipped the existence check"
+
+
+def test_git_tag_lookup_failure_surfaces(cmd_mox: CmdMox, tmp_path: Path) -> None:
+    # A failed lookup must raise rather than fall through to creation.
+    cmd_mox.mock("git").with_args("tag", "--list", "v1.2.3").returns(
+        exit_code=128, stderr="not a git repository"
+    )
+
+    cmd_mox.replay()
+    with pytest.raises(RuntimeError, match="tag lookup failed"):
+        ensure_tag("1.2.3", cwd=tmp_path)
+    cmd_mox.verify()
 ```
+
+Between them these four cases cover every branch of `ensure_tag`: a
+failed lookup, a tag that already exists, a successful creation, and a
+failed creation.
 
 ### Spies and passthrough capture (turn real calls into fixtures)
 
 ```python
+from pathlib import Path
+
+import pytest
+from cmd_mox import CmdMox
 from cuprum import Catalogue, sh
 
 CATALOGUE = Catalogue.from_programs("echo")
 
 
-def test_spy_and_record(cmd_mox, monkeypatch, tmp_path):
+def test_spy_and_record(
+    cmd_mox: CmdMox, monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
     monkeypatch.chdir(tmp_path)
 
     # Spy records actual usage; passthrough runs the real command
@@ -630,9 +683,9 @@ def test_spy_and_record(cmd_mox, monkeypatch, tmp_path):
 
     # Inspect what happened
     spy.assert_called()
-    assert spy.call_count == 1
+    assert spy.call_count == 1, "echo was not invoked exactly once"
     args = spy.invocations[0].argv[1:]
-    assert args == ["hello world"]
+    assert args == ["hello world"], "the recorded arguments do not match"
 ```
 
 ## Operational guidelines
