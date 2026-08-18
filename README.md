@@ -54,7 +54,7 @@ ______________________________________________________________________
 
 ## Features
 
-- One router, six language skills, and four domain or quality skills.
+- One router, six language skills, and five domain or quality skills.
 - Short `SKILL.md` files, with references for the longer comparison material.
 - Coverage for typing (PEP 612, PEP 695, PEP 696, PEP 698, PEP 742),
   exceptions and logging (Ruff TRY/BLE/EM/LOG/N818/PERF203/B017),
@@ -64,6 +64,10 @@ ______________________________________________________________________
 - Verification skills covering selection plus deep dives for
   `hypothesis`, `crosshair`, and `mutmut`.
 - Quality-tool skill for `deadcode`, `pyscn`, and Pyinstrument.
+- Ruff 0.16 skill covering the 413-rule default set, `ruff: ignore`
+  suppression comments, Markdown formatting, and the documented
+  settings, CLI, and rule deltas since 0.14.0 — the material most
+  models predate.
 
 ______________________________________________________________________
 
@@ -71,13 +75,45 @@ ______________________________________________________________________
 
 - [Users' guide](docs/users-guide.md) — installation, invocation, routing,
   and when to reach for the verification or quality-tool skills.
+- [Developers' guide](docs/developers-guide.md) — working on this
+  repository: prerequisites, the `Makefile` gates, and what the test
+  suite covers.
 - [Skill catalogue status](docs/skill-catalogue-status.md) — what is
   active and what is research input.
 - [Initial-skill execplan](docs/execplans/initial-skill.md) — design,
   rationale, and validation history for the catalogue.
+- [ADR 0001](docs/adr/0001-ruff-skill-routing-boundary.md) — why the
+  Ruff skill is version-pinned and where its routing boundary sits.
 - [Python router](skills/python-router/SKILL.md) — the main entry point.
 - [Types and APIs](skills/python-types-and-apis/SKILL.md) — generics,
   `TypeVar`, `ParamSpec`, `TypeIs`, overloads, typed kwargs.
+- [Ruff 0.16](skills/ruff-016/SKILL.md) — default rule set, suppression
+  comments, Markdown formatting, settings and rule deltas.
+
+______________________________________________________________________
+
+## Development
+
+The catalogue combines Markdown content with a small Python test suite.
+Run the gates through the `Makefile` rather than invoking the tools
+directly:
+
+| Target              | What it does                               |
+| ------------------- | ------------------------------------------ |
+| `make fmt`          | Reflow tables and apply markdownlint fixes |
+| `make markdownlint` | Lint every Markdown file                   |
+| `make nixie`        | Validate every Mermaid diagram             |
+| `make lint`         | Both of the above                          |
+| `make test`         | Run the pytest suite via `uv`              |
+| `make typecheck`    | Run mypy via `uv`                          |
+| `make check`        | Default goal; the full commit gate         |
+
+`make test` and `make typecheck` require `uv`; the `dev` dependency
+group in `pyproject.toml` supplies pytest, `cmd-mox`, mypy, and
+Hypothesis. The test suite stubs the external Markdown tools with
+`cmd-mox`. The [developers' guide](docs/developers-guide.md) covers the
+gates in full, and [scripting standards](docs/scripting-standards.md)
+gives the conventions any new Python must follow.
 
 ______________________________________________________________________
 
@@ -93,7 +129,8 @@ of [Hypothesis](https://github.com/HypothesisWorks/hypothesis),
 [mutmut](https://github.com/boxed/mutmut); the quality-tool skill leans
 on [`deadcode`](https://github.com/albertas/deadcode),
 [`pyscn`](https://github.com/ludo-technologies/pyscn), and
-[Pyinstrument](https://github.com/joerick/pyinstrument).
+[Pyinstrument](https://github.com/joerick/pyinstrument). The Ruff skill
+draws on [Ruff](https://github.com/astral-sh/ruff).
 
 ______________________________________________________________________
 

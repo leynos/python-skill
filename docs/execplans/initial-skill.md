@@ -47,6 +47,8 @@ Domain and quality skills:
   plugin ecosystem, snapshot testing, async tests.
 - `python-verification` — selector between Hypothesis, CrossHair, mutmut.
 - `python-quality-tools` — deadcode, pyscn, Pyinstrument.
+- `ruff-016` — Ruff 0.16 defaults, suppression comments, settings and
+  CLI deltas (added after the initial catalogue; see the progress log).
 
 Deep dives:
 
@@ -156,6 +158,38 @@ Update this plan after each milestone with:
   `python-concurrency/references/async-task-discipline.md` written
   with the firecrawl-sourced detail; SKILL.md trailing links and
   `skill-catalogue-status.md` updated to reference it.
+
+- 2026-07-26: `ruff-016` added as a fourth domain-and-quality skill
+  (`skills/ruff-016/SKILL.md` plus `default-rule-set.md`,
+  `suppression-comments.md`, `settings-and-cli.md`, and
+  `rule-and-version-delta.md`). This departs from the original topology,
+  and the departure is justified: Ruff 0.16.0 changed the default rule
+  set from 59 rules to 413, began formatting Markdown code blocks, and
+  added native `ruff: ignore` suppression, all after the training
+  cut-off of current models. Routing boundary recorded in
+  [ADR 0001](../adr/0001-ruff-skill-routing-boundary.md). Every factual
+  claim was sourced from upstream artefacts (the `astral-sh/ruff`
+  changelogs, a `ruff.schema.json` diff across the 0.14.0/0.15.0/0.16.0
+  tags, `crates/ruff_linter/src/codes.rs` at 0.16.0, and a parse of the
+  published default-rules page) rather than recollection. The schema
+  diff caught one error: `lint.ruff.parenthesize-tuple-in-subscript`
+  already existed in 0.14.0 and was dropped from the new-settings table.
+  Maintenance trigger for Ruff 0.17 is recorded in
+  `docs/skill-catalogue-status.md`.
+
+- 2026-08-16: the repository gained `pyproject.toml`, `uv.lock`, a
+  `tests/` suite (pytest, cmd-mox, hypothesis, mypy strict), and a
+  `Makefile` wiring the lint, format, type-check, and test gates
+  together. `typecheck` and `test` were previously no-op targets and
+  now run real tools. `docs/scripting-standards.md` was imported from
+  `agent-template-python`, with the local baseline set to Python 3.14.
+  This is drift from the original Markdown-only topology, and the
+  drift is justified: the `Makefile`'s own behaviour — file selection
+  via `git ls-files`, failure propagation through `pipefail`, and
+  `--` option-terminator handling before `mdtablefix` — was carrying
+  real defects that only tests could catch. New documentation:
+  `docs/developers-guide.md`, covering the gates and the test suite
+  for anyone working on this repository rather than using the skills.
 
 ## Open follow-up (deferred)
 

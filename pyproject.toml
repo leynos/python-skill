@@ -1,0 +1,30 @@
+[project]
+name = "python-skill"
+version = "0.0.0"
+description = "Advanced Python skill catalogue for Codex"
+requires-python = ">=3.14"
+dependencies = []
+
+[dependency-groups]
+dev = ["pytest>=8.3", "cmd-mox>=0.2", "mypy>=1.11", "hypothesis>=6.100"]
+
+[tool.uv]
+package = false
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
+addopts = "-ra"
+# Tests follow the explicit record -> replay -> verify lifecycle described in
+# docs/scripting-standards.md rather than the plugin's implicit one.
+cmd_mox_auto_lifecycle = false
+
+[tool.mypy]
+python_version = "3.14"
+strict = true
+files = ["tests"]
+
+# cmd-mox ships no py.typed marker as of 0.2.0.
+[[tool.mypy.overrides]]
+module = "cmd_mox.*"
+ignore_missing_imports = true

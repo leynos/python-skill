@@ -5,15 +5,15 @@ question each one answers best.
 
 ## At a glance
 
-| Concern                                  | Hypothesis                  | CrossHair                          | mutmut                       |
-| ---------------------------------------- | --------------------------- | ---------------------------------- | ---------------------------- |
-| Engine                                   | Random + shrinking          | Symbolic execution (Z3)            | Mutation of production code  |
-| Catches                                  | Property violations         | Reachable assertion failures       | Test-suite blind spots       |
-| Best on                                  | Pure functions, state machines | Small pure functions, branchy code | Suite quality                |
-| Worst on                                 | C extensions, scheduling   | Floats, strings, heap-heavy code   | Slow suites                  |
-| Time per run (typical)                   | Seconds to minutes          | Seconds to hours                   | Hours (parallelize nightly)  |
-| Counter-example shape                    | Shrunk minimal input        | Concrete satisfying assignment     | Diff of surviving mutant     |
-| Pairs naturally with                     | mutmut                      | Hypothesis                         | Hypothesis, pytest suites    |
+| Concern                | Hypothesis                     | CrossHair                          | mutmut                      |
+| ---------------------- | ------------------------------ | ---------------------------------- | --------------------------- |
+| Engine                 | Random + shrinking             | Symbolic execution (Z3)            | Mutation of production code |
+| Catches                | Property violations            | Reachable assertion failures       | Test-suite blind spots      |
+| Best on                | Pure functions, state machines | Small pure functions, branchy code | Suite quality               |
+| Worst on               | C extensions, scheduling       | Floats, strings, heap-heavy code   | Slow suites                 |
+| Time per run (typical) | Seconds to minutes             | Seconds to hours                   | Hours (parallelize nightly) |
+| Counter-example shape  | Shrunk minimal input           | Concrete satisfying assignment     | Diff of surviving mutant    |
+| Pairs naturally with   | mutmut                         | Hypothesis                         | Hypothesis, pytest suites   |
 
 ## Pick by question
 

@@ -48,6 +48,11 @@ input or supporting material.
   References: `selection-matrix.md`.
 - `python-quality-tools` — `deadcode`, `pyscn`, and Pyinstrument.
   References: `deadcode-and-pyscn.md`, `pyinstrument.md`.
+- `ruff-016` — Ruff 0.16: the 413-rule default set, `ruff: ignore` and
+  `ruff: file-ignore` suppression, Markdown code-block formatting, and
+  the settings, CLI, and rule deltas across 0.14.x–0.16.0.
+  References: `default-rule-set.md`, `suppression-comments.md`,
+  `settings-and-cli.md`, `rule-and-version-delta.md`.
 
 ### Verification deep dives
 
@@ -63,10 +68,18 @@ input or supporting material.
 
 - [README](../README.md) — installation and quick-start.
 - [Users' guide](users-guide.md) — invocation and routing.
+- [Developers' guide](developers-guide.md) — prerequisites, the
+  `Makefile` gates, and what the test suite covers.
 - [Initial-skill execplan](execplans/initial-skill.md) — design,
   rationale, and the living progress log.
+- [ADR 0001](adr/0001-ruff-skill-routing-boundary.md) — why the Ruff
+  skill is version-pinned and where its boundary with
+  `python-errors-and-logging` sits.
 - [Research notes](research/topic-notes.md) — consolidated firecrawl
   findings on each requested topic with relevance weighting.
+- [Scripting standards](scripting-standards.md) — imported scripting
+  conventions for any Python added to this repository; the local
+  baseline is Python 3.14.
 
 ## Inputs (not part of the active catalogue)
 
@@ -77,6 +90,14 @@ input or supporting material.
   reference.
 - `../rust-skill.worktrees/skill-refresh/` — the Rust catalogue this
   one is modelled on. Format and routing conventions match.
+
+## Maintenance
+
+- `ruff-016` is version-pinned material. Revisit it when Ruff 0.17
+  ships: check the default rule count, which preview rules stabilized,
+  and whether new settings appeared in `ruff.schema.json`. The counts
+  in `default-rule-set.md` were taken from the published default-rules
+  page for 0.16.0.
 
 ## Open questions
 
