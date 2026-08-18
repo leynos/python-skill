@@ -10,7 +10,7 @@ and the cmd-mox tests call it rather than restating its commands; the
 mocking example uses `mocker.patch.object`, not the
 nonexistent `mocker.patch_object`; the Cyclopts test uses
 `app.parse_args`, since `cyclopts.testing` does not exist; the Async
-subsections sit at heading level 3 so no heading level is skipped; and
+subsections sit at heading level 3, so no heading level is skipped; and
 the example test functions carry type annotations and their assertions
 carry failure messages, where upstream's do not.*
 
@@ -652,7 +652,7 @@ def test_git_tag_lookup_failure_surfaces(cmd_mox: CmdMox, tmp_path: Path) -> Non
     cmd_mox.verify()
 ```
 
-Between them these four cases cover every branch of `ensure_tag`: a
+Between them, these four cases cover every branch of `ensure_tag`: a
 failed lookup, a tag that already exists, a successful creation, and a
 failed creation.
 

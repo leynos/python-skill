@@ -20,11 +20,11 @@ process.
 ## Getting started
 
 `uv.lock` is committed, so `uv run --group dev <tool>` resolves the
-pinned versions of every `dev` dependency without a separate install
-step. The `dev` group supplies four tools:
+pinned versions of every `dev` dependency without a separate
+installation step. The `dev` group supplies four tools:
 
 - `pytest` — the test runner.
-- `cmd-mox` — stubs external commands so the test suite never invokes
+- `cmd-mox` — stubs external commands, so the test suite never invokes
   a real Markdown tool.
 - `mypy` — strict-mode type-checking of `tests/`.
 - `hypothesis` — property-based testing, used for one test over
