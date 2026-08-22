@@ -22,7 +22,7 @@ Use this when the router's question list does not resolve to one skill.
 | Valid data has dependent or recursive structure | `hypothesis`                      | `python-verification`             |
 | Failure depends on a sequence of operations     | `hypothesis`                      | `python-verification`             |
 | Small pure function needs contract path search  | `crosshair`                       | `hypothesis`                      |
-| Two small pure implementations may disagree     | `crosshair`                       | `python-testing`                  |
+| Pure refactor needs symbolic behaviour diff     | `crosshair`                       | `python-testing`                  |
 | Tests pass but mutants survive                  | `mutmut`                          | `python-testing`                  |
 | Flaky test relies on time or order              | `python-testing`                  | `python-concurrency`              |
 | Real service, load, or resource behaviour       | `python-testing`                  | `python-quality-tools`            |

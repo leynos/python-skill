@@ -50,8 +50,8 @@ single scale from weak to strong.
   or narrow boundary that broad generated search may not reach. Use
   `diffbehavior` when a critical refactor should preserve behaviour.
 - **Pick mutmut** when the suite passes consistently but confidence in its
-  assertions remains low. Mutation testing can audit example, property, and
-  symbolic tests alike.
+  assertions remains low. Mutation testing can audit example and property
+  tests alike.
 - **Leave this cluster** for real-service integration, race conditions,
   performance, resource leaks, and native undefined behaviour.
 

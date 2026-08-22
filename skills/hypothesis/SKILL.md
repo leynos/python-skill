@@ -5,8 +5,8 @@ description: Write lightweight and advanced Hypothesis property-based tests for 
 
 # Hypothesis property-based testing for Python
 
-Hypothesis generates inputs against a property and shrinks a failing case to a
-minimal counter-example. Treat it as ordinary pytest when the code is cheap to
+Hypothesis generates inputs against a property and shrinks failures towards
+a small counter-example. Treat it as ordinary pytest when the code is cheap to
 run, repeatable, and governed by a clear invariant. Start with `@given`, a
 built-in strategy, and one semantic assertion. Custom strategies, settings
 profiles, and state machines are escalation tools, not an entrance fee.
