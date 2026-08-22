@@ -1,86 +1,98 @@
 ---
 name: python-verification
-description: Select between Hypothesis, CrossHair, and mutmut for Python verification work. Use when example-based tests are not enough and the question is which adversary should generate or evaluate cases.
+description: Select the next testing adversary when pytest examples or lightweight Hypothesis properties are insufficient. Use to choose among advanced Hypothesis, CrossHair, and mutmut by the evidence required, not by perceived tool strength.
 globs: ["**/*.py"]
 ---
 
 # Python Verification
 
-Use this when example-based tests cover the obvious cases but the bug
-class is broader than the corpus. The three tools each answer a
-different question; load this skill to choose, then load the matching
-deep dive.
+Use this when the required evidence is unclear or the task has outgrown ordinary
+examples and a lightweight property. Do not insert a selector ceremony between
+a clear, cheap invariant and a five-line `@given` test; load `hypothesis`
+directly for that case.
+
+The tools here answer different questions. They form an escalation map, not a
+single scale from weak to strong.
+
+## Before escalating
+
+- One named scenario, exact output, or finite normative table belongs in
+  `python-testing`.
+- One invariant over a broad, cheap, repeatable input space belongs directly
+  in `hypothesis`.
+- Load this selector when valid data needs a substantial model, operation
+  history matters, every reachable path matters, or the question is whether
+  the suite would detect wrong code.
 
 ## The three questions
 
-- **Hypothesis** — *Does this property hold across a generated input
-  space?* Random generation with shrinking; the cheapest adversary for
-  pure-ish functions with an algebraic property (round-trip, oracle,
-  invariant).
-- **CrossHair** — *Is there an input that violates this assertion or
-  contract?* Symbolic execution backed by Z3; explores reachable
-  branches and reports counter-examples when possible. Useful for code
-  where every reachable path matters and a small search budget is
-  acceptable.
-- **mutmut** — *Would the test suite notice if the production code
-  were wrong?* Mutation testing rewrites the production code one
-  small step at a time and runs the suite; surviving mutants are
-  tests that did not exercise the changed behaviour.
+- **Hypothesis**: *Does this property hold across a generated input space?*
+  Generation with shrinking is the cheapest adversary for round trips,
+  idempotence, oracles, invariants, and metamorphic relations. Its advanced
+  forms cover dependent data, recursive structures, and operation histories.
+- **CrossHair**: *Is there an input that violates this assertion or contract?*
+  Symbolic execution backed by Z3 explores reachable branches and reports a
+  counter-example when possible. It suits small pure functions where path
+  coverage matters.
+- **mutmut**: *Would the test suite notice if the production code were
+  wrong?* Mutation testing changes production code one small step at a time
+  and runs the suite. It measures test sensitivity, not program correctness.
 
 ## Decision surface
 
-- **Pick Hypothesis** when a pure function has an algebraic property,
-  an oracle is available, or the corpus of hand-written cases keeps
-  growing because each new bug needs another case. State machines
-  with `RuleBasedStateMachine` extend the same idea to collections,
-  caches, and protocol clients.
-- **Pick CrossHair** when the function is small, pure, and the bug is
-  a missed branch or boundary case. Also useful for
-  `crosshair diffbehavior old.f new.f` — verifying that a refactor
-  preserves behaviour.
-- **Pick mutmut** when the suite passes consistently but the team is
-  not confident the tests would catch a regression. Mutation testing
-  measures the suite, not the code.
+- **Stay with lightweight Hypothesis** when built-in strategies can describe
+  the input and one semantic assertion states the property.
+- **Escalate within Hypothesis** when valid fields depend on one another, the
+  data is recursive, or a bug depends on a sequence of operations.
+  `st.builds`, `st.from_type`, `@st.composite`, recursive strategies, and
+  `RuleBasedStateMachine` are successive tools, not prerequisites.
+- **Pick CrossHair** when a small pure function has a contract, missed branch,
+  or narrow boundary that broad generated search may not reach. Use
+  `diffbehavior` when a critical refactor should preserve behaviour.
+- **Pick mutmut** when the suite passes consistently but confidence in its
+  assertions remains low. Mutation testing can audit example, property, and
+  symbolic tests alike.
+- **Leave this cluster** for real-service integration, race conditions,
+  performance, resource leaks, and native undefined behaviour.
 
-## What none of them detect
+## What none of them establish
 
-- Race conditions and ordering bugs — use thread sanitizers or
-  scheduler-pinning tools.
-- Resource leaks under load — use load tests and OS-level profilers.
-- Bugs in C extensions — Hypothesis and mutmut see the Python
-  surface; CrossHair cannot execute through C.
-- Architectural mistakes — verification proves the code as written
-  matches the contract as written; both can still be wrong.
+- A passing generated or symbolic search is not a proof outside the explored
+  domain and budget.
+- Race conditions and ordering bugs need scheduler-aware or stress tools.
+- Resource leaks under load need load tests and OS-level profilers.
+- Native-extension faults need sanitizers or native fuzzers.
+- Architectural mistakes survive when the contract itself is wrong.
 
-## Combining the three
+## Combining the tools
 
-The cheap composition runs Hypothesis at every CI run, runs mutmut on
-a nightly job, and reaches for CrossHair when a specific function
-needs scrutiny:
+Use combinations only when the questions are orthogonal:
 
-- Hypothesis catches the property failures and reports a shrunk
-  counter-example.
-- CrossHair confirms that no reachable branch violates the property
-  (within its limits).
-- mutmut confirms the property would notice if the production code
-  were wrong.
+- Named pytest examples explain the specification and pin regressions.
+- Hypothesis searches broad input spaces and shrinks failures.
+- CrossHair scrutinizes reachable paths in selected small pure functions.
+- mutmut checks whether the assertions notice plausible defects.
 
-A property that Hypothesis cannot falsify and mutmut shows is
-exercised by surviving zero mutants is a property worth keeping.
+A common shape is pytest examples plus lightweight Hypothesis on every CI run,
+targeted CrossHair on critical refactors or a slower cadence, and mutmut as a
+nightly or pre-release suite audit. Do not run all three merely because all
+three are installed.
 
 ## Red flags
 
-- A Hypothesis property that filters most inputs (`assume` or
-  `prop_filter` rejection budget exhausted) — the strategy should
-  construct valid inputs.
-- A CrossHair run with no timeout — symbolic execution can run
-  arbitrarily long; cap with `--per-test-timeout`.
-- A mutmut run that includes mutants ruled out by the type checker —
-  filter them out so the survivor list reflects real test gaps.
-- A "verification" CI job that only runs Hypothesis at `max_examples=10`.
-- Snapshot tests promoted as the system of record for a property —
-  the property is the spec; the snapshot is a fixture.
+- A direct invariant is routed through several selector documents before
+  anyone writes the obvious `@given` test.
+- A Hypothesis property filters most inputs. Construct valid data instead.
+- A state machine models no history-dependent behaviour.
+- A CrossHair run has no timeout. Symbolic execution can run arbitrarily long;
+  cap the search budget.
+- A mutmut run includes a slow, flaky integration suite or mutants the type
+  checker already rejects.
+- A verification CI job runs expensive tools on every push without a stated
+  assurance target.
+- A snapshot is treated as the system of record for an invariant. The property
+  is the specification; the snapshot is an example.
 
-Read [selection-matrix.md](references/selection-matrix.md) when the
-choice between tools is still unclear, then load the matching deep
-dive (`hypothesis`, `crosshair`, or `mutmut`).
+Read [selection-matrix.md](references/selection-matrix.md) when the choice is
+still unclear, then load the matching deep dive (`hypothesis`, `crosshair`, or
+`mutmut`).
