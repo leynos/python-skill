@@ -23,7 +23,7 @@ Use this when the router's question list does not resolve to one skill.
 | Failure depends on a sequence of operations     | `hypothesis`                      | `python-verification`             |
 | Small pure function needs contract path search  | `crosshair`                       | `hypothesis`                      |
 | Pure refactor needs symbolic behaviour diff     | `crosshair`                       | `python-testing`                  |
-| Tests pass but mutants survive                  | `mutmut`                          | `python-testing`                  |
+| Tests pass, but mutants survive                 | `mutmut`                          | `python-testing`                  |
 | Flaky test relies on time or order              | `python-testing`                  | `python-concurrency`              |
 | Real service, load, or resource behaviour       | `python-testing`                  | `python-quality-tools`            |
 | Unused symbols and unreachable branches         | `python-quality-tools`            | None                              |

@@ -113,10 +113,17 @@ def test_order_old(a: int, b: int) -> None:
     assert relation(a, b)
 
 
-# Draw one bound, then construct the other value inside it.
-@given(b=st.integers(min_value=1), offset=st.integers(min_value=0))
-def test_order(b: int, offset: int) -> None:
-    a = offset % b
+# Draw one bound, then generate the dependent value inside it.
+@st.composite
+def bounded_order(draw) -> tuple[int, int]:
+    b = draw(st.integers(min_value=1))
+    a = draw(st.integers(min_value=0, max_value=b - 1))
+    return a, b
+
+
+@given(pair=bounded_order())
+def test_order(pair: tuple[int, int]) -> None:
+    a, b = pair
     assert relation(a, b)
 ```
 
@@ -154,8 +161,9 @@ single test does not need a strategy registry.
 
 ## Targeted property generation
 
-`hypothesis.target(value)` biases exploration toward inputs that maximize or
-minimize a score. Use it for a specific search objective such as longest
+`hypothesis.target(value)` maximizes finite numeric observations. It has no
+separate minimization mode; for a minimum search, negate the score with
+`target(-score)`. Use it for a specific search objective such as longest
 output, deepest tree, or greatest memory estimate. Do not add targets to an
 ordinary invariant without evidence that useful cases are otherwise rare.
 

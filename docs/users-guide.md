@@ -129,7 +129,7 @@ CrossHair and mutmut on slower cadences.
   `ruff: disable`/`enable` versus `noqa`, plus `--add-ignore` and the
   `RUF100`–`RUF106` hygiene rules.
 - **"Does this rule exist yet?"** The reference tables record what
-  stabilized in 0.15.0 and 0.16.0 and what is still preview, material
+  stabilized in 0.15.0 and 0.16.0 and what remains in preview, material
   that postdates most models' training data.
 
 Rule-level questions about exceptions and logging stay with
