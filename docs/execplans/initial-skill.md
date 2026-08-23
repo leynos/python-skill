@@ -191,6 +191,12 @@ Update this plan after each milestone with:
   `docs/developers-guide.md`, covering the gates and the test suite
   for anyone working on this repository rather than using the skills.
 
+- 2026-08-23: testing hierarchy and routing boundary clarified: named
+  examples and finite semantic tables stay with `python-testing`, cheap
+  invariants route directly to `hypothesis`, advanced generated or stateful
+  data stays with Hypothesis, CrossHair handles bounded pure-function path
+  scrutiny, and `mutmut` remains an orthogonal suite-sensitivity audit.
+
 ## Open follow-up (deferred)
 
 - A `python-pyproject` skill mirroring `arch-crate-design` (the

@@ -71,6 +71,23 @@ filenames.
 `mypy` runs in strict mode over `tests/` only; the catalogue's
 Markdown content is not type-checked, since it contains no Python.
 
+## Testing catalogue boundary
+
+The testing hierarchy is also a routing boundary. Start with named pytest
+examples or a finite semantic table in `python-testing`; route a cheap,
+repeatable invariant directly to `hypothesis`. Stay with Hypothesis for
+dependent, recursive, or stateful generated data, and use CrossHair for
+bounded path scrutiny of small pure functions. `mutmut` is orthogonal: it
+audits whether the configured test runner notices plausible defects, including
+only symbolic checks that runner explicitly invokes. Standalone CrossHair
+commands need their own run.
+
+`python-router` owns the first route. `python-verification` is the escalation
+selector when the required evidence is unclear; it is not a prerequisite for
+an obvious lightweight property. Integration, concurrency, load, performance,
+resource, and native-fault questions remain outside this hierarchy and need
+their specialist tests or tools.
+
 ## Adding Python
 
 Any new Python added to this repository, including test helpers,
