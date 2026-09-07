@@ -27,12 +27,12 @@ from tests._scratch import (
 if t.TYPE_CHECKING:  # pragma: no cover - typing only
     from cmd_mox import CmdMox
 
-MARKDOWN_TOOLS = ("mdtablefix", "markdownlint", "nixie")
+EXTERNAL_TOOLS = ("mdtablefix", "markdownlint", "nixie", "uv")
 
 
 def _stub_all(cmd_mox: CmdMox) -> None:
     """Register passing stubs for every external tool the recipes call."""
-    for tool in MARKDOWN_TOOLS:
+    for tool in EXTERNAL_TOOLS:
         cmd_mox.stub(tool).returns(exit_code=0)
 
 
@@ -54,6 +54,7 @@ def test_default_goal_is_check(scratch_repo: ScratchRepo) -> None:
     [
         ("markdownlint", "markdownlint"),
         ("nixie", "nixie"),
+        ("skill-frontmatter", "validate_skill_frontmatter.py"),
         ("typecheck", "mypy"),
         ("test", "pytest"),
     ],
@@ -105,6 +106,21 @@ def test_lint_passes_when_both_tools_pass(
 
     cmd_mox.verify()
     assert result.returncode == 0, result.stderr
+
+
+def test_lint_fails_when_skill_frontmatter_check_fails(
+    scratch_repo: ScratchRepo, cmd_mox: CmdMox
+) -> None:
+    """A failed frontmatter validator must fail the aggregate lint gate."""
+    for tool in ("markdownlint", "nixie"):
+        cmd_mox.stub(tool).returns(exit_code=0)
+    cmd_mox.stub("uv").returns(exit_code=1)
+    cmd_mox.replay()
+
+    result = scratch_repo.make("lint")
+
+    cmd_mox.verify()
+    assert result.returncode != 0, "a failed skill-frontmatter gate was swallowed"
 
 
 def test_check_fmt_runs_markdownlint(
