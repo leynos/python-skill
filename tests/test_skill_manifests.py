@@ -316,6 +316,24 @@ def test_python_testing_description_survives_the_quoting_fix() -> None:
     assert _frontmatter(manifest)["description"] == PYTHON_TESTING_DESCRIPTION
 
 
+def test_manifest_check_rejects_the_original_unquoted_description(
+    tmp_path: Path,
+) -> None:
+    """The reported colon-space mutation must fail strict manifest validation."""
+    skill_dir = _write_manifest(
+        tmp_path / "python-testing",
+        "---\n"
+        "name: python-testing\n"
+        f"description: {PYTHON_TESTING_DESCRIPTION}\n"
+        "---\n\n"
+        "# Python Testing\n",
+    )
+
+    result = _run_manifest_check(skill_dir)
+
+    assert result.returncode != 0, result.stdout + result.stderr
+
+
 @pytest.mark.parametrize(
     "manifest",
     [path for path in SHIPPED_MANIFESTS if path.parent.name != ROUTER_SKILL],
