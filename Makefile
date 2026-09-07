@@ -7,7 +7,7 @@ SHELL := /bin/bash
 
 MD_GLOB := **/*.md
 
-.PHONY: help fmt markdownlint nixie lint check check-fmt typecheck test
+.PHONY: help fmt markdownlint nixie skill-frontmatter lint check check-fmt typecheck test
 
 help: ## Show this help
 	@grep -hE '^[a-zA-Z_-]+:.*## ' $(MAKEFILE_LIST) \
@@ -25,7 +25,10 @@ markdownlint: ## Lint every Markdown file
 nixie: ## Validate every Mermaid diagram
 	nixie .
 
-lint: markdownlint nixie ## Run all lint gates
+skill-frontmatter: ## Validate every shipped skill frontmatter
+	uv run --group dev python scripts/validate_skill_frontmatter.py
+
+lint: markdownlint nixie skill-frontmatter ## Run all lint gates
 
 check-fmt: markdownlint ## Formatting gate
 
