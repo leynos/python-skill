@@ -39,6 +39,10 @@ VALID_MANIFEST = (
     "# Valid\n"
 )
 
+# Valid YAML that omits the required `description`, so it passes the frontmatter
+# lint and fails schema validation.
+INVALID_MANIFEST = "---\nname: b-invalid\n---\n\n# Fixture\n"
+
 
 def _run_make(target: str, *skill_dirs: Path) -> subprocess.CompletedProcess[str]:
     """Run a Makefile target over shipped skills or given fixture directories.
@@ -133,28 +137,48 @@ def test_shipped_skill_manifests_satisfy_the_contract() -> None:
 
 
 @pytest.mark.parametrize(
-    ("case", "frontmatter"),
+    ("case", "frontmatter", "expected"),
     [
-        ("missing", "description: A fixture that lacks the required name.\n"),
-        ("empty", 'name: ""\ndescription: A fixture whose name is empty.\n'),
+        (
+            "missing-name",
+            "description: A fixture that lacks the required name.\n",
+            "Missing required field in frontmatter: name",
+        ),
+        (
+            "empty-name",
+            'name: ""\ndescription: A fixture whose name is empty.\n',
+            "Field 'name' must be a non-empty string",
+        ),
+        (
+            "missing-description",
+            "name: missing-description\n",
+            "Missing required field in frontmatter: description",
+        ),
+        (
+            "empty-description",
+            'name: empty-description\ndescription: ""\n',
+            "Field 'description' must be a non-empty string",
+        ),
     ],
 )
-def test_manifest_check_rejects_an_unusable_name(
-    tmp_path: Path, case: str, frontmatter: str
+def test_manifest_check_rejects_an_unusable_manifest(
+    tmp_path: Path, case: str, frontmatter: str, expected: str
 ) -> None:
-    """A strict loader cannot discover a skill without a usable discovery name.
+    """Both required fields are enforced, present but unusable included.
 
-    An absent ``name`` and an empty ``name`` fail discovery identically, so
-    the contract must reject both rather than only the absent case.
+    An absent ``name`` or ``description`` and an empty one fail validation
+    identically. Where the schema checks it, the directory name matches the
+    manifest ``name``, so a rejection can only come from the field under test.
     """
     skill_dir = _write_manifest(
-        tmp_path / f"{case}-name",
+        tmp_path / case,
         f"---\n{frontmatter}---\n\n# Fixture\n",
     )
 
     result = _run_manifest_check(skill_dir)
 
     assert result.returncode != 0, result.stdout + result.stderr
+    assert expected in result.stderr, result.stdout + result.stderr
 
 
 @pytest.mark.parametrize(
@@ -192,6 +216,29 @@ def test_frontmatter_lint_reports_an_early_failure(tmp_path: Path) -> None:
     result = _run_make("skill-frontmatter-lint", broken, valid)
 
     assert result.returncode != 0, result.stdout + result.stderr
+    assert "syntax error" in result.stdout, result.stdout + result.stderr
+
+
+@pytest.mark.parametrize(
+    "invalid_first", [True, False], ids=["invalid-first", "invalid-last"]
+)
+def test_manifest_validate_reports_a_failure_in_any_position(
+    tmp_path: Path, invalid_first: bool
+) -> None:
+    """A non-conformant directory fails the target wherever it sits in the list.
+
+    An invalid directory first is the ``set -e`` guard: without it the loop
+    exits with the status of the valid skill that follows. An invalid directory
+    last proves the loop reaches the end of ``SKILL_DIRS``.
+    """
+    valid = _write_manifest(tmp_path / "z-valid", VALID_MANIFEST)
+    invalid = _write_manifest(tmp_path / "b-invalid", INVALID_MANIFEST)
+    skill_dirs = (invalid, valid) if invalid_first else (valid, invalid)
+
+    result = _run_make("skill-manifest-validate", *skill_dirs)
+
+    assert result.returncode != 0, result.stdout + result.stderr
+    assert "Missing required field in frontmatter: description" in result.stderr
 
 
 def test_lint_runs_the_manifest_contract(
@@ -218,6 +265,7 @@ def test_lint_runs_the_manifest_contract(
 
     cmd_mox.verify()
     assert result.returncode != 0, result.stdout + result.stderr
+    assert "Missing required field in frontmatter: name" in result.stderr
 
 
 def test_frontmatter_lint_reports_an_unreadable_manifest(tmp_path: Path) -> None:

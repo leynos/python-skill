@@ -103,7 +103,7 @@ directly:
 | `make fmt`                  | Reflow tables and apply markdownlint fixes  |
 | `make markdownlint`         | Lint every Markdown file                    |
 | `make nixie`                | Validate every Mermaid diagram              |
-| `make lint`                 | Markdown lint and the skill manifest checks |
+| `make lint`                 | Markdown, Mermaid, and skill manifest lint  |
 | `make skill-manifest-check` | Validate every shipped `SKILL.md`           |
 | `make test`                 | Run the pytest suite via `uv`               |
 | `make typecheck`            | Run mypy via `uv`                           |

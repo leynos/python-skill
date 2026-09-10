@@ -66,10 +66,12 @@ it.
 The `Makefile` sets `SHELL := /bin/bash` and
 `.SHELLFLAGS := -eu -o pipefail -c`, so a failure anywhere in a
 recipe's pipeline propagates instead of being masked by the exit
-status of the pipeline's last command. The manifest loops repeat
-`set -euo pipefail` for the same reason: a `for` loop without it
-returns the status of its final iteration, so a conformant trailing
-skill would hide a malformed earlier one.
+status of the pipeline's last command. The manifest loops set `-e` for
+the same reason: `skill-frontmatter-lint` sets `-euo pipefail` inline,
+`skill-manifest-validate` sets `-eu` and takes `pipefail` from
+`.SHELLFLAGS`, and a `for` loop without `-e` returns the status of its
+final iteration, so a conformant trailing skill would hide a malformed
+earlier one.
 
 ## The skill manifest contract
 
