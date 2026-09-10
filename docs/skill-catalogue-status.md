@@ -66,6 +66,8 @@ input or supporting material.
 
 ## Documentation
 
+- [Agent instructions](../AGENTS.md) — commit gates and the rules for
+  changes under `skills/`.
 - [README](../README.md) — installation and quick-start.
 - [Users' guide](users-guide.md) — invocation and routing.
 - [Developers' guide](developers-guide.md) — prerequisites, the

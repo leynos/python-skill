@@ -98,22 +98,24 @@ The catalogue combines Markdown content with a small Python test suite.
 Run the gates through the `Makefile` rather than invoking the tools
 directly:
 
-| Target              | What it does                               |
-| ------------------- | ------------------------------------------ |
-| `make fmt`          | Reflow tables and apply markdownlint fixes |
-| `make markdownlint` | Lint every Markdown file                   |
-| `make nixie`        | Validate every Mermaid diagram             |
-| `make lint`         | Both of the above                          |
-| `make test`         | Run the pytest suite via `uv`              |
-| `make typecheck`    | Run mypy via `uv`                          |
-| `make check`        | Default goal; the full commit gate         |
+| Target                      | What it does                                |
+| --------------------------- | ------------------------------------------- |
+| `make fmt`                  | Reflow tables and apply markdownlint fixes  |
+| `make markdownlint`         | Lint every Markdown file                    |
+| `make nixie`                | Validate every Mermaid diagram              |
+| `make lint`                 | Markdown lint and the skill manifest checks |
+| `make skill-manifest-check` | Validate every shipped `SKILL.md`           |
+| `make test`                 | Run the pytest suite via `uv`               |
+| `make typecheck`            | Run mypy via `uv`                           |
+| `make check`                | Default goal; the full commit gate          |
 
 `make test` and `make typecheck` require `uv`; the `dev` dependency
-group in `pyproject.toml` supplies pytest, `cmd-mox`, mypy, and
-Hypothesis. The test suite stubs the external Markdown tools with
-`cmd-mox`. The [developers' guide](docs/developers-guide.md) covers the
-gates in full, and [scripting standards](docs/scripting-standards.md)
-gives the conventions any new Python must follow.
+group in `pyproject.toml` supplies pytest, `cmd-mox`, mypy, Hypothesis,
+PyYAML, `skills-ref`, and `yamllint`. The test suite stubs the external
+Markdown tools with `cmd-mox`. The
+[developers' guide](docs/developers-guide.md) covers the gates in full,
+and [scripting standards](docs/scripting-standards.md) gives the
+conventions any new Python must follow.
 
 ______________________________________________________________________
 
@@ -142,7 +144,9 @@ ______________________________________________________________________
 
 ## Contributing
 
-Contributions are welcome. Keep new material under `skills/`, prefer short
-first-class skills with references for longer detail, and update
+Contributions are welcome. Read [AGENTS.md](AGENTS.md) before changing
+tracked files: it lists the commit gates and the rules for changes under
+`skills/`. Keep new material under `skills/`, prefer short first-class
+skills with references for longer detail, and update
 [docs/skill-catalogue-status.md](docs/skill-catalogue-status.md) when adding
 or retiring a skill.
