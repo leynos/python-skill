@@ -1,7 +1,8 @@
 ---
 name: python-abstractions
 description: Use for Python decorators, descriptors, context managers (function and class form), metaclasses, and multiple dispatch. The common question is "which abstraction hides this complexity at the right level?".
-globs: ["**/*.py"]
+metadata:
+  globs: "**/*.py"
 ---
 
 # Python Abstractions

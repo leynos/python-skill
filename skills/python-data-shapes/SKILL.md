@@ -1,7 +1,8 @@
 ---
 name: python-data-shapes
 description: Use for choosing a Python data container — `msgspec.Struct`, `dataclasses.dataclass`, `attrs`, `TypedDict`, `NamedTuple`, frozen vs mutable, tagged unions, and the boundary between wire format and domain object.
-globs: ["**/*.py"]
+metadata:
+  globs: "**/*.py"
 ---
 
 # Python Data Shapes

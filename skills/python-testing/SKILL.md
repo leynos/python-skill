@@ -1,7 +1,8 @@
 ---
 name: python-testing
-description: Use for advanced pytest usage: fixture scopes, named examples, finite parametrization, marks, plugins, snapshot and approval tests, async tests, and the boundary between example, property, and verification testing.
-globs: ["**/tests/**/*.py", "**/test_*.py", "**/conftest.py"]
+description: "Use for advanced pytest usage: fixture scopes, named examples, finite parametrization, marks, plugins, snapshot and approval tests, async tests, and the boundary between example, property, and verification testing."
+metadata:
+  globs: "**/tests/**/*.py, **/test_*.py, **/conftest.py"
 ---
 
 # Python Testing (pytest)

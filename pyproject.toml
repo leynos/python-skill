@@ -6,7 +6,15 @@ requires-python = ">=3.14"
 dependencies = []
 
 [dependency-groups]
-dev = ["pytest>=8.3", "cmd-mox>=0.2", "mypy>=1.11", "hypothesis>=6.100"]
+dev = [
+    "pytest>=8.3",
+    "cmd-mox>=0.2",
+    "mypy>=1.11",
+    "hypothesis>=6.100",
+    "pyyaml>=6.0.3",
+    "skills-ref @ git+https://github.com/agentskills/agentskills.git@69ef37e9424c0a7ea9dd2293b559e43ec8176379#subdirectory=skills-ref",
+    "yamllint",
+]
 
 [tool.uv]
 package = false
@@ -27,4 +35,9 @@ files = ["tests"]
 # cmd-mox ships no py.typed marker as of 0.2.0.
 [[tool.mypy.overrides]]
 module = "cmd_mox.*"
+ignore_missing_imports = true
+
+# PyYAML ships no py.typed marker as of 6.0.3.
+[[tool.mypy.overrides]]
+module = "yaml.*"
 ignore_missing_imports = true

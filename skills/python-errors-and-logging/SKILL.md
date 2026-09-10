@@ -1,7 +1,8 @@
 ---
 name: python-errors-and-logging
 description: Use for Python exception design, raising, catching, and logging. Covers narrow `except`, `raise … from …`, domain hierarchies with `Error` suffixes, parameterised logging, `logger.exception`, and the Ruff TRY/BLE/EM/LOG/N818/PERF203 rules.
-globs: ["**/*.py"]
+metadata:
+  globs: "**/*.py"
 ---
 
 # Python Errors and Logging
