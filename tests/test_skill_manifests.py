@@ -246,6 +246,62 @@ def test_router_keeps_its_own_invocation_policy() -> None:
     )
 
 
+@pytest.mark.parametrize(
+    ("case", "config", "failure"),
+    [
+        ("absent-file", None, None),
+        (
+            "malformed-yaml",
+            "policy: [unclosed\n",
+            (yaml.YAMLError, "expected ',' or ']'"),
+        ),
+        (
+            "non-mapping-root",
+            "- allow_implicit_invocation: false\n",
+            (AssertionError, "is not a YAML mapping"),
+        ),
+        (
+            "non-mapping-policy",
+            "policy: false\n",
+            (AssertionError, "carries no policy mapping"),
+        ),
+    ],
+)
+def test_openai_policy_handles_absent_and_unusable_configurations(
+    tmp_path: Path,
+    case: str,
+    config: str | None,
+    failure: tuple[type[BaseException], str] | None,
+) -> None:
+    """An absent configuration reads as ``None``; a present unusable one fails.
+
+    ``agents/openai.yaml`` is optional, so a skill shipping none is a state the
+    caller must be able to tell apart from a configuration that is present but
+    unusable. Each unusable shape raises its own diagnostic, which the rows
+    assert rather than only that some failure occurred: the two
+    ``AssertionError`` messages differ, so a fixture pins which check fired
+    rather than merely that one did. The YAML error is asserted at
+    ``yaml.YAMLError``, the base class, since which subclass PyYAML raises
+    depends on where the parse fails rather than on the helper's behaviour.
+    """
+    skill_dir = tmp_path / case
+    skill_dir.mkdir()
+    if config is not None:
+        config_path = skill_dir / "agents" / "openai.yaml"
+        config_path.parent.mkdir()
+        config_path.write_text(config, encoding="utf-8")
+
+    if failure is None:
+        assert _openai_policy(skill_dir) is None, f"{case} should read as absent"
+        return
+
+    expected_type, diagnostic = failure
+    with pytest.raises(expected_type) as excinfo:
+        _openai_policy(skill_dir)
+
+    assert diagnostic in str(excinfo.value), str(excinfo.value)
+
+
 def test_frontmatter_lint_reports_an_early_failure(tmp_path: Path) -> None:
     """A failure in any skill fails the target, not just one in the final skill.
 
