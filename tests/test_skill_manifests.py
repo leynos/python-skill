@@ -2,9 +2,11 @@
 
 Each shipped skill's ``SKILL.md`` opens with YAML frontmatter that a strict
 loader reads before the skill is usable, and the manifest's ``name`` is the
-identifier discovery resolves. The Makefile targets exercised here are the
-ones ``make lint`` depends on, so a manifest that a loader could not use fails
-the commit gate rather than reaching an installation untouched.
+identifier discovery resolves. Each sub-skill also ships an
+``agents/openai.yaml`` that opts it out of implicit invocation, leaving the
+router as the catalogue's discovery surface. The Makefile targets exercised
+here are the ones ``make lint`` depends on, so a manifest that a loader could
+not use fails the commit gate rather than reaching an installation untouched.
 
 Unlike the other Makefile tests, these run in the checkout rather than in a
 scratch repository: the manifest targets resolve their tools through
@@ -27,6 +29,11 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 SHIPPED_MANIFESTS = sorted((REPO_ROOT / "skills").glob("*/SKILL.md"))
 MARKDOWN_TOOLS = ("markdownlint", "nixie")
 
+# The router is invoked implicitly; every other skill is opted out, so that the
+# router owns the routing decision rather than competing with its own targets.
+ROUTER_SKILL = "python-router"
+IMPLICIT_INVOCATION = "allow_implicit_invocation"
+
 # A manifest that is not valid YAML, and a conformant skill sorted after it. The
 # conformant skill must not mask the malformed one in a `for` loop's status.
 BROKEN_MANIFEST = "---\nname: [unclosed\n---\n\n# Broken\n"
@@ -42,6 +49,11 @@ VALID_MANIFEST = (
 # Valid YAML that omits the required `description`, so it passes the frontmatter
 # lint and fails schema validation.
 INVALID_MANIFEST = "---\nname: b-invalid\n---\n\n# Fixture\n"
+
+# The scanner diagnostic yamllint reports for the truncated flow sequence in
+# BROKEN_MANIFEST. Pinned by the parser in `uv.lock`, so assert the wording
+# rather than only that some syntax error occurred.
+BROKEN_SYNTAX_ERROR = "syntax error: expected ',' or ']', but got '<document start>'"
 
 
 def _run_make(target: str, *skill_dirs: Path) -> subprocess.CompletedProcess[str]:
@@ -129,6 +141,30 @@ def _write_manifest(skill_dir: Path, body: str) -> Path:
     return skill_dir
 
 
+def _openai_policy(skill_dir: Path) -> dict[str, object] | None:
+    """Read the ``policy`` mapping from a skill's ``agents/openai.yaml``.
+
+    Parameters
+    ----------
+    skill_dir : Path
+        The skill directory, which need not ship the configuration.
+
+    Returns
+    -------
+    dict of str to object or None
+        The parsed ``policy`` mapping, or ``None`` when the skill ships no
+        ``agents/openai.yaml`` at all.
+    """
+    config = skill_dir / "agents" / "openai.yaml"
+    if not config.is_file():
+        return None
+    parsed = yaml.safe_load(config.read_text(encoding="utf-8"))
+    assert isinstance(parsed, dict), f"{config} is not a YAML mapping"
+    policy = parsed.get("policy")
+    assert isinstance(policy, dict), f"{config} carries no policy mapping"
+    return policy
+
+
 def test_shipped_skill_manifests_satisfy_the_contract() -> None:
     """Every shipped skill passes YAML and Agent Skills schema validation."""
     result = _run_manifest_check()
@@ -159,6 +195,16 @@ def test_shipped_skill_manifests_satisfy_the_contract() -> None:
             'name: empty-description\ndescription: ""\n',
             "Field 'description' must be a non-empty string",
         ),
+        (
+            "list-description",
+            "name: list-description\ndescription:\n  - one\n  - two\n",
+            "Field 'description' must be a non-empty string",
+        ),
+        (
+            "mapping-description",
+            "name: mapping-description\ndescription:\n  text: hello\n",
+            "Field 'description' must be a non-empty string",
+        ),
     ],
 )
 def test_manifest_check_rejects_an_unusable_manifest(
@@ -166,9 +212,11 @@ def test_manifest_check_rejects_an_unusable_manifest(
 ) -> None:
     """Both required fields are enforced, present but unusable included.
 
-    An absent ``name`` or ``description`` and an empty one fail validation
-    identically. Where the schema checks it, the directory name matches the
-    manifest ``name``, so a rejection can only come from the field under test.
+    An absent ``name`` or ``description``, an empty one, and a list or mapping
+    in place of a string all fail validation, the last two with the diagnostic
+    shown for an empty scalar. Where the schema checks it the directory name
+    matches the manifest ``name``, so a rejection can only come from the field
+    under test.
     """
     skill_dir = _write_manifest(
         tmp_path / case,
@@ -203,6 +251,42 @@ def test_shipped_metadata_values_are_strings(manifest: Path) -> None:
     assert not non_strings, f"metadata values must be strings: {non_strings}"
 
 
+@pytest.mark.parametrize(
+    "manifest",
+    [path for path in SHIPPED_MANIFESTS if path.parent.name != ROUTER_SKILL],
+    ids=lambda path: path.parent.name,
+)
+def test_sub_skills_disable_implicit_invocation(manifest: Path) -> None:
+    """Every skill but the router opts out of implicit invocation.
+
+    A sub-skill is reached through the router, which resolves a task to one
+    skill. An implicitly invocable sub-skill competes with that routing
+    decision, so the option is disabled for every skill the router owns.
+    """
+    skill = manifest.parent
+    policy = _openai_policy(skill)
+
+    assert policy is not None, f"{skill} ships no agents/openai.yaml"
+    assert policy.get(IMPLICIT_INVOCATION) is False, (
+        f"{skill} must set {IMPLICIT_INVOCATION}: false, got {policy!r}"
+    )
+
+
+def test_router_keeps_its_own_invocation_policy() -> None:
+    """The router stays implicitly invocable, so the catalogue is discoverable.
+
+    The test above opts every other skill out, which leaves the router as the
+    only entry point. Disabling implicit invocation for the router too, whether
+    by editing its policy or by copying a sub-skill's configuration, would
+    leave the catalogue reachable only by an explicit invocation.
+    """
+    policy = _openai_policy(REPO_ROOT / "skills" / ROUTER_SKILL)
+
+    assert policy is None or policy.get(IMPLICIT_INVOCATION) is not False, (
+        f"{ROUTER_SKILL} must not disable implicit invocation, got {policy!r}"
+    )
+
+
 def test_frontmatter_lint_reports_an_early_failure(tmp_path: Path) -> None:
     """A failure in any skill fails the target, not just one in the final skill.
 
@@ -216,7 +300,25 @@ def test_frontmatter_lint_reports_an_early_failure(tmp_path: Path) -> None:
     result = _run_make("skill-frontmatter-lint", broken, valid)
 
     assert result.returncode != 0, result.stdout + result.stderr
-    assert "syntax error" in result.stdout, result.stdout + result.stderr
+    assert BROKEN_SYNTAX_ERROR in result.stdout, result.stdout + result.stderr
+
+
+def test_frontmatter_lint_reports_a_trailing_failure(tmp_path: Path) -> None:
+    """A malformed skill in the final position fails the target as well.
+
+    ``skill-frontmatter-lint`` walks the list as given, so the conformant entry
+    first must neither mask the malformed entry after it nor bring the walk to
+    an early end: a target that only inspected its first entry would pass here.
+    Together with the early-failure case this pins failure reporting to both
+    positions rather than to one.
+    """
+    valid = _write_manifest(tmp_path / "z-valid", VALID_MANIFEST)
+    broken = _write_manifest(tmp_path / "a-broken", BROKEN_MANIFEST)
+
+    result = _run_make("skill-frontmatter-lint", valid, broken)
+
+    assert result.returncode != 0, result.stdout + result.stderr
+    assert BROKEN_SYNTAX_ERROR in result.stdout, result.stdout + result.stderr
 
 
 @pytest.mark.parametrize(
