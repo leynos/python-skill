@@ -113,9 +113,11 @@ filenames.
 The manifest tests are the exception: they run `make` in the checkout
 itself rather than in a scratch repository, because both targets
 resolve their tools through `uv run --group dev` and so need the
-project's `pyproject.toml` and `uv.lock`. They pass `SKILL_DIRS` to
-pin the run to specific directories, and they stub the Markdown tools
-with `cmd-mox` so that only the manifest targets under test execute.
+project's `pyproject.toml` and `uv.lock`. Most pass `SKILL_DIRS` to
+pin the run to fixture directories, while the tests that exercise the
+default deliberately omit the override so the default itself stays
+covered. They stub the Markdown tools with `cmd-mox` so that only the
+manifest targets under test execute.
 
 `mypy` runs in strict mode over `tests/` only; the catalogue's
 Markdown content is not type-checked, since it contains no Python.

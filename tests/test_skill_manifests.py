@@ -55,6 +55,44 @@ INVALID_MANIFEST = "---\nname: b-invalid\n---\n\n# Fixture\n"
 # rather than only that some syntax error occurred.
 BROKEN_SYNTAX_ERROR = "syntax error: expected ',' or ']', but got '<document start>'"
 
+# Every shipped skill's `globs` hint, as it stood at the top level before this
+# branch folded each YAML list into one comma-separated `metadata` string.
+# Pinned because no other gate constrains the fold: unknown top-level fields are
+# rejected, but `skills-ref` coerces a metadata value with `str(v)` rather than
+# rejecting a wrong shape, and the frontmatter lint reads YAML syntax only. A
+# dropped or reworded pattern would therefore validate while quietly narrowing
+# where the skill claims to apply. `None` marks the three skills that carry no
+# hint, which is a deliberate distinction rather than an omission.
+EXPECTED_GLOBS: dict[str, str | None] = {
+    "crosshair": None,
+    "hypothesis": None,
+    "mutmut": None,
+    "python-abstractions": "**/*.py",
+    "python-concurrency": "**/*.py",
+    "python-data-shapes": "**/*.py",
+    "python-errors-and-logging": "**/*.py",
+    "python-iterators-and-generators": "**/*.py",
+    "python-quality-tools": "**/*.py, **/pyproject.toml",
+    "python-router": "**/pyproject.toml, **/*.py, **/*.pyi",
+    "python-testing": "**/tests/**/*.py, **/test_*.py, **/conftest.py",
+    "python-types-and-apis": "**/pyproject.toml, **/*.py, **/*.pyi",
+    "python-verification": "**/*.py",
+    "ruff-016": (
+        "**/pyproject.toml, **/ruff.toml, **/.ruff.toml, **/*.py, **/*.pyi, **/*.md"
+    ),
+}
+
+# The `python-testing` description as it stood before #4 quoted it. The issue
+# permits quoting the scalar, not rewording it, and nothing else pins the text:
+# the schema asks only that a description be a non-empty string, so any other
+# sentence would satisfy every gate while breaking that acceptance criterion.
+PYTHON_TESTING_DESCRIPTION = (
+    "Use for advanced pytest usage: fixture scopes, named examples, finite "
+    "parametrization, marks, plugins, snapshot and approval tests, async "
+    "tests, and the boundary between example, property, and verification "
+    "testing."
+)
+
 
 def _run_make(target: str, *skill_dirs: Path) -> subprocess.CompletedProcess[str]:
     """Run a Makefile target over shipped skills or the given fixture directories."""
@@ -129,6 +167,32 @@ def test_shipped_skill_manifests_satisfy_the_contract() -> None:
     result = _run_manifest_check()
 
     assert result.returncode == 0, result.stdout + result.stderr
+
+
+def test_default_skill_dirs_reach_every_shipped_skill() -> None:
+    """The Makefile's own ``SKILL_DIRS`` default validates every shipped skill.
+
+    Every other test here overrides ``SKILL_DIRS`` with fixtures, and the
+    shipped-catalogue test above only checks the exit status, which an empty
+    default would also satisfy: both loops would iterate zero times and report
+    success. Running the target with no override and comparing the skills it
+    reports against the shipped inventory is what catches a default that
+    expanded to nothing or to a truncated list.
+    """
+    result = _run_make("skill-manifest-validate")
+
+    assert result.returncode == 0, result.stdout + result.stderr
+    validated = {
+        line.removeprefix("Valid skill: ")
+        for line in result.stdout.splitlines()
+        if line.startswith("Valid skill: ")
+    }
+    shipped = {str(path.parent.relative_to(REPO_ROOT)) for path in SHIPPED_MANIFESTS}
+
+    assert validated == shipped, (
+        f"default SKILL_DIRS missed {sorted(shipped - validated)} "
+        f"and added {sorted(validated - shipped)}"
+    )
 
 
 @pytest.mark.parametrize(
@@ -208,6 +272,47 @@ def test_shipped_metadata_values_are_strings(manifest: Path) -> None:
         key: value for key, value in metadata.items() if not isinstance(value, str)
     }
     assert not non_strings, f"metadata values must be strings: {non_strings}"
+
+
+@pytest.mark.parametrize("skill", sorted(EXPECTED_GLOBS))
+def test_shipped_globs_survive_the_metadata_fold(skill: str) -> None:
+    """Every migrated ``globs`` hint still names the same patterns, in order.
+
+    The fold from a top-level YAML list to one comma-separated string is the
+    semantic change this branch makes to the catalogue, so it is the one most
+    worth pinning: the schema accepts any string, which means a lost pattern
+    would ship as a narrower claim about where the skill applies without any
+    gate noticing.
+    """
+    expected = EXPECTED_GLOBS[skill]
+    manifest = REPO_ROOT / "skills" / skill / "SKILL.md"
+    metadata = _frontmatter(manifest).get("metadata", {})
+
+    assert isinstance(metadata, dict), f"{skill} metadata is not a mapping"
+    assert metadata.get("globs") == expected, (
+        f"{skill} globs changed: {metadata.get('globs')!r}, expected {expected!r}"
+    )
+
+
+def test_globs_expectations_cover_every_shipped_skill() -> None:
+    """A skill added without a pinned ``globs`` entry fails here, not silently.
+
+    The table drives one case per key, so without this the new skill would
+    simply go unchecked.
+    """
+    assert set(EXPECTED_GLOBS) == {path.parent.name for path in SHIPPED_MANIFESTS}
+
+
+def test_python_testing_description_survives_the_quoting_fix() -> None:
+    """#4 permits quoting the description, not rewording it.
+
+    Nothing else pins the text: the schema requires only that a description be a
+    non-empty string, so any other sentence would pass every gate while breaking
+    the acceptance criterion that the text is unchanged.
+    """
+    manifest = REPO_ROOT / "skills" / "python-testing" / "SKILL.md"
+
+    assert _frontmatter(manifest)["description"] == PYTHON_TESTING_DESCRIPTION
 
 
 @pytest.mark.parametrize(
@@ -340,7 +445,7 @@ def test_frontmatter_lint_reports_a_trailing_failure(tmp_path: Path) -> None:
     "invalid_first", [True, False], ids=["invalid-first", "invalid-last"]
 )
 def test_manifest_validate_reports_a_failure_in_any_position(
-    tmp_path: Path, invalid_first: bool
+    tmp_path: Path, *, invalid_first: bool
 ) -> None:
     """A non-conformant directory fails the target wherever it sits in the list.
 
