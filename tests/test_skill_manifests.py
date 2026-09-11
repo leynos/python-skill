@@ -57,24 +57,7 @@ BROKEN_SYNTAX_ERROR = "syntax error: expected ',' or ']', but got '<document sta
 
 
 def _run_make(target: str, *skill_dirs: Path) -> subprocess.CompletedProcess[str]:
-    """Run a Makefile target over shipped skills or given fixture directories.
-
-    Parameters
-    ----------
-    target : str
-        The Makefile target to run, such as ``skill-manifest-check``.
-    *skill_dirs : Path
-        Fixture skill directories to check instead of the shipped set. When
-        none are given, ``SKILL_DIRS`` keeps its default of every shipped
-        skill.
-
-    Returns
-    -------
-    subprocess.CompletedProcess of str
-        The completed process, with stdout and stderr decoded as text. The
-        exit status is returned rather than raised on, since several tests
-        assert that a gate fails.
-    """
+    """Run a Makefile target over shipped skills or the given fixture directories."""
     arguments = ["make", target]
     if skill_dirs:
         arguments.append(
@@ -97,18 +80,7 @@ def _run_manifest_check(
 
 
 def _frontmatter(manifest: Path) -> dict[str, object]:
-    """Parse the YAML frontmatter block of a skill manifest.
-
-    Parameters
-    ----------
-    manifest : Path
-        The ``SKILL.md`` to parse.
-
-    Returns
-    -------
-    dict of str to object
-        The parsed frontmatter mapping, empty when the block holds no keys.
-    """
+    """Parse the YAML frontmatter block of a skill manifest."""
     lines = manifest.read_text(encoding="utf-8").splitlines()
     assert lines and lines[0] == "---", (
         f"{manifest} does not open with a frontmatter fence"
@@ -122,20 +94,7 @@ def _frontmatter(manifest: Path) -> dict[str, object]:
 
 
 def _write_manifest(skill_dir: Path, body: str) -> Path:
-    """Create a skill directory containing the given manifest text.
-
-    Parameters
-    ----------
-    skill_dir : Path
-        Directory to create; it must not already exist.
-    body : str
-        The complete ``SKILL.md`` content, fences included.
-
-    Returns
-    -------
-    Path
-        The directory just created.
-    """
+    """Create a skill directory containing the given manifest text."""
     skill_dir.mkdir()
     (skill_dir / "SKILL.md").write_text(body, encoding="utf-8")
     return skill_dir
