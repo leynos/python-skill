@@ -1,7 +1,8 @@
 ---
 name: python-router
 description: Route Python work to the smallest useful skill. Use for Python coding, design, typing, errors and logging, decorators and other abstractions, iterators and generators, data shapes, concurrency, testing, verification, and quality-tool selection.
-globs: ["**/pyproject.toml", "**/*.py", "**/*.pyi"]
+metadata:
+  globs: "**/pyproject.toml, **/*.py, **/*.pyi"
 ---
 
 # Python Router

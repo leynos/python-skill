@@ -1,7 +1,8 @@
 ---
 name: python-types-and-apis
 description: Use for Python typing decisions — generics, `TypeVar`, `ParamSpec`, `TypeIs` and `TypeGuard`, `NewType`, `Protocol`, `@overload`, typed kwargs, and the shape of public function signatures.
-globs: ["**/pyproject.toml", "**/*.py", "**/*.pyi"]
+metadata:
+  globs: "**/pyproject.toml, **/*.py, **/*.pyi"
 ---
 
 # Python Types and APIs

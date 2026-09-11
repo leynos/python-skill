@@ -1,7 +1,8 @@
 ---
 name: python-verification
 description: Select the next testing adversary when pytest examples or lightweight Hypothesis properties are insufficient. Use to choose among advanced Hypothesis, CrossHair, and mutmut by the evidence required, not by perceived tool strength.
-globs: ["**/*.py"]
+metadata:
+  globs: "**/*.py"
 ---
 
 # Python Verification

@@ -1,7 +1,8 @@
 ---
 name: python-quality-tools
 description: Use for Python code-quality scanners and profilers beyond unit testing and type-checking — `deadcode` for unused symbols, `pyscn` for unreachable code, clone, and coupling metrics, and Pyinstrument for low-overhead profiling.
-globs: ["**/*.py", "**/pyproject.toml"]
+metadata:
+  globs: "**/*.py, **/pyproject.toml"
 ---
 
 # Python Quality Tools

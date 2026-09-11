@@ -197,6 +197,21 @@ Update this plan after each milestone with:
   data stays with Hypothesis, CrossHair handles bounded pure-function path
   scrutiny, and `mutmut` remains an orthogonal suite-sensitivity audit.
 
+- 2026-09-10: the skill manifest contract was imported from
+  `agent-helper-scripts` at `aebf2f6`. `make lint` now depends on
+  `skill-manifest-check`, which lints each `SKILL.md` frontmatter with
+  `yamllint` and validates each skill directory against the Agent Skills
+  schema with `skills-ref validate`; both tools are `dev` group
+  dependencies resolved through `uv`. Two manifest changes were needed to
+  satisfy the schema. The catalogue-specific `globs` hint moved from a
+  top-level field into `metadata.globs` as one comma-separated string,
+  because unknown top-level fields are rejected and `metadata` admits
+  string values only — `skills-ref` coerces values with `str(v)` rather
+  than rejecting other shapes, so a list would have validated but reached
+  consumers as a Python repr. The `python-testing` description was quoted
+  to repair the unquoted-colon parse failure reported as issue #4. Contract
+  tests live in `tests/test_skill_manifests.py`.
+
 ## Open follow-up (deferred)
 
 - A `python-pyproject` skill mirroring `arch-crate-design` (the

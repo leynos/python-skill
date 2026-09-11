@@ -1,7 +1,8 @@
 ---
 name: python-iterators-and-generators
 description: Use for Python iterators, generators, lazy evaluation, and refactoring deeply nested loops by extracting an iterator or a context manager. Covers `yield`, `yield from`, generator expressions, `itertools` discipline, and async iteration.
-globs: ["**/*.py"]
+metadata:
+  globs: "**/*.py"
 ---
 
 # Python Iterators and Generators

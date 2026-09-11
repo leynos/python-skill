@@ -1,7 +1,8 @@
 ---
 name: ruff-016
 description: "Use for Ruff 0.16 — the 413-rule default set, `ruff: ignore` and `ruff: file-ignore` suppression comments, Markdown code-block formatting, and the settings, CLI, and rule changes introduced across 0.14.x, 0.15.x, and 0.16.0. Load when upgrading Ruff, writing or reviewing `[tool.ruff]` configuration, or when a Ruff behaviour looks unfamiliar."
-globs: ["**/pyproject.toml", "**/ruff.toml", "**/.ruff.toml", "**/*.py", "**/*.pyi", "**/*.md"]
+metadata:
+  globs: "**/pyproject.toml, **/ruff.toml, **/.ruff.toml, **/*.py, **/*.pyi, **/*.md"
 ---
 
 # Ruff 0.16

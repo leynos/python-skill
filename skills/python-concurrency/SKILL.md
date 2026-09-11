@@ -1,7 +1,8 @@
 ---
 name: python-concurrency
 description: Use for choosing between threads, `asyncio`, `multiprocessing`, and PEP 734 subinterpreters in Python. Covers workload shape (CPU vs I/O), shared state and the GIL, cancellation, and the `concurrent.interpreters` / `InterpreterPoolExecutor` API new in Python 3.14.
-globs: ["**/*.py"]
+metadata:
+  globs: "**/*.py"
 ---
 
 # Python Concurrency

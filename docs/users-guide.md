@@ -16,6 +16,15 @@ cp -a skills/* ~/.codex/skills/
 The catalogue is self-contained; the only directories Codex needs are
 `skills/<name>/SKILL.md` and `skills/<name>/references/*.md`.
 
+Each `skills/<name>/` directory carries a `SKILL.md` with YAML
+frontmatter. A strict loader discovers a skill by its directory and
+identifies it by the `name` field, so the two must match: a skill
+then answers to the same identifier on disk and at the point of
+discovery. The `make lint` gate validates every shipped manifest and
+rejects a malformed one, so a checkout that has passed the gate
+carries only valid manifests. The `cp -a` command above copies bytes
+verbatim and performs no validation.
+
 ## Invocation
 
 The router is the default entry point. Invoke it explicitly in a
