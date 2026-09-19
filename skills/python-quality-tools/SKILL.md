@@ -8,21 +8,26 @@ metadata:
 # Python Quality Tools
 
 Use this when the codebase needs a sanity sweep beyond what `ruff`,
-`mypy`, and pytest cover. The three tools here answer different
-questions and run on different cadences.
+`mypy`, and pytest cover. Use `skylos` for Skylos dead-code triage,
+implicit runtime callers, precise entrypoint rules, and gate repair. This
+skill owns broader tool selection and the other scanners and profilers.
 
 ## Working stance
 
 - Run lint, type-check, and tests on every push. Run the heavier
   scanners on a slower cadence.
-- Each tool produces a worklist, not a build failure. Triage and
-  promote real findings to issues or PRs.
+- Start new scanner adoption with a triaged worklist. Honour existing
+  repository gates; do not turn a failing Skylos gate into an advisory
+  scan or replace it with another tool to avoid a finding.
 - Pyinstrument is a profiler, not a benchmarker. Use it to find
   hot paths; use `pytest-benchmark` (see `python-testing`) to
   regression-test individual hot paths.
 
 ## Decision surface
 
+- **Skylos** — for an existing Skylos gate or deliberate Skylos cleanup,
+  load `skylos`. It owns safe removal, runtime-call evidence, narrow
+  exceptions, and configuration-contract maintenance.
 - **`deadcode`** — name-based unused-symbol detection (Albertas
   Gimbutas's tool). Fast, runs on the whole repo, supports `--fix`
   to delete the dead names. Good for finding orphaned helpers,
@@ -41,7 +46,9 @@ questions and run on different cadences.
 
 ## When to reach for which
 
-- *Unused function or import suspected* → `deadcode`.
+- *Skylos finding or existing Skylos dead-code gate* → `skylos`.
+- *Unused function or import suspected, no scanner chosen* → consider
+  `deadcode`; do not substitute it for an established Skylos gate.
 - *Unreachable branch behind a refactor* → `pyscn` dead-code report.
 - *Copy-pasted block now diverging* → `pyscn` clone report.
 - *Cyclic complexity creeping up* → `pyscn` CBO and complexity.

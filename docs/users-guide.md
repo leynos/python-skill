@@ -63,7 +63,9 @@ The router asks a short question list and resolves to a single skill:
 - *Verification escalation or adversary selection* →
   `python-verification`, then one primary deep dive from `hypothesis`,
   `crosshair`, or `mutmut`.
-- *Dead code, clones, profiling* → `python-quality-tools`.
+- *Skylos dead-code findings, runtime callers, or entrypoint drift* →
+  `skylos`.
+- *Scanner selection, clones, profiling* → `python-quality-tools`.
 - *Ruff configuration, defaults, suppression, or upgrade* → `ruff-016`.
 
 Pairing rules:
@@ -113,6 +115,9 @@ CrossHair and mutmut on slower cadences.
 
 ## When to reach for the quality tools
 
+- **Skylos**: when the repository already gates dead code with Skylos or
+  you are deliberately using it for cleanup. Load `skylos`; preserve
+  the existing gate rather than substituting another scanner.
 - **deadcode**: when the question is "is this name still used?".
   Run on changed files in CI; review `--fix` diffs by hand.
 - **pyscn**: when the question is "is this branch reachable?", "is
@@ -122,6 +127,32 @@ CrossHair and mutmut on slower cadences.
 - **Pyinstrument**: when a request or test is slow and the question
   is "where does the time go?". Use to find hot paths; use
   `pytest-benchmark` to regression-test them.
+
+## When to reach for the Skylos skill
+
+Invoke the dedicated skill for a failing Skylos gate or safe cleanup:
+
+```text
+Use $skylos to triage these SKY-U001 findings after a class rename.
+Preserve real runtime callers and keep any exceptions narrowly justified.
+```
+
+`skylos` separates genuine dead code, implicit runtime callers, stale
+configuration, and unresolved evidence. Its references cover a Protocol
+and worker-callback case where renaming an entrypoint exception fixed one
+finding but left four live helpers reported.
+
+The workflow distinguishes per-definition reporting exemptions from
+packaged script entry points. It includes explicit `full_name` rules,
+a configuration-contract test pattern, an unused-sibling negative
+control, and guidance for avoiding broad parent rules or vacuous tests.
+Use the consuming repository's pinned tool and project test environment;
+the documented 4.33.2 case is not a request to upgrade or downgrade it.
+
+The skill installs with the existing `cp -a skills/*` command. Like the
+other skills, its `agents/openai.yaml` disables implicit invocation; load
+it explicitly or follow the router's direction. It does not install
+Skylos, run scans, or change CI policy merely by being loaded.
 
 ## When to reach for the Ruff skill
 

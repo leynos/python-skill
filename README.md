@@ -54,7 +54,7 @@ ______________________________________________________________________
 
 ## Features
 
-- One router, six language skills, and five domain or quality skills.
+- One router, focused language skills, and dedicated domain and quality skills.
 - Short `SKILL.md` files, with references for the longer comparison material.
 - Coverage for typing (PEP 612, PEP 695, PEP 696, PEP 698, PEP 742),
   exceptions and logging (Ruff TRY/BLE/EM/LOG/N818/PERF203/B017),
@@ -64,6 +64,8 @@ ______________________________________________________________________
 - Verification skills covering selection plus deep dives for
   `hypothesis`, `crosshair`, and `mutmut`.
 - Quality-tool skill for `deadcode`, `pyscn`, and Pyinstrument.
+- Skylos dead-code management: safe deletion, implicit runtime callers,
+  precise entrypoint exceptions, and merge-aware configuration contracts.
 - Ruff 0.16 skill covering the 413-rule default set, `ruff: ignore`
   suppression comments, Markdown formatting, and the documented
   settings, CLI, and rule deltas since 0.14.0 — the material most
@@ -87,6 +89,8 @@ ______________________________________________________________________
 - [Python router](skills/python-router/SKILL.md) — the main entry point.
 - [Types and APIs](skills/python-types-and-apis/SKILL.md) — generics,
   `TypeVar`, `ParamSpec`, `TypeIs`, overloads, typed kwargs.
+- [Skylos](skills/skylos/SKILL.md) — dead-code triage, Protocol and callback
+  false positives, narrow configuration, and regression evidence.
 - [Ruff 0.16](skills/ruff-016/SKILL.md) — default rule set, suppression
   comments, Markdown formatting, settings and rule deltas.
 
@@ -132,7 +136,9 @@ of [Hypothesis](https://github.com/HypothesisWorks/hypothesis),
 on [`deadcode`](https://github.com/albertas/deadcode),
 [`pyscn`](https://github.com/ludo-technologies/pyscn), and
 [Pyinstrument](https://github.com/joerick/pyinstrument). The Ruff skill
-draws on [Ruff](https://github.com/astral-sh/ruff).
+draws on [Ruff](https://github.com/astral-sh/ruff). The Skylos skill draws
+on [Skylos](https://github.com/duriantaco/skylos) documentation and pinned
+source, together with a maintainer-supplied dead-code triage case.
 
 ______________________________________________________________________
 
