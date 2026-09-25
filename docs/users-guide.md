@@ -116,8 +116,8 @@ CrossHair and mutmut on slower cadences.
 ## When to reach for the quality tools
 
 - **Skylos**: when the repository already gates dead code with Skylos or
-  you are deliberately using it for cleanup. Load `skylos`; preserve
-  the existing gate rather than substituting another scanner.
+  the repository uses it deliberately for cleanup. Load `skylos`;
+  preserve the existing gate rather than substituting another scanner.
 - **deadcode**: when the question is "is this name still used?".
   Run on changed files in CI; review `--fix` diffs by hand.
 - **pyscn**: when the question is "is this branch reachable?", "is
@@ -153,6 +153,9 @@ The skill installs with the existing `cp -a skills/*` command. Like the
 other skills, its `agents/openai.yaml` disables implicit invocation; load
 it explicitly or follow the router's direction. It does not install
 Skylos, run scans, or change CI policy merely by being loaded.
+
+See [migration-0.1.0.md](migration-0.1.0.md) for a summary of the
+routing changes that introduced this skill.
 
 ## When to reach for the Ruff skill
 
