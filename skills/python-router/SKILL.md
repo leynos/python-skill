@@ -45,7 +45,9 @@ follow-on skill.
 - Choosing whether to escalate among generated, symbolic, and mutation
   testing: `python-verification`; deep dives in `hypothesis`, `crosshair`,
   `mutmut`
-- Dead-code detection, clone and complexity scans, or profiling:
+- Skylos dead-code findings, implicit runtime callers, entrypoint rules,
+  or rename/merge drift in a Skylos gate: `skylos`
+- Choosing a dead-code scanner, clone and complexity scans, or profiling:
   `python-quality-tools`
 - Ruff configuration, settings and CLI changes, selector rewrites,
   suppression comments, the 0.16 default rule set, formatter and

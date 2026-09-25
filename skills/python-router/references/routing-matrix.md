@@ -26,6 +26,8 @@ Use this when the router's question list does not resolve to one skill.
 | Tests pass, but mutants survive                 | `mutmut`                          | `python-testing`                  |
 | Flaky test relies on time or order              | `python-testing`                  | `python-concurrency`              |
 | Real service, load, or resource behaviour       | `python-testing`                  | `python-quality-tools`            |
+| Skylos finding or stale entrypoint rule         | `skylos`                          | None                              |
+| Protocol/callback false positive in Skylos      | `skylos`                          | `python-types-and-apis`           |
 | Unused symbols and unreachable branches         | `python-quality-tools`            | None                              |
 | Hot loop too slow                               | `python-quality-tools`            | `python-iterators-and-generators` |
 | Ruff upgrade floods CI with new diagnostics     | `ruff-016`                        | None                              |
@@ -50,3 +52,6 @@ Use this when the router's question list does not resolve to one skill.
 - Do not load `ruff-016` to explain a single diagnostic whose family is
   already covered by a language skill; load it when the question is about
   Ruff itself: configuration, defaults, suppression, or a version delta.
+- Route Skylos findings and configuration repairs directly to `skylos`;
+  use `python-quality-tools` when choosing a scanner or profiler. Do not
+  load another analyser merely to avoid the repository's existing gate.

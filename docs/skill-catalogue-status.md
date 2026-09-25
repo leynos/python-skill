@@ -48,6 +48,9 @@ input or supporting material.
   References: `selection-matrix.md`.
 - `python-quality-tools` — `deadcode`, `pyscn`, and Pyinstrument.
   References: `deadcode-and-pyscn.md`, `pyinstrument.md`.
+- `skylos` — dead-code management, implicit runtime callers, precise
+  entrypoint rules, safe removal, and merge/rename configuration drift.
+  References: `configuration-and-evidence.md`, `triage-and-regression.md`.
 - `ruff-016` — Ruff 0.16: the 413-rule default set, `ruff: ignore` and
   `ruff: file-ignore` suppression, Markdown code-block formatting, and
   the settings, CLI, and rule deltas across 0.14.x–0.16.0.
@@ -95,6 +98,10 @@ input or supporting material.
 
 ## Maintenance
 
+- `skylos` records a 4.33.2 case and links that release's source; it does
+  not mandate that version for consuming repositories. Recheck selector,
+  reachability, output, and Protocol-skip behaviour when their pin changes.
+  Keep the unused-sibling negative control when reviewing exceptions.
 - `ruff-016` is version-pinned material. Revisit it when Ruff 0.17
   ships: check the default rule count, which preview rules stabilized,
   and whether new settings appeared in `ruff.schema.json`. The counts
