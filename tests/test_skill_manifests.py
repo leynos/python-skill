@@ -80,6 +80,7 @@ EXPECTED_GLOBS: dict[str, str | None] = {
     "ruff-016": (
         "**/pyproject.toml, **/ruff.toml, **/.ruff.toml, **/*.py, **/*.pyi, **/*.md"
     ),
+    "skylos":"**/*.py, **/*.pyi, **/pyproject.toml, **/Makefile",
 }
 
 # The `python-testing` description as it stood before #4 quoted it. The issue

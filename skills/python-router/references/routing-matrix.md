@@ -27,7 +27,7 @@ Use this when the router's question list does not resolve to one skill.
 | Flaky test relies on time or order              | `python-testing`                  | `python-concurrency`              |
 | Real service, load, or resource behaviour       | `python-testing`                  | `python-quality-tools`            |
 | Skylos finding or stale entrypoint rule         | `skylos`                          | None                              |
-| Protocol/callback false positive in Skylos       | `skylos`                          | `python-types-and-apis`            |
+| Protocol/callback false positive in Skylos      | `skylos`                          | `python-types-and-apis`           |
 | Unused symbols and unreachable branches         | `python-quality-tools`            | None                              |
 | Hot loop too slow                               | `python-quality-tools`            | `python-iterators-and-generators` |
 | Ruff upgrade floods CI with new diagnostics     | `ruff-016`                        | None                              |
