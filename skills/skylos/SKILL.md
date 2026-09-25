@@ -91,6 +91,36 @@ all helpers reachable. Read method, class, and parameter findings
 separately; changing `typ.Protocol` to `Protocol` is not a justified fix
 without a controlled comparison.
 
+## Documentation is a liveness signal
+
+In 4.33.2, a public method escapes `SKY-U001` when a document names it
+as `Owner.method` and its owning class is otherwise live. Skylos reads
+`.md`, `.rst`, and `.txt` files, plus `README` and `FAQ`, under the
+resolved project root rather than the scan argument. The signal has two
+silent ceilings that are hard-coded in the analyser: a document over
+300000 bytes is skipped entirely, and reading stops before the document
+that would take the running total past 2000000 bytes.
+
+Record these as analyser constraints, not repository policy. Growing a
+document past the per-file ceiling withdraws credit from every method it
+names; a skipped guide documents nothing. Move self-contained material to
+a new topic document rather than trimming evidence to fit.
+
+Treat a `SKY-U001` that appears after a docs-only change as a question
+about the symbol, not a finding to silence:
+
+- If a required runtime caller is missing, a refactor removed it. Restore
+  the caller; the ceiling has merely exposed a real defect.
+- If the symbol is live but its caller is implicit, verify the caller and
+  record a precise entrypoint whose reason names it.
+- If the symbol is genuinely dead, remove it.
+
+Only a verified false positive that no entrypoint record can describe
+reaches a named whitelist exception. Do not disable the liveness pass or
+restore a mention merely to reinstate the rescue. See
+[configuration-and-evidence.md](references/configuration-and-evidence.md)
+for the matcher, ordering, and diagnostic JSON.
+
 ## Choose the smallest honest change
 
 First fix actual dead code, broken wiring, or stale names. When remaining

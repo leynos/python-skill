@@ -137,6 +137,56 @@ Keep function and method rules separate. A helper moved from a thread
 target to a direct call needs a new reason or removal of a now-unnecessary
 exception, not a stale story copied from the old implementation.
 
+## Documentation liveness and its ceilings
+
+The 4.33.2 [liveness pass][liveness] rescues a method with the reason
+`documented_public_api` when all of the following hold:
+
+- The method name is public, and its file is not under a `test`,
+  `tests`, `docs`, or `examples` directory. Module-level functions are
+  never rescued this way.
+- The owning class is live: it has a reference, is exported, or has a
+  public name. A private `_Owner` needs a reference or an export.
+- The combined document text contains `Owner.method` on word
+  boundaries, a `:meth:` role ending in `Owner.method` or `method`, or,
+  for a method name of at least ten characters containing `_`,
+  `.method(`.
+
+Documents are files ending in `.md`, `.rst`, or `.txt`, or whose stem is
+`README` or `FAQ`, found by `rglob` under the resolved project root: the
+nearest ancestor of the scan path holding `pyproject.toml`,
+`package.json`, `setup.py`, or `.git`. Scanning `src/` still reads the
+repository's `docs/`. Only `.git`, `.venv`, `venv`, and `__pycache__`
+are excluded, so build output, vendored trees, and `node_modules` spend
+the same budget.
+
+Two constants bound the read, with no warning and no setting:
+
+- A document over 300000 bytes is skipped. Exactly 300000 bytes is read.
+- Reading stops at the first document that would take the running total
+  past 2000000 bytes; it and every later document are ignored.
+
+`rglob` order follows the filesystem, not a sorted path, so which
+documents fall outside the total budget can differ between machines.
+`SKYLOS_DEAD_CODE_LIVENESS=0` disables every liveness rescue at once; it
+is an experiment switch, not a repair.
+
+A scratch probe with the 4.33.2 release, run as
+`skylos pkg --json --no-grep-verify`, confirmed each boundary. A 46-byte
+guide naming `Owner.documented_method` rescued it. Padding that guide to
+300045 bytes returned the method to `unused_functions` with nothing on
+stderr. With the guide read after seven 290000-byte text files, it was
+skipped; with six, it was read. The motivating repository's developers'
+guide crossed 300000 bytes during ordinary documentation growth, so
+further material moved to a separate topic document.
+
+To diagnose a finding that appeared after a docs-only change, compare
+`analysis_summary.dead_code_liveness.rescued` in the JSON report before
+and after that change. A lost `documented_public_api` rescue shows that
+the ceiling changed the evidence; it does not show whether the method is
+live. Triage it as in the skill: restore a missing caller, record a
+verified implicit caller as an entrypoint naming it, or delete dead code.
+
 ## Inspect evidence without overreading it
 
 Find the exact symbol in the emitted schema. Depending on the version
@@ -171,4 +221,5 @@ enable uploads, or start paid AI review merely to clear a static gate.
 [cli]: https://docs.skylos.dev/cli-reference
 [matcher]: https://github.com/duriantaco/skylos/blob/de23f0c52a21c724fdbdcdaa340fc573676e9f6a/skylos/deadcode/config_entrypoints.py
 [scripts]: https://github.com/duriantaco/skylos/blob/de23f0c52a21c724fdbdcdaa340fc573676e9f6a/skylos/analysis/pyproject_entrypoints.py
+[liveness]: https://github.com/duriantaco/skylos/blob/de23f0c52a21c724fdbdcdaa340fc573676e9f6a/skylos/deadcode/liveness.py
 [evidence]: https://github.com/duriantaco/skylos/blob/de23f0c52a21c724fdbdcdaa340fc573676e9f6a/skylos/deadcode/evidence.py
