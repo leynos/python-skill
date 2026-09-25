@@ -195,3 +195,82 @@ def test_reference_links_in_skill_files_resolve(repo_root: Path) -> None:
         )
 
     assert not broken, f"broken reference links: {broken}"
+
+
+def _matrix_rows(matrix: str) -> dict[str, tuple[str, ...]]:
+    """Map each routing-matrix symptom to its primary skill and common pair."""
+    rows: dict[str, tuple[str, ...]] = {}
+    for line in matrix.splitlines():
+        row = line.strip()
+        if not row.startswith("|") or set(row) <= set("| -:"):
+            continue
+        symptom, *skills = (cell.strip() for cell in row.strip("|").split("|"))
+        rows[symptom] = tuple(skills[:2])
+    return rows
+
+
+def _router_routes(router_skill: str) -> dict[str, frozenset[str]]:
+    """Map each "Route by question" trigger to the skills it routes to."""
+    routes: dict[str, frozenset[str]] = {}
+    for bullet in _bullets(_section(router_skill, "Route by question")):
+        trigger, _, destination = bullet.rpartition(":")
+        routes[trigger.strip()] = frozenset(BACKTICKED.findall(destination))
+    return routes
+
+
+@pytest.mark.parametrize(
+    ("symptom", "primary", "pair"),
+    [
+        ("Skylos finding or stale entrypoint rule", "`skylos`", "None"),
+        (
+            "Protocol/callback false positive in Skylos",
+            "`skylos`",
+            "`python-types-and-apis`",
+        ),
+        ("Unused symbols and unreachable branches", "`python-quality-tools`", "None"),
+        (
+            "Hot loop too slow",
+            "`python-quality-tools`",
+            "`python-iterators-and-generators`",
+        ),
+    ],
+)
+def test_dead_code_matrix_rows_route_to_their_owner(
+    repo_root: Path, symptom: str, primary: str, pair: str
+) -> None:
+    """Pin the dead-code split row by row.
+
+    Reachability alone cannot catch a reassigned row: another row or bullet
+    would still name the skill. Skylos triage belongs to `skylos`; scanner
+    selection and profiling stay with `python-quality-tools`.
+    """
+    matrix = (
+        repo_root / "skills" / SELF / "references" / "routing-matrix.md"
+    ).read_text(encoding="utf-8")
+
+    assert _matrix_rows(matrix).get(symptom) == (primary, pair)
+
+
+@pytest.mark.parametrize(
+    ("trigger", "destination"),
+    [
+        (
+            (
+                "Skylos dead-code findings, implicit runtime callers, entrypoint "
+                "rules, or rename/merge drift in a Skylos gate"
+            ),
+            "skylos",
+        ),
+        (
+            "Choosing a dead-code scanner, clone and complexity scans, or profiling",
+            "python-quality-tools",
+        ),
+    ],
+)
+def test_dead_code_router_entries_route_to_their_owner(
+    repo_root: Path, trigger: str, destination: str
+) -> None:
+    """Each dead-code question in the router names exactly one destination."""
+    router = (repo_root / "skills" / SELF / "SKILL.md").read_text(encoding="utf-8")
+
+    assert _router_routes(router).get(trigger) == frozenset({destination})
