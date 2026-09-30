@@ -55,11 +55,16 @@ versions of every `dev` dependency without a separate installation step. The
 | `make test`                    | Run `pytest` via `uv`                    |
 | `make check`                   | Default goal; runs every gate above      |
 
-`make fmt` reflows Markdown tables with `mdtablefix` before applying
-markdownlint's own fixes; it is deliberately not part of `check` because it
-rewrites files, and a commit gate should not mutate the working tree as a side
-effect. `check-fmt` does not run `mdtablefix`, so it can only detect formatting
-drift, not correct it.
+`make fmt` rewrites Markdown with
+`mdtablefix --in-place --git
+--include-untracked --wrap --renumber --breaks --ellipsis --fences`
+and then applies markdownlint's own fixes; it is deliberately not part of
+`check` because it rewrites files, and a commit gate should not mutate the
+working tree as a side effect. `check-fmt` runs the same `mdtablefix` command
+with `--check` in place of `--in-place`, which reports formatting drift and
+fails without rewriting any file, after the markdownlint gate. Install
+mdtablefix 0.6.1 or later with `cargo binstall --no-confirm mdtablefix@0.6.1` or
+`cargo install --locked mdtablefix@0.6.1`.
 
 The `Makefile` sets `SHELL := /bin/bash` and
 `.SHELLFLAGS := -eu -o pipefail -c`, so a failure anywhere in a recipe's
