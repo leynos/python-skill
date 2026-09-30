@@ -1,7 +1,7 @@
 # pytest plugin sketch
 
-The plugin ecosystem is large; this is the short list of plugins that
-earn their keep in most production codebases.
+The plugin ecosystem is large; this is the short list of plugins that earn
+their keep in most production codebases.
 
 ## Parallel execution
 
@@ -11,9 +11,9 @@ earn their keep in most production codebases.
 uv run pytest -n auto
 ```
 
-`-n auto` matches the CPU count. Requires test independence; a flake
-that depends on order is exposed quickly. Pair with `pytest-randomly`
-when adopting xdist.
+`-n auto` matches the CPU count. Requires test independence; a flake that
+depends on order is exposed quickly. Pair with `pytest-randomly` when adopting
+xdist.
 
 ## Async tests
 
@@ -33,9 +33,8 @@ Configure the default loop scope and mode in `pyproject.toml`:
 asyncio_mode = "auto"           # decorate-less marking, opt-out per file
 ```
 
-`asyncio_mode = "auto"` removes the per-test `@pytest.mark.asyncio`
-decoration; pair with `loop_scope = "function"` to keep each test
-isolated.
+`asyncio_mode = "auto"` removes the per-test `@pytest.mark.asyncio` decoration;
+pair with `loop_scope = "function"` to keep each test isolated.
 
 ## Coverage
 
@@ -45,8 +44,8 @@ isolated.
 uv run pytest --cov=src --cov-branch --cov-report=term-missing
 ```
 
-Branch coverage is the cheapest signal that conditionals are
-exercised; line coverage alone hides whole `if` arms.
+Branch coverage is the cheapest signal that conditionals are exercised; line
+coverage alone hides whole `if` arms.
 
 ## Benchmarking
 
@@ -57,9 +56,9 @@ def test_serialise(benchmark):
     benchmark(msgspec.json.encode, payload)
 ```
 
-Reports min/max/mean/stddev. Useful for spotting regressions in
-small, focused benchmarks; for system-level profiling load
-`python-quality-tools` and use Pyinstrument.
+Reports min/max/mean/stddev. Useful for spotting regressions in small, focused
+benchmarks; for system-level profiling load `python-quality-tools` and use
+Pyinstrument.
 
 ## Snapshot testing
 
@@ -70,8 +69,8 @@ def test_renders(snapshot):
     assert render(payload) == snapshot
 ```
 
-Snapshots live next to the test; `--snapshot-update` rewrites them.
-Review the diff like any other code change.
+Snapshots live next to the test; `--snapshot-update` rewrites them. Review the
+diff like any other code change.
 
 ## Order randomization
 
@@ -82,8 +81,8 @@ Review the diff like any other code change.
 addopts = "-p pytest_randomly"
 ```
 
-Randomizes test order and seeds RNG. Use the seed reported on
-failure (`pytest --randomly-seed=12345`) to reproduce.
+Randomizes test order and seeds RNG. Use the seed reported on failure
+(`pytest --randomly-seed=12345`) to reproduce.
 
 ## Profile a slow test
 

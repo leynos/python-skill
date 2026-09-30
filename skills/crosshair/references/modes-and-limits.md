@@ -1,7 +1,7 @@
 # CrossHair modes and limits
 
-A deeper look at when each mode is the right tool and how to bound
-the search so it terminates.
+A deeper look at when each mode is the right tool and how to bound the search
+so it terminates.
 
 ## `check` in detail
 
@@ -10,9 +10,9 @@ uv run crosshair check mypkg.parse --per_condition_timeout 30
 uv run crosshair check mypkg --per_condition_timeout 60   # whole module
 ```
 
-Targets can be a fully qualified function name, a module, or a
-glob. The runner enumerates contracts (`assert`, PEP 316,
-`icontract`, `deal`) and tries to violate each.
+Targets can be a fully qualified function name, a module, or a glob. The runner
+enumerates contracts (`assert`, PEP 316, `icontract`, `deal`) and tries to
+violate each.
 
 Useful flags:
 
@@ -21,8 +21,8 @@ Useful flags:
 - `--analysis_kind` — restrict to `asserts`, `pep316`, `icontract`,
   `deal`, or combinations.
 
-A successful run reports nothing on `stdout`. A failure prints the
-violated condition and a concrete input that produces it.
+A successful run reports nothing on `stdout`. A failure prints the violated
+condition and a concrete input that produces it.
 
 ## `cover` in detail
 
@@ -30,9 +30,9 @@ violated condition and a concrete input that produces it.
 uv run crosshair cover mypkg.parse --coverage_type opcode
 ```
 
-CrossHair reports inputs that drive `parse` through previously
-uncovered opcodes. The output is a sequence of suggested example
-inputs; copy them into a parametrized test:
+CrossHair reports inputs that drive `parse` through previously uncovered
+opcodes. The output is a sequence of suggested example inputs; copy them into a
+parametrized test:
 
 ```python
 @pytest.mark.parametrize("payload", [
@@ -44,8 +44,8 @@ def test_parse_smoke(payload: bytes) -> None:
     parse(payload)         # property: does not crash
 ```
 
-`cover` is the cheap way to find inputs Hypothesis missed. Pair it
-with `pytest --cov-branch` to confirm coverage holes have closed.
+`cover` is the cheap way to find inputs Hypothesis missed. Pair it with
+`pytest --cov-branch` to confirm coverage holes have closed.
 
 ## `diffbehavior` in detail
 
@@ -53,10 +53,10 @@ with `pytest --cov-branch` to confirm coverage holes have closed.
 uv run crosshair diffbehavior mypkg.parse_old mypkg.parse_new
 ```
 
-CrossHair finds an input where the two functions disagree (return
-value, raised exception type, or observable side effect inside the
-symbolic boundary). Output is a satisfying input; the recommended
-follow-up is a regression test pinning the input.
+CrossHair finds an input where the two functions disagree (return value, raised
+exception type, or observable side effect inside the symbolic boundary). Output
+is a satisfying input; the recommended follow-up is a regression test pinning
+the input.
 
 Tips:
 
@@ -68,8 +68,7 @@ Tips:
 ## What CrossHair cannot prove
 
 - **Termination**: CrossHair bounds loops in its search; an infinite
-  loop in production code that CrossHair did not unroll stays
-  invisible.
+  loop in production code that CrossHair did not unroll stays invisible.
 - **Memory safety**: a Python OOM is not a CrossHair concern.
 - **Behaviour under threads**: the symbolic execution assumes
   single-threaded execution.
@@ -87,8 +86,8 @@ per_condition_timeout = 30
 analysis_kind = "asserts,pep316,icontract"
 ```
 
-In CI, run with these defaults for the touched modules; once a
-month, run a longer "deep" job with `per_condition_timeout = 300`.
+In CI, run with these defaults for the touched modules; once a month, run a
+longer "deep" job with `per_condition_timeout = 300`.
 
 ## Pairing with Hypothesis
 
@@ -101,9 +100,9 @@ def test_inverse(x: int) -> None:
     assert f(g(x)) == x
 ```
 
-Hypothesis explores the random space; CrossHair fills in the corners
-when the random generator misses. Use the `crosshair` backend for
-specific properties, not the whole suite.
+Hypothesis explores the random space; CrossHair fills in the corners when the
+random generator misses. Use the `crosshair` backend for specific properties,
+not the whole suite.
 
 ## Common mistakes
 

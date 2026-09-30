@@ -1,29 +1,27 @@
 # Metaclasses and multiple dispatch
 
-Two advanced patterns that share a common warning: most of the things they
-seem to solve have a simpler answer.
+Two advanced patterns that share a common warning: most of the things they seem
+to solve have a simpler answer.
 
 ## Before reaching for a metaclass
 
 Try these first:
 
 - `__init_subclass__` runs at subclass-definition time and receives the
-  subclass and the keyword arguments passed on the `class` line. It
-  covers most "register every subclass" and "enforce one method on
-  every subclass" use cases.
+  subclass and the keyword arguments passed on the `class` line. It covers most
+  "register every subclass" and "enforce one method on every subclass" use
+  cases.
 - `__class_getitem__` (and `Generic[T]`) handles subscripted class
   syntax (`MyType[int]`) without touching class creation.
 - `typing.dataclass_transform` lets a decorator pretend to be
-  `@dataclass` for the static type checker without involving a
-  metaclass.
+  `@dataclass` for the static type checker without involving a metaclass.
 - Class decorators handle one-off transformations of a single class.
 
 A metaclass is the right answer only when the behaviour must run at
-class-creation time and must do something the alternatives cannot —
-custom MRO, control over which name binds the class, or a fully
-custom `__call__` that does not return the class itself. The notable
-real-world examples are `abc.ABCMeta`, `enum.EnumMeta`, and
-`msgspec.Struct`'s `StructMeta`.
+class-creation time and must do something the alternatives cannot — custom MRO,
+control over which name binds the class, or a fully custom `__call__` that does
+not return the class itself. The notable real-world examples are `abc.ABCMeta`,
+`enum.EnumMeta`, and `msgspec.Struct`'s `StructMeta`.
 
 ## Pattern: registration via `__init_subclass__`
 
@@ -56,14 +54,13 @@ class Sealed(metaclass=SealedMeta):
     __sealed__ = True
 ```
 
-Use this shape sparingly. `dataclass_transform` is the right answer
-when the goal is to give the type checker something extra; a
-metaclass should buy you a runtime invariant that nothing else can.
+Use this shape sparingly. `dataclass_transform` is the right answer when the
+goal is to give the type checker something extra; a metaclass should buy you a
+runtime invariant that nothing else can.
 
 ## Multiple dispatch
 
-`isinstance` ladders in a public function are a classic refactoring
-target:
+`isinstance` ladders in a public function are a classic refactoring target:
 
 ```python
 def render(node):
@@ -92,8 +89,8 @@ def _(node: Text) -> str: ...
 def _(node: Image) -> str: ...
 ```
 
-Use when one argument carries the dispatch and the registry can live in
-one module.
+Use when one argument carries the dispatch and the registry can live in one
+module.
 
 ### `plum-dispatch` and `ovld` — multi-argument, type-hint native
 
@@ -108,9 +105,8 @@ def overlap(a: Box, b: Circle) -> bool: ...
 def overlap(a: Circle, b: Circle) -> bool: ...
 ```
 
-Use when dispatch is genuinely multi-argument (geometry overlap,
-arithmetic over polymorphic operands) and the types involved are
-named.
+Use when dispatch is genuinely multi-argument (geometry overlap, arithmetic
+over polymorphic operands) and the types involved are named.
 
 ### `typing.overload` — static only
 
@@ -123,16 +119,15 @@ def parse(s: str, *, raw: Literal[True]) -> bytes: ...
 def parse(s: str, *, raw: Literal[False] = False) -> dict[str, object]: ...
 ```
 
-`@overload` does not dispatch at runtime; it tells the type checker that
-the return type depends on the literal argument. Use it when the
-runtime body is one function but the static surface has shape variation.
+`@overload` does not dispatch at runtime; it tells the type checker that the
+return type depends on the literal argument. Use it when the runtime body is
+one function but the static surface has shape variation.
 
 ### When to keep the `isinstance` ladder
 
-If there are two cases and the function is internal, do not paper over
-it with dispatch. Polymorphism (a method on each subclass) is also a
-better answer when the dispatched function naturally belongs on the
-class.
+If there are two cases and the function is internal, do not paper over it with
+dispatch. Polymorphism (a method on each subclass) is also a better answer when
+the dispatched function naturally belongs on the class.
 
 ## Common mistakes
 
@@ -141,5 +136,4 @@ class.
 - `singledispatch` on a method that should be a real virtual call on
   the class.
 - A dispatch library imported just to give the checker overload-shape
-  information; `@overload` does that without adding a runtime
-  dependency.
+  information; `@overload` does that without adding a runtime dependency.

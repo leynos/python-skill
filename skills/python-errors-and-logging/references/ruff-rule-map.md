@@ -31,8 +31,8 @@ select = [
 - **TRY401** — `logger.exception("Failed: %s", exc)` doubles the
   exception in the output; drop the `%s` and the argument.
 - **BLE001** — `except Exception:` and bare `except:` only when the
-  comment names a sound reason (top-level worker boundary that must not
-  crash the process).
+  comment names a sound reason (top-level worker boundary that must not crash
+  the process).
 - **EM101 / EM102** — `raise X(f"…")` and `raise X("plain text")` get
   flagged; build the message first, then pass it.
 - **LOG004 / LOG014** — f-strings inside logging calls evaluate
@@ -43,12 +43,12 @@ select = [
 - **LOG015** — calls on `logging` itself rather than a named logger
   prevent per-module configuration.
 - **N818** — concrete exception classes end with `Error`
-  (`CardDeclinedError`, not `CardDeclined`); base classes can omit the
-  suffix if they are abstract (`PaymentsError` is also fine because it
-  refers to a domain group, not a specific failure).
+  (`CardDeclinedError`, not `CardDeclined`); base classes can omit the suffix
+  if they are abstract (`PaymentsError` is also fine because it refers to a
+  domain group, not a specific failure).
 - **PERF203** — `try`/`except` inside a hot loop is slower than hoisting
-  the block; only keep the inner form when each iteration genuinely
-  needs to recover and the rate is low.
+  the block; only keep the inner form when each iteration genuinely needs to
+  recover and the rate is low.
 - **B017** — `pytest.raises(Exception)` matches anything; always pin
   the type and, when useful, the `match=` regex.
 

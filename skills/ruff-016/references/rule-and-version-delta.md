@@ -1,8 +1,8 @@
 # Rule delta: 0.14.x → 0.15.x → 0.16.0
 
-What changed in the rule set across the three release series, for
-checking whether a code exists, whether it is stable, and when it
-appeared. Current state: <https://docs.astral.sh/ruff/rules/>.
+What changed in the rule set across the three release series, for checking
+whether a code exists, whether it is stable, and when it appeared. Current
+state: <https://docs.astral.sh/ruff/rules/>.
 
 Release dates: 0.14.0 on 2025-10-07, 0.15.0 on 2026-02-03, 0.16.0 on
 2026-07-23. Most current models were trained before 0.15.0.
@@ -43,24 +43,24 @@ Behaviour stabilized alongside them:
 
 Sixteen rules left preview:
 
-`ASYNC212`, `ASYNC240`, `ASYNC250`, `B912`, `FURB110`, `FURB171`,
-`PLC0207`, `PLW0108`, `RUF037`, `RUF060`, `RUF061`, `RUF064`,
-`RUF102`, `RUF103`, `RUF104`, `UP042`.
+`ASYNC212`, `ASYNC240`, `ASYNC250`, `B912`, `FURB110`, `FURB171`, `PLC0207`,
+`PLW0108`, `RUF037`, `RUF060`, `RUF061`, `RUF064`, `RUF102`, `RUF103`, `RUF104`,
+`UP042`.
 
-Behaviour: `A003` covers decorators and default arguments; `PYI016`
-considers `typing.Optional`; `SIM905` fixes with `maxsplit` alone;
-`SIM910` handles more key expressions; `UP008` has a safe fix when no
-comments are lost; `UP043` applies to `.pyi` below Python 3.13.
+Behaviour: `A003` covers decorators and default arguments; `PYI016` considers
+`typing.Optional`; `SIM905` fixes with `maxsplit` alone; `SIM910` handles more
+key expressions; `UP008` has a safe fix when no comments are lost; `UP043`
+applies to `.pyi` below Python 3.13.
 
 ## Preview rules added in 0.14.x-0.15.x
 
-Rules predating 0.14.0, such as `PLC2701`, are out of scope here; see
-the rule index under "Sources" for the complete list.
+Rules predating 0.14.0, such as `PLC2701`, are out of scope here; see the rule
+index under "Sources" for the complete list.
 
-Enable lint preview rules with `preview = true` under
-`[tool.ruff.lint]`, or `ruff check --preview` on the command line.
-Formatter preview is a separate setting, so enabling one does not
-enable the other. Expect these rules to stabilize in a later release.
+Enable lint preview rules with `preview = true` under `[tool.ruff.lint]`, or
+`ruff check --preview` on the command line. Formatter preview is a separate
+setting, so enabling one does not enable the other. Expect these rules to
+stabilize in a later release.
 
 | Code       | Name                                          | Added   |
 | ---------- | --------------------------------------------- | ------- |
@@ -93,12 +93,12 @@ enable the other. Expect these rules to stabilize in a later release.
 
 Also preview from the Airflow set: `AIR003`
 (`airflow-variable-get-outside-task`, 0.15.6), `AIR304`
-(`airflow3-dag-dynamic-value`, 0.15.6), and `AIR321`
-(`airflow31-moved`, 0.15.1).
+(`airflow3-dag-dynamic-value`, 0.15.6), and `AIR321` (`airflow31-moved`,
+0.15.1).
 
-Removed: **`RUF076`** (`pytest-fixture-autouse`) was added in 0.15.17
-and withdrawn in 0.15.20 as too opinionated for the `RUF` category. Do
-not recommend it.
+Removed: **`RUF076`** (`pytest-fixture-autouse`) was added in 0.15.17 and
+withdrawn in 0.15.20 as too opinionated for the `RUF` category. Do not
+recommend it.
 
 ## Notable preview behaviour changes
 
@@ -127,8 +127,8 @@ Worth knowing because they change fixes, not just diagnostics:
   Ruff defaults `target-version` to `py310`.
 - `py315` is accepted as a target from 0.14.11 (preview).
 - Lazy imports (Python 3.15) parse from 0.15.6 (preview), with isort
-  preserving the `lazy` keyword and semantic-syntax errors reported for
-  illegal placements.
+  preserving the `lazy` keyword and semantic-syntax errors reported for illegal
+  placements.
 - PEP 798 star-unpacking in comprehensions parses from 0.15.6 (preview).
 - `frozendict` is recognized as a builtin on 3.15+ (0.15.8, preview).
 

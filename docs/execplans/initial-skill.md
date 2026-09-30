@@ -2,17 +2,18 @@
 
 ## Big picture
 
-Build an advanced Python skill set modelled on `rust-skill.worktrees/skill-refresh`.
-A single router resolves a Python task to the smallest useful first-class skill;
-deep dives back the heaviest verification tools. The exception, logging, typing,
-and context-manager rules from `agent-template-python/template/.rules` are
-restated as decision surfaces, not enforced rules.
+Build an advanced Python skill set modelled on
+`rust-skill.worktrees/skill-refresh`. A single router resolves a Python task to
+the smallest useful first-class skill; deep dives back the heaviest
+verification tools. The exception, logging, typing, and context-manager rules
+from `agent-template-python/template/.rules` are restated as decision surfaces,
+not enforced rules.
 
 ## Constraints
 
 - Each `SKILL.md` follows the rust-skill format: YAML frontmatter (`name`,
-  `description`, optional `globs`), a working stance, a decision surface,
-  red flags, and pointers into `references/`.
+  `description`, optional `globs`), a working stance, a decision surface, red
+  flags, and pointers into `references/`.
 - Keep each `SKILL.md` under ~120 lines; push tables and worked examples to
   `references/*.md`.
 - Catalogue tone: helpful technical lead, no superlatives, no life-coach prose.
@@ -132,11 +133,10 @@ Update this plan after each milestone with:
 - 2026-05-27 (continued): all thirteen `SKILL.md` files written
   (`python-router`, six language skills, `python-testing`,
   `python-verification`, `python-quality-tools`, and the
-  `hypothesis`/`crosshair`/`mutmut` deep dives) along with their
-  reference documents. README, users' guide, catalogue-status, and
-  LICENSE written. Skill line counts: language and domain skills 67–111
-  lines; deep dives 146–159 lines (in line with rust-skill's
-  `proptest/SKILL.md` precedent of 226 lines).
+  `hypothesis`/`crosshair`/`mutmut` deep dives) along with their reference
+  documents. README, users' guide, catalogue-status, and LICENSE written. Skill
+  line counts: language and domain skills 67–111 lines; deep dives 146–159
+  lines (in line with rust-skill's `proptest/SKILL.md` precedent of 226 lines).
 
 ## Validation outcome
 
@@ -146,50 +146,46 @@ Update this plan after each milestone with:
 - The router lists every active skill and reaches each via a question
   prompt; the routing matrix carries the secondary cases.
 - README links to the router and to the users' guide;
-  `skill-catalogue-status.md` enumerates active skills with their
-  references.
+  `skill-catalogue-status.md` enumerates active skills with their references.
 
 - 2026-05-27 (continued): LICENSE switched from MIT to ISC per user
-  direction (copied from `../actix-v2a/LICENSE`); README updated
-  accordingly. `python-concurrency/SKILL.md` Async discipline section
-  expanded to cover `TaskGroup` as default, `gather` caveats,
-  `cancel()` as a request, `shield` rules, and custom task factories
-  (including `eager_task_factory`). New reference document
-  `python-concurrency/references/async-task-discipline.md` written
-  with the firecrawl-sourced detail; SKILL.md trailing links and
+  direction (copied from `../actix-v2a/LICENSE`); README updated accordingly.
+  `python-concurrency/SKILL.md` Async discipline section expanded to cover
+  `TaskGroup` as default, `gather` caveats, `cancel()` as a request, `shield`
+  rules, and custom task factories (including `eager_task_factory`). New
+  reference document `python-concurrency/references/async-task-discipline.md`
+  written with the firecrawl-sourced detail; SKILL.md trailing links and
   `skill-catalogue-status.md` updated to reference it.
 
 - 2026-07-26: `ruff-016` added as a fourth domain-and-quality skill
   (`skills/ruff-016/SKILL.md` plus `default-rule-set.md`,
   `suppression-comments.md`, `settings-and-cli.md`, and
-  `rule-and-version-delta.md`). This departs from the original topology,
-  and the departure is justified: Ruff 0.16.0 changed the default rule
-  set from 59 rules to 413, began formatting Markdown code blocks, and
-  added native `ruff: ignore` suppression, all after the training
-  cut-off of current models. Routing boundary recorded in
-  [ADR 0001](../adr/0001-ruff-skill-routing-boundary.md). Every factual
-  claim was sourced from upstream artefacts (the `astral-sh/ruff`
-  changelogs, a `ruff.schema.json` diff across the 0.14.0/0.15.0/0.16.0
-  tags, `crates/ruff_linter/src/codes.rs` at 0.16.0, and a parse of the
-  published default-rules page) rather than recollection. The schema
-  diff caught one error: `lint.ruff.parenthesize-tuple-in-subscript`
-  already existed in 0.14.0 and was dropped from the new-settings table.
-  Maintenance trigger for Ruff 0.17 is recorded in
-  `docs/skill-catalogue-status.md`.
+  `rule-and-version-delta.md`). This departs from the original topology, and
+  the departure is justified: Ruff 0.16.0 changed the default rule set from 59
+  rules to 413, began formatting Markdown code blocks, and added native
+  `ruff: ignore` suppression, all after the training cut-off of current models.
+  Routing boundary recorded in
+  [ADR 0001](../adr/0001-ruff-skill-routing-boundary.md). Every factual claim
+  was sourced from upstream artefacts (the `astral-sh/ruff` changelogs, a
+  `ruff.schema.json` diff across the 0.14.0/0.15.0/0.16.0 tags,
+  `crates/ruff_linter/src/codes.rs` at 0.16.0, and a parse of the published
+  default-rules page) rather than recollection. The schema diff caught one
+  error: `lint.ruff.parenthesize-tuple-in-subscript` already existed in 0.14.0
+  and was dropped from the new-settings table. Maintenance trigger for Ruff
+  0.17 is recorded in `docs/skill-catalogue-status.md`.
 
 - 2026-08-16: the repository gained `pyproject.toml`, `uv.lock`, a
-  `tests/` suite (pytest, cmd-mox, hypothesis, mypy strict), and a
-  `Makefile` wiring the lint, format, type-check, and test gates
-  together. `typecheck` and `test` were previously no-op targets and
-  now run real tools. `docs/scripting-standards.md` was imported from
-  `agent-template-python`, with the local baseline set to Python 3.14.
-  This is drift from the original Markdown-only topology, and the
-  drift is justified: the `Makefile`'s own behaviour — file selection
-  via `git ls-files`, failure propagation through `pipefail`, and
-  `--` option-terminator handling before `mdtablefix` — was carrying
-  real defects that only tests could catch. New documentation:
-  `docs/developers-guide.md`, covering the gates and the test suite
-  for anyone working on this repository rather than using the skills.
+  `tests/` suite (pytest, cmd-mox, hypothesis, mypy strict), and a `Makefile`
+  wiring the lint, format, type-check, and test gates together. `typecheck` and
+  `test` were previously no-op targets and now run real tools.
+  `docs/scripting-standards.md` was imported from `agent-template-python`, with
+  the local baseline set to Python 3.14. This is drift from the original
+  Markdown-only topology, and the drift is justified: the `Makefile`'s own
+  behaviour — file selection via `git ls-files`, failure propagation through
+  `pipefail`, and `--` option-terminator handling before `mdtablefix` — was
+  carrying real defects that only tests could catch. New documentation:
+  `docs/developers-guide.md`, covering the gates and the test suite for anyone
+  working on this repository rather than using the skills.
 
 - 2026-08-23: testing hierarchy and routing boundary clarified: named
   examples and finite semantic tables stay with `python-testing`, cheap
@@ -200,22 +196,22 @@ Update this plan after each milestone with:
 - 2026-09-10: the skill manifest contract was imported from
   `agent-helper-scripts` at `aebf2f6`. `make lint` now depends on
   `skill-manifest-check`, which lints each `SKILL.md` frontmatter with
-  `yamllint` and validates each skill directory against the Agent Skills
-  schema with `skills-ref validate`; both tools are `dev` group
-  dependencies resolved through `uv`. Two manifest changes were needed to
-  satisfy the schema. The catalogue-specific `globs` hint moved from a
-  top-level field into `metadata.globs` as one comma-separated string,
-  because unknown top-level fields are rejected and `metadata` admits
-  string values only — `skills-ref` coerces values with `str(v)` rather
-  than rejecting other shapes, so a list would have validated but reached
-  consumers as a Python repr. The `python-testing` description was quoted
-  to repair the unquoted-colon parse failure reported as issue #4. Contract
-  tests live in `tests/test_skill_manifests.py`.
+  `yamllint` and validates each skill directory against the Agent Skills schema
+  with `skills-ref validate`; both tools are `dev` group dependencies resolved
+  through `uv`. Two manifest changes were needed to satisfy the schema. The
+  catalogue-specific `globs` hint moved from a top-level field into
+  `metadata.globs` as one comma-separated string, because unknown top-level
+  fields are rejected and `metadata` admits string values only — `skills-ref`
+  coerces values with `str(v)` rather than rejecting other shapes, so a list
+  would have validated but reached consumers as a Python repr. The
+  `python-testing` description was quoted to repair the unquoted-colon parse
+  failure reported as issue #4. Contract tests live in
+  `tests/test_skill_manifests.py`.
 
 ## Open follow-up (deferred)
 
 - A `python-pyproject` skill mirroring `arch-crate-design` (the
-  `agent-template-python` rules currently cover this material;
-  deferred until a concrete user task surfaces).
+  `agent-template-python` rules currently cover this material; deferred until a
+  concrete user task surfaces).
 - A `python-supply-chain` skill covering `uv` lockfiles, `pip-audit`,
   and SBOM generation (deferred for the same reason).

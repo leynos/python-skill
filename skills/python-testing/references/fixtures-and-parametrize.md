@@ -1,8 +1,7 @@
 # Fixtures and parametrize
 
-The two pillars of pytest. Used well they keep tests short and the
-failure messages precise; used badly they hide the setup that the
-failure depends on.
+The two pillars of pytest. Used well they keep tests short and the failure
+messages precise; used badly they hide the setup that the failure depends on.
 
 ## Fixture scopes
 
@@ -29,9 +28,8 @@ def schema(small_db) -> DB:
 - `package` — shared across a directory.
 - `session` — shared across the whole run.
 
-A wider scope means faster runs but more cross-test coupling. Move the
-scope wider only when the fixture is read-only inside the broader
-group.
+A wider scope means faster runs but more cross-test coupling. Move the scope
+wider only when the fixture is read-only inside the broader group.
 
 ## Parametrize a test
 
@@ -67,9 +65,8 @@ def test_inserts(db: DB) -> None:
     assert db.count() == 1
 ```
 
-Every test that uses `db` now runs twice — once per backend. Used
-deliberately, this is the cheapest way to verify a contract across
-implementations.
+Every test that uses `db` now runs twice — once per backend. Used deliberately,
+this is the cheapest way to verify a contract across implementations.
 
 ## Indirect parametrization
 
@@ -83,9 +80,9 @@ def test_can_view(user: User) -> None:
     assert can_view_dashboard(user)
 ```
 
-`indirect=True` feeds the parameter into the fixture rather than into
-the test directly. Use it when the value identifies the system under
-test rather than the input.
+`indirect=True` feeds the parameter into the fixture rather than into the test
+directly. Use it when the value identifies the system under test rather than
+the input.
 
 ## Fixture composition
 
@@ -99,8 +96,7 @@ def client(db: DB) -> Iterator[Client]:
         yield c
 ```
 
-The dependency graph is resolved automatically; cycles raise an
-error.
+The dependency graph is resolved automatically; cycles raise an error.
 
 ## Marker hygiene
 
@@ -129,8 +125,8 @@ Unregistered markers warn or fail depending on configuration.
 ## Common mistakes
 
 - A fixture that yields a mock pretending to be a collaborator. The
-  test passes against the mock and fails against reality. Either use
-  the real collaborator or test the contract elsewhere.
+  test passes against the mock and fails against reality. Either use the real
+  collaborator or test the contract elsewhere.
 - A `module`-scope fixture that mutates state. The next test in the
   module sees the mutation; flakes follow.
 - Parametrizing over inputs that share a fixture's setup, in

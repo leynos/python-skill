@@ -1,8 +1,8 @@
 # Settings, formatter, and CLI: 0.14.0 → 0.16.0
 
-Every configuration key added between 0.14.0 and 0.16.0, plus the
-formatter and CLI changes that go with them. Nothing was removed from
-the settings schema over this range.
+Every configuration key added between 0.14.0 and 0.16.0, plus the formatter and
+CLI changes that go with them. Nothing was removed from the settings schema
+over this range.
 
 Full reference: <https://docs.astral.sh/ruff/settings/>.
 
@@ -19,9 +19,8 @@ Maps file extensions to a known language: `python`, `pyi`, `ipynb`, or
 extension = { mdx = "markdown", qmd = "markdown" }
 ```
 
-This replaces the built-in `.qmd` handling, which was dropped in
-0.15.3. There is a matching `--extension` CLI flag, which overrides the
-file setting.
+This replaces the built-in `.qmd` handling, which was dropped in 0.15.3. There
+is a matching `--extension` CLI flag, which overrides the file setting.
 
 ### `format.nested-string-quote-style` (0.16.0; preview in 0.15.9)
 
@@ -34,9 +33,8 @@ No effect below Python 3.12, which cannot reuse the outer quote.
 
 ### `lint.isort.import-heading` (0.16.0)
 
-Map of section name to heading comment; Ruff inserts or replaces the
-comment above each section. Compatible with isort's
-`import_heading_{section}` options.
+Map of section name to heading comment; Ruff inserts or replaces the comment
+above each section. Compatible with isort's `import_heading_{section}` options.
 
 ```toml
 [tool.ruff.lint.isort.import-heading]
@@ -52,8 +50,8 @@ Custom section names are accepted as additional keys.
 ### `lint.flake8-tidy-imports.ban-lazy` and `require-lazy` (0.16.0)
 
 Both only apply when targeting **Python 3.15 or newer**, where the
-`lazy import` statement exists. Each takes either `"all"` or an
-include/exclude selector:
+`lazy import` statement exists. Each takes either `"all"` or an include/exclude
+selector:
 
 ```toml
 [tool.ruff.lint.flake8-tidy-imports]
@@ -67,13 +65,13 @@ ban-lazy = ["django", "mypkg.plugins"]
 - `ban-lazy` — imports that must **not** be lazy.
 
 Both drive **`TID254`** (`lazy-import-mismatch`, preview). The related
-**`TID255`** (`lazy-import-immediately-resolved`, preview) flags a lazy
-import whose binding is used eagerly anyway.
+**`TID255`** (`lazy-import-immediately-resolved`, preview) flags a lazy import
+whose binding is used eagerly anyway.
 
 ### `lint.pylint.max-statements-in-try` (0.16.0)
 
-Threshold for **`PLW0717`** (`too-many-statements-in-try-clause`,
-preview), added in 0.15.14.
+Threshold for **`PLW0717`** (`too-many-statements-in-try-clause`, preview),
+added in 0.15.14.
 
 ### `lint.ruff.strictly-empty-init-modules` (0.15.0)
 
@@ -82,9 +80,9 @@ When true, **`RUF067`** (`non-empty-init-module`, preview) requires
 
 ### `analyze.type-checking-imports` (0.15.0)
 
-Whether `ruff analyze graph` includes imports inside
-`if TYPE_CHECKING:` blocks. Defaults to `true`; set `false` to exclude
-them. Matching CLI option added in 0.14.6.
+Whether `ruff analyze graph` includes imports inside `if TYPE_CHECKING:`
+blocks. Defaults to `true`; set `false` to exclude them. Matching CLI option
+added in 0.14.6.
 
 ## Changed settings
 
@@ -99,8 +97,8 @@ them. Matching CLI option added in 0.14.6.
 
 ### Markdown code blocks (default-on in 0.16.0)
 
-`ruff format` formats Python code blocks in Markdown files, and `.md`
-files are part of default discovery.
+`ruff format` formats Python code blocks in Markdown files, and `.md` files are
+part of default discovery.
 
 - Info strings formatted: `python`, `py`, `python3`, `py3`, `pyi`.
   `pycon` blocks are supported too. `pyi` blocks use stub style.
@@ -109,10 +107,10 @@ files are part of default discovery.
 - A block that does not parse, or that would not round-trip, is
   skipped.
 - Suppression: normal `# fmt: off` / `# fmt: on` inside the block, or
-  HTML comments around blocks — `<!-- fmt:off -->` / `<!-- fmt:on -->`,
-  and the blacken-docs spellings `<!-- blacken-docs:off -->` /
-  `<!-- blacken-docs:on -->`. An `off` without a matching `on` runs to
-  the end of the document.
+  HTML comments around blocks — `<!-- fmt:off -->` / `<!-- fmt:on -->`, and the
+  blacken-docs spellings `<!-- blacken-docs:off -->` /
+  `<!-- blacken-docs:on -->`. An `off` without a matching `on` runs to the end
+  of the document.
 - Opt out entirely with `extend-exclude = ["*.md"]`.
 - Under `ruff-pre-commit`, Markdown must be opted in via `types_or`:
 
@@ -154,15 +152,15 @@ The LSP formats Markdown too, since 0.15.1.
 
 ### JSON output is now nullable
 
-In `--output-format json`, these fields may be `null` rather than the
-old `""` / row 1, column 1 placeholders:
+In `--output-format json`, these fields may be `null` rather than the old `""`
+/ row 1, column 1 placeholders:
 
 - `filename`
 - `location`, `end_location`
 - `fix.edits[].location`, `fix.edits[].end_location`
 
-Anything consuming Ruff JSON — dashboards, review bots, CI
-annotations — needs a null check before 0.16 lands.
+Anything consuming Ruff JSON — dashboards, review bots, CI annotations — needs
+a null check before 0.16 lands.
 
 ### `format --check` in CI
 
