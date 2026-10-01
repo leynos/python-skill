@@ -27,7 +27,7 @@ if t.TYPE_CHECKING:  # pragma: no cover - typing only
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 SHIPPED_MANIFESTS = sorted((REPO_ROOT / "skills").glob("*/SKILL.md"))
-MARKDOWN_TOOLS = ("markdownlint", "nixie")
+MARKDOWN_TOOLS = ("markdownlint-cli2", "nixie")
 
 # The router is invoked implicitly; every other skill is opted out, so that the
 # router owns the routing decision rather than competing with its own targets.
