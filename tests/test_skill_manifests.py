@@ -93,6 +93,7 @@ PYTHON_TESTING_DESCRIPTION = (
     "tests, and the boundary between example, property, and verification "
     "testing."
 )
+UNQUOTED_DESCRIPTION_ERROR = "syntax error: mapping values are not allowed here"
 
 
 def _run_make(target: str, *skill_dirs: Path) -> subprocess.CompletedProcess[str]:
@@ -332,6 +333,7 @@ def test_manifest_check_rejects_the_original_unquoted_description(
     result = _run_manifest_check(skill_dir)
 
     assert result.returncode != 0, result.stdout + result.stderr
+    assert UNQUOTED_DESCRIPTION_ERROR in result.stdout + result.stderr
 
 
 @pytest.mark.parametrize(

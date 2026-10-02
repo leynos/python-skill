@@ -3,8 +3,9 @@
 The Makefile tests run ``make`` against a scratch git repository so that the
 real recipes are exercised without touching the working tree, and so that
 pathological filenames can be committed safely. Third-party tools that the
-recipes shell out to (``mdtablefix``, ``markdownlint``, ``nixie``) are replaced
-by cmd-mox shims, keeping their real execution outside the unit tests.
+recipes shell out to (``mdtablefix``, ``markdownlint``, ``nixie``, and ``uv``)
+are replaced by cmd-mox shims, keeping their real execution outside the unit
+tests.
 """
 
 from __future__ import annotations

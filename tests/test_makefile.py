@@ -98,11 +98,15 @@ def test_lint_fails_when_a_tool_fails(
 def test_lint_passes_when_both_tools_pass(
     scratch_repo: ScratchRepo, cmd_mox: CmdMox
 ) -> None:
-    """Both tools passing must leave `make lint` green."""
+    """All lint tools passing must leave `make lint` green."""
+    scratch_repo.write(
+        "skills/example/SKILL.md",
+        "---\nname: example\ndescription: Example skill.\n---\n",
+    )
     _stub_all(cmd_mox)
     cmd_mox.replay()
 
-    result = scratch_repo.make("lint")
+    result = scratch_repo.make("lint", "SKILL_DIRS=skills/example/")
 
     cmd_mox.verify()
     assert result.returncode == 0, result.stderr
@@ -112,12 +116,16 @@ def test_lint_fails_when_skill_manifest_check_fails(
     scratch_repo: ScratchRepo, cmd_mox: CmdMox
 ) -> None:
     """A failed manifest validator must fail the aggregate lint gate."""
+    scratch_repo.write(
+        "skills/example/SKILL.md",
+        "---\nname: example\ndescription: Example skill.\n---\n",
+    )
     for tool in ("markdownlint", "nixie"):
         cmd_mox.stub(tool).returns(exit_code=0)
     cmd_mox.stub("uv").returns(exit_code=1)
     cmd_mox.replay()
 
-    result = scratch_repo.make("lint")
+    result = scratch_repo.make("lint", "SKILL_DIRS=skills/example/")
 
     cmd_mox.verify()
     assert result.returncode != 0, "a failed skill-manifest gate was swallowed"
