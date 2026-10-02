@@ -59,7 +59,9 @@ def test_default_goal_is_check(scratch_repo: ScratchRepo) -> None:
 
     assert bare.returncode == 0, bare.stderr
     assert explicit.returncode == 0, explicit.stderr
-    assert bare.stdout == explicit.stdout
+    assert bare.stdout == explicit.stdout, (
+        "the default goal plans something other than check"
+    )
 
 
 @pytest.mark.parametrize(
@@ -173,7 +175,7 @@ def test_check_fmt_runs_markdownlint(
 
     cmd_mox.verify()
     assert result.returncode == 0, result.stderr
-    assert spy.call_count == 1
+    assert spy.call_count == 1, f"the linter ran {spy.call_count} times, not once"
 
 
 # --- mdtablefix invocation --------------------------------------------------
@@ -199,7 +201,7 @@ def test_check_fmt_runs_the_table_check_with_every_estate_flag(
     assert result.returncode == 0, result.stderr
     argv = _argv_of(spy, "--check")
     assert set(ESTATE_FLAGS) <= set(argv), f"missing flags in {argv}"
-    assert "--in-place" not in argv
+    assert "--in-place" not in argv, f"check-fmt would rewrite files: {argv}"
 
 
 def test_fmt_rewrites_with_every_estate_flag_then_lints_with_fix(
@@ -219,8 +221,8 @@ def test_fmt_rewrites_with_every_estate_flag_then_lints_with_fix(
     assert result.returncode == 0, result.stderr
     argv = _argv_of(spy, "--in-place")
     assert set(ESTATE_FLAGS) <= set(argv), f"missing flags in {argv}"
-    assert "--check" not in argv
-    assert "--fix" in _argv_of(lint, "--fix")
+    assert "--check" not in argv, f"fmt would only check: {argv}"
+    assert "--fix" in _argv_of(lint, "--fix"), "the linter was not asked to fix"
 
 
 def test_fmt_lints_after_it_rewrites(tmp_path: Path, repo_root: Path) -> None:
@@ -267,7 +269,9 @@ def test_fmt_builds_no_file_list(scratch_repo: ScratchRepo, cmd_mox: CmdMox) -> 
 
     cmd_mox.verify()
     assert result.returncode == 0, result.stderr
-    assert not (scratch_repo.path / "INJECTED.md").exists()
+    assert not (scratch_repo.path / "INJECTED.md").exists(), (
+        "a tracked name was executed"
+    )
     argv = _argv_of(spy, "--in-place")
     assert all(arg.startswith("--") for arg in argv), f"a path reached {argv}"
 
