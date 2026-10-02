@@ -137,7 +137,7 @@ def test_lint_fails_when_skill_manifest_check_fails(
         "skills/example/SKILL.md",
         "---\nname: example\ndescription: Example skill.\n---\n",
     )
-    for tool in ("markdownlint", "nixie"):
+    for tool in (LINTER, "nixie"):
         cmd_mox.stub(tool).returns(exit_code=0)
 
     def uv_result(invocation: Invocation) -> tuple[str, str, int]:
