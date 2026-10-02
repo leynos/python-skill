@@ -13,6 +13,7 @@ import subprocess
 import typing as t
 from pathlib import Path
 
+from cmd_mox import Invocation
 import pytest
 from hypothesis import HealthCheck, given, settings
 from hypothesis import strategies as st
@@ -122,13 +123,28 @@ def test_lint_fails_when_skill_manifest_check_fails(
     )
     for tool in ("markdownlint", "nixie"):
         cmd_mox.stub(tool).returns(exit_code=0)
-    cmd_mox.stub("uv").returns(exit_code=1)
+
+    def uv_result(invocation: Invocation) -> tuple[str, str, int]:
+        if invocation.args[3:4] == ["yamllint"]:
+            return "", "", 0
+        if invocation.args[3:5] == ["skills-ref", "validate"]:
+            return "", "", 1
+        pytest.fail(f"unexpected uv invocation: {invocation.args!r}")
+
+    uv_spy = cmd_mox.spy("uv").runs(uv_result)
     cmd_mox.replay()
 
     result = scratch_repo.make("lint", "SKILL_DIRS=skills/example/")
 
     cmd_mox.verify()
     assert result.returncode != 0, "a failed skill-manifest gate was swallowed"
+    assert [invocation.args[3] for invocation in uv_spy.invocations] == [
+        "yamllint",
+        "skills-ref",
+    ]
+    uv_spy.assert_called_with(
+        "run", "--group", "dev", "skills-ref", "validate", "skills/example/"
+    )
 
 
 def test_check_fmt_runs_markdownlint(
