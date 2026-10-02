@@ -13,6 +13,7 @@ import subprocess
 import typing as t
 from pathlib import Path
 
+from cmd_mox import Invocation
 import pytest
 from hypothesis import HealthCheck, given, settings
 from hypothesis import strategies as st
@@ -27,12 +28,12 @@ from tests._scratch import (
 if t.TYPE_CHECKING:  # pragma: no cover - typing only
     from cmd_mox import CmdMox
 
-MARKDOWN_TOOLS = ("mdtablefix", "markdownlint", "nixie")
+EXTERNAL_TOOLS = ("mdtablefix", "markdownlint", "nixie", "uv")
 
 
 def _stub_all(cmd_mox: CmdMox) -> None:
     """Register passing stubs for every external tool the recipes call."""
-    for tool in MARKDOWN_TOOLS:
+    for tool in EXTERNAL_TOOLS:
         cmd_mox.stub(tool).returns(exit_code=0)
 
 
@@ -54,6 +55,7 @@ def test_default_goal_is_check(scratch_repo: ScratchRepo) -> None:
     [
         ("markdownlint", "markdownlint"),
         ("nixie", "nixie"),
+        ("skill-manifest-check", "skills-ref"),
         ("typecheck", "mypy"),
         ("test", "pytest"),
     ],
@@ -97,14 +99,52 @@ def test_lint_fails_when_a_tool_fails(
 def test_lint_passes_when_both_tools_pass(
     scratch_repo: ScratchRepo, cmd_mox: CmdMox
 ) -> None:
-    """Both tools passing must leave `make lint` green."""
+    """All lint tools passing must leave `make lint` green."""
+    scratch_repo.write(
+        "skills/example/SKILL.md",
+        "---\nname: example\ndescription: Example skill.\n---\n",
+    )
     _stub_all(cmd_mox)
     cmd_mox.replay()
 
-    result = scratch_repo.make("lint")
+    result = scratch_repo.make("lint", "SKILL_DIRS=skills/example/")
 
     cmd_mox.verify()
     assert result.returncode == 0, result.stderr
+
+
+def test_lint_fails_when_skill_manifest_check_fails(
+    scratch_repo: ScratchRepo, cmd_mox: CmdMox
+) -> None:
+    """A failed manifest validator must fail the aggregate lint gate."""
+    scratch_repo.write(
+        "skills/example/SKILL.md",
+        "---\nname: example\ndescription: Example skill.\n---\n",
+    )
+    for tool in ("markdownlint", "nixie"):
+        cmd_mox.stub(tool).returns(exit_code=0)
+
+    def uv_result(invocation: Invocation) -> tuple[str, str, int]:
+        if invocation.args[3:4] == ["yamllint"]:
+            return "", "", 0
+        if invocation.args[3:5] == ["skills-ref", "validate"]:
+            return "", "", 1
+        pytest.fail(f"unexpected uv invocation: {invocation.args!r}")
+
+    uv_spy = cmd_mox.spy("uv").runs(uv_result)
+    cmd_mox.replay()
+
+    result = scratch_repo.make("lint", "SKILL_DIRS=skills/example/")
+
+    cmd_mox.verify()
+    assert result.returncode != 0, "a failed skill-manifest gate was swallowed"
+    assert [invocation.args[3] for invocation in uv_spy.invocations] == [
+        "yamllint",
+        "skills-ref",
+    ]
+    uv_spy.assert_called_with(
+        "run", "--group", "dev", "skills-ref", "validate", "skills/example/"
+    )
 
 
 def test_check_fmt_runs_markdownlint(
