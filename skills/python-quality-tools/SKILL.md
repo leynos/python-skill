@@ -7,21 +7,21 @@ metadata:
 
 # Python Quality Tools
 
-Use this when the codebase needs a sanity sweep beyond what `ruff`,
-`mypy`, and pytest cover. Use `skylos` for Skylos dead-code triage,
-implicit runtime callers, precise entrypoint rules, and gate repair. This
-skill owns broader tool selection and the other scanners and profilers.
+Use this when the codebase needs a sanity sweep beyond what `ruff`, `mypy`, and
+pytest cover. Use `skylos` for Skylos dead-code triage, implicit runtime
+callers, precise entrypoint rules, and gate repair. This skill owns broader
+tool selection and the other scanners and profilers.
 
 ## Working stance
 
 - Run lint, type-check, and tests on every push. Run the heavier
   scanners on a slower cadence.
 - Start new scanner adoption with a triaged worklist. Honour existing
-  repository gates; do not turn a failing Skylos gate into an advisory
-  scan or replace it with another tool to avoid a finding.
+  repository gates; do not turn a failing Skylos gate into an advisory scan or
+  replace it with another tool to avoid a finding.
 - Pyinstrument is a profiler, not a benchmarker. Use it to find
-  hot paths; use `pytest-benchmark` (see `python-testing`) to
-  regression-test individual hot paths.
+  hot paths; use `pytest-benchmark` (see `python-testing`) to regression-test
+  individual hot paths.
 
 ## Decision surface
 
@@ -29,9 +29,9 @@ skill owns broader tool selection and the other scanners and profilers.
   load `skylos`. It owns safe removal, runtime-call evidence, narrow
   exceptions, and configuration-contract maintenance.
 - **`deadcode`** — name-based unused-symbol detection (Albertas
-  Gimbutas's tool). Fast, runs on the whole repo, supports `--fix`
-  to delete the dead names. Good for finding orphaned helpers,
-  unused imports the linter missed, and obsolete public API.
+  Gimbutas's tool). Fast, runs on the whole repo, supports `--fix` to delete
+  the dead names. Good for finding orphaned helpers, unused imports the linter
+  missed, and obsolete public API.
 - **`pyscn`** — Go + tree-sitter analyser. Three signals:
   - Dead-code detection from a control-flow graph (statements after
     `return`, branches behind impossible conditions).
@@ -41,8 +41,8 @@ skill owns broader tool selection and the other scanners and profilers.
     function.
   Run with `uvx pyscn@latest analyze .`.
 - **Pyinstrument** — statistical sampler (default 1 ms). Lower
-  overhead than `cProfile`, accurate on tight loops and async event
-  loops where deterministic profilers exaggerate small-function cost.
+  overhead than `cProfile`, accurate on tight loops and async event loops where
+  deterministic profilers exaggerate small-function cost.
 
 ## When to reach for which
 
@@ -62,10 +62,9 @@ uv tool run deadcode . --fix                 # rewrite files
 uv tool run deadcode . --exclude tests/ --ignore-names "test_*"
 ```
 
-The tool is name-based, so dynamic dispatch (`getattr`, plugin
-registries, ORM attributes referenced from templates) needs an
-ignore list. Always review the diff before committing the `--fix`
-output.
+The tool is name-based, so dynamic dispatch (`getattr`, plugin registries, ORM
+attributes referenced from templates) needs an ignore list. Always review the
+diff before committing the `--fix` output.
 
 ## pyscn quick-start
 
@@ -78,11 +77,10 @@ uvx pyscn@latest check .                              # pass/fail gate
 uvx pyscn@latest check --max-complexity 15 .          # custom threshold
 ```
 
-`analyze` produces full reports (table, JSON, or SARIF). `check` is a
-separate quality-gate subcommand that returns pass/fail against
-configurable thresholds; use it from CI when the build should fail on
-regressions. The MCP server is useful for editor-side reviews; the CLI
-is enough for CI.
+`analyze` produces full reports (table, JSON, or SARIF). `check` is a separate
+quality-gate subcommand that returns pass/fail against configurable thresholds;
+use it from CI when the build should fail on regressions. The MCP server is
+useful for editor-side reviews; the CLI is enough for CI.
 
 ## Pyinstrument quick-start
 
@@ -119,6 +117,6 @@ with pyinstrument.profile():
   profilers distort event-loop work; switch to Pyinstrument.
 
 Read [deadcode-and-pyscn.md](references/deadcode-and-pyscn.md) and
-[pyinstrument.md](references/pyinstrument.md) for invocation patterns,
-output interpretation, and the CI tiering that earns the most signal
-per minute of compute.
+[pyinstrument.md](references/pyinstrument.md) for invocation patterns, output
+interpretation, and the CI tiering that earns the most signal per minute of
+compute.

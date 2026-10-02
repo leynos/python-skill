@@ -1,8 +1,7 @@
 # deadcode and pyscn
 
-The two complementary dead-code detectors. `deadcode` chases unused
-names; `pyscn` chases unreachable statements. Run both; treat the
-output as a worklist.
+The two complementary dead-code detectors. `deadcode` chases unused names;
+`pyscn` chases unreachable statements. Run both; treat the output as a worklist.
 
 ## deadcode
 
@@ -45,10 +44,10 @@ ignore-names = ["test_*", "_setup_*", "Meta"]
 
 ### Limits
 
-deadcode is name-based; dynamic dispatch (`getattr`, plugin registries,
-ORM attributes referenced from templates, fixtures pytest discovers by
-name) needs explicit ignores. A false positive is cheap to dismiss; a
-false negative is invisible.
+deadcode is name-based; dynamic dispatch (`getattr`, plugin registries, ORM
+attributes referenced from templates, fixtures pytest discovers by name) needs
+explicit ignores. A false positive is cheap to dismiss; a false negative is
+invisible.
 
 ## pyscn
 
@@ -61,11 +60,11 @@ uvx pyscn@latest analyze .
 What pyscn reports:
 
 - **Dead code** — control-flow graph identifies statements after
-  `return`/`raise`, branches behind impossible conditions, and
-  unreachable `elif`/`else` arms.
+  `return`/`raise`, branches behind impossible conditions, and unreachable
+  `elif`/`else` arms.
 - **Clones** — Type 1 (identical), 2 (renamed identifiers), 3
-  (near-miss with small changes), 4 (semantic equivalence). The
-  threshold is configurable.
+  (near-miss with small changes), 4 (semantic equivalence). The threshold is
+  configurable.
 - **CBO (coupling between objects)** — per-class import and
   attribute coupling.
 - **Cyclomatic complexity** — per-function decision count.
@@ -81,13 +80,11 @@ uvx pyscn@latest check .                                  # quality gate
 uvx pyscn@latest check --max-complexity 15 --select complexity .
 ```
 
-`analyze` is the report command; `check` is the separate quality-gate
-command that returns pass/fail against thresholds. Both accept
-`--select` to narrow the analyses (`complexity`, `deps`, `deadcode`,
-`clones`, `cbo`).
+`analyze` is the report command; `check` is the separate quality-gate command
+that returns pass/fail against thresholds. Both accept `--select` to narrow the
+analyses (`complexity`, `deps`, `deadcode`, `clones`, `cbo`).
 
-The MCP server (built-in) lets editor-side agents query the analysis
-on demand:
+The MCP server (built-in) lets editor-side agents query the analysis on demand:
 
 ```bash
 uvx pyscn@latest mcp
@@ -96,8 +93,7 @@ uvx pyscn@latest mcp
 ### Interpreting the output
 
 - *Dead code report*: each entry is a file path, a line range, and a
-  reason. Investigate; either delete the code or add the test that
-  reaches it.
+  reason. Investigate; either delete the code or add the test that reaches it.
 - *Clone report*: each entry pairs two locations. Extract a shared
   helper or accept the duplication with a comment.
 - *Coupling report*: a high CBO does not always mean a refactor is
@@ -112,18 +108,17 @@ uv tool run deadcode . --no-color > deadcode.txt
 uvx pyscn@latest analyze --select deadcode --json . > pyscn.json
 ```
 
-`deadcode.txt` lists the unused names; `pyscn.json` lists the
-unreachable statements. The union is the worklist. A line flagged
-by both is a strong candidate for deletion.
+`deadcode.txt` lists the unused names; `pyscn.json` lists the unreachable
+statements. The union is the worklist. A line flagged by both is a strong
+candidate for deletion.
 
 ## CI tiering
 
 - **Per-push**: run `deadcode` against the changed files only (use
-  `--include` if available; otherwise `deadcode src/...`). The cost
-  is small.
+  `--include` if available; otherwise `deadcode src/...`). The cost is small.
 - **Weekly**: run `pyscn analyze .` on `main`; publish the JSON or
-  SARIF artefact. Wire `pyscn check .` into the merge gate when the
-  thresholds are agreed.
+  SARIF artefact. Wire `pyscn check .` into the merge gate when the thresholds
+  are agreed.
 - **Pre-release**: review the survivor list and triage.
 
 ## Common mistakes
@@ -131,7 +126,7 @@ by both is a strong candidate for deletion.
 - Treating `deadcode --fix` as a one-step command. Always review the
   diff; tests may not reach a "dead" name yet, but the design might.
 - Ignoring all `pyscn` clone findings because the project "obviously"
-  has shared idioms. Look at the diff; small near-misses often hide
-  divergent fixes that should be merged.
+  has shared idioms. Look at the diff; small near-misses often hide divergent
+  fixes that should be merged.
 - Reading complexity numbers without the function. A 25-branch state
   machine is fine; a 25-branch helper is not.

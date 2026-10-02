@@ -20,8 +20,8 @@ def parse(s: str, *, raw: bool = False) -> bytes | dict[str, object]:
 ```
 
 The implementation `def` carries the union return; the overloads carry the
-precise per-shape returns. Callers see the right type for their literal
-keyword argument.
+precise per-shape returns. Callers see the right type for their literal keyword
+argument.
 
 Use `@overload` when:
 
@@ -37,8 +37,8 @@ Avoid `@overload` when:
 
 ## TypedDict and Unpack
 
-`TypedDict` plus `Unpack[...]` (PEP 692) lets a function declare typed
-keyword arguments without writing every parameter in the signature.
+`TypedDict` plus `Unpack[...]` (PEP 692) lets a function declare typed keyword
+arguments without writing every parameter in the signature.
 
 ```python
 from typing import NotRequired, TypedDict, Unpack
@@ -80,9 +80,9 @@ class Payload(TypedDict, total=False):
     note: NotRequired[str]
 ```
 
-`total=False` makes every key optional unless marked `Required`. The
-mirror, `total=True`, is the default. `Required` and `NotRequired`
-let a single class mix both.
+`total=False` makes every key optional unless marked `Required`. The mirror,
+`total=True`, is the default. `Required` and `NotRequired` let a single class
+mix both.
 
 ## Common mistakes
 
@@ -92,5 +92,5 @@ let a single class mix both.
   type-checker guarantee does not survive a JSON round trip. Use
   `msgspec.Struct` or a validator at the boundary.
 - An implementation `def` annotated with one of the overload signatures.
-  Type checkers will flag the mismatch; the implementation must accept
-  the union of all overloads.
+  Type checkers will flag the mismatch; the implementation must accept the
+  union of all overloads.

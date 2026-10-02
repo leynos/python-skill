@@ -21,38 +21,37 @@ cutting concern.
   shut down; `@contextmanager` is right when the resource is `try/finally`
   shaped and a single function expresses it cleanly.
 - Descriptors belong on classes whose attributes need consistent
-  validation, lazy computation, or per-instance bookkeeping; never use
-  them when a `@property` suffices.
+  validation, lazy computation, or per-instance bookkeeping; never use them
+  when a `@property` suffices.
 - Metaclasses are a last resort. Most "I want to customize class creation"
   problems are solved by `__init_subclass__`, decorators, or
   `dataclass_transform`.
 - For multi-argument dispatch, prefer `functools.singledispatch` for the
-  one-argument case and a typed external library for the multi-argument
-  case; never fall back to `isinstance` ladders in a public function.
+  one-argument case and a typed external library for the multi-argument case;
+  never fall back to `isinstance` ladders in a public function.
 
 ## Decision surface
 
 - **Decorator (`P`, `R`)**: a cross-cutting concern (logging, retry,
-  caching, transactions) wraps a function with a fixed call shape; the
-  wrapper must preserve the wrapped signature for callers and type
-  checkers (`ParamSpec`).
+  caching, transactions) wraps a function with a fixed call shape; the wrapper
+  must preserve the wrapped signature for callers and type checkers
+  (`ParamSpec`).
 - **Function context manager (`@contextlib.contextmanager`)**: setup and
-  teardown collapse into a single function with one `yield`; reuse is
-  local.
+  teardown collapse into a single function with one `yield`; reuse is local.
 - **Class context manager (`__enter__`/`__exit__`)**: the manager holds
-  state, exposes methods between `__enter__` and `__exit__`, or needs
-  custom exception suppression (`__exit__` returning `True`).
+  state, exposes methods between `__enter__` and `__exit__`, or needs custom
+  exception suppression (`__exit__` returning `True`).
 - **Async context manager (`__aenter__`/`__aexit__`,
-  `@asynccontextmanager`)**: the resource is awaited (connection pool,
-  HTTP session); never block in `__aenter__`.
+  `@asynccontextmanager`)**: the resource is awaited (connection pool, HTTP
+  session); never block in `__aenter__`.
 - **Descriptor (`__get__`/`__set__`/`__set_name__`)**: an attribute
-  needs validation, lazy computation, or per-instance state and the
-  rule repeats across attributes (validated fields, typed columns,
-  cached_property variants).
+  needs validation, lazy computation, or per-instance state and the rule
+  repeats across attributes (validated fields, typed columns, cached_property
+  variants).
 - **Metaclass**: class-creation behaviour cannot be expressed via
   `__init_subclass__`, `__class_getitem__`, decorators, or
-  `dataclass_transform`. Examples: ORM model registries with custom
-  MRO, plugin systems with strict invariants, `msgspec.Struct` itself.
+  `dataclass_transform`. Examples: ORM model registries with custom MRO, plugin
+  systems with strict invariants, `msgspec.Struct` itself.
 - **Dispatch**:
   - `typing.overload` — static-only narrowing, no runtime dispatch.
   - `functools.singledispatch` — one argument, stdlib, global registry.
@@ -76,8 +75,11 @@ cutting concern.
 - `singledispatch` used on a method that should be a regular
   polymorphism point on the class.
 
-Read [decorators-and-paramspec.md](references/decorators-and-paramspec.md),
-[context-manager-extraction.md](references/context-manager-extraction.md),
-[descriptors.md](references/descriptors.md), and
-[metaclasses-and-dispatch.md](references/metaclasses-and-dispatch.md) when
+<!-- markdownlint-disable MD013 -->
+
+Read
+[decorators-and-paramspec.md](references/decorators-and-paramspec.md), [context-manager-extraction.md](references/context-manager-extraction.md), [descriptors.md](references/descriptors.md),
+and [metaclasses-and-dispatch.md](references/metaclasses-and-dispatch.md) when
 one of those forks dominates.
+
+<!-- markdownlint-enable MD013 -->

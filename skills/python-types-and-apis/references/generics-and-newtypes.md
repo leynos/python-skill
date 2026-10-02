@@ -44,8 +44,8 @@ ValidatedEmail = NewType("ValidatedEmail", EmailAddress)
 def send(_: ValidatedEmail) -> None: ...
 ```
 
-The layered form expresses "this email has been validated against the
-schema" without making the schema runtime-visible.
+The layered form expresses "this email has been validated against the schema"
+without making the schema runtime-visible.
 
 ## Generic functions and classes
 
@@ -59,9 +59,8 @@ class Page[T]:
         self.cursor = cursor
 ```
 
-Prefer PEP 695 inline syntax in Python 3.12+. The older
-`T = TypeVar("T")` style remains valid and is required for code that must
-run on 3.11 or earlier.
+Prefer PEP 695 inline syntax in Python 3.12+. The older `T = TypeVar("T")`
+style remains valid and is required for code that must run on 3.11 or earlier.
 
 ## Generic protocols
 
@@ -72,9 +71,9 @@ class SupportsClose[T](Protocol):
     def close(self) -> T: ...
 ```
 
-Generic protocols describe "anything that produces a `T` when closed"
-without naming a base class. They compose well with `contextlib.contextmanager`
-and with adapter layers.
+Generic protocols describe "anything that produces a `T` when closed" without
+naming a base class. They compose well with `contextlib.contextmanager` and
+with adapter layers.
 
 ## Variance
 
@@ -84,14 +83,14 @@ Most generics in Python are invariant by default. The exceptions:
 - `Callable[[X], R]` is contravariant in `X` and covariant in `R`.
 
 If a generic is read-only, mark the `TypeVar` `covariant=True`; if it is
-write-only, `contravariant=True`. Most user-defined generics are
-invariant and should stay so.
+write-only, `contravariant=True`. Most user-defined generics are invariant and
+should stay so.
 
 ## Common mistakes
 
 - Using `Generic[T]` and inline `[T]` together. Pick one syntax.
 - Using `NewType` for a value that requires validation, then bypassing
-  the constructor. The checker stays happy; the runtime invariant is
-  silently broken.
+  the constructor. The checker stays happy; the runtime invariant is silently
+  broken.
 - Adding a generic parameter that no caller varies. If every call site
   uses the same concrete type, the generic is noise.

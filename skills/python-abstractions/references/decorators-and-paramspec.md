@@ -1,10 +1,9 @@
 # Decorators with ParamSpec
 
-A decorator is useful when a cross-cutting concern (logging, retry,
-caching, transactions, authorization) wraps many functions with the
-same shape. The two failures to avoid are (1) erasing the wrapped
-signature so the type checker stops helping, and (2) hiding control
-flow that callers needed to see.
+A decorator is useful when a cross-cutting concern (logging, retry, caching,
+transactions, authorization) wraps many functions with the same shape. The two
+failures to avoid are (1) erasing the wrapped signature so the type checker
+stops helping, and (2) hiding control flow that callers needed to see.
 
 ## Pattern: preserving the signature
 
@@ -26,9 +25,9 @@ def trace(fn: Callable[P, R]) -> Callable[P, R]:
     return wrapped
 ```
 
-`@wraps(fn)` copies `__name__`, `__doc__`, and `__wrapped__` so
-introspection works; `ParamSpec` makes the type checker see `wrapped`
-as having the same signature as `fn`.
+`@wraps(fn)` copies `__name__`, `__doc__`, and `__wrapped__` so introspection
+works; `ParamSpec` makes the type checker see `wrapped` as having the same
+signature as `fn`.
 
 ## Pattern: a decorator factory
 
@@ -53,8 +52,8 @@ def retry(
     return decorate
 ```
 
-Two layers: the outer factory takes configuration, the inner decorate
-returns the wrapped callable. Both layers stay typed.
+Two layers: the outer factory takes configuration, the inner decorate returns
+the wrapped callable. Both layers stay typed.
 
 ## Pattern: injecting a prefix argument
 
@@ -71,9 +70,9 @@ def with_session(
     return wrapped
 ```
 
-`Concatenate[Session, P]` tells the checker that `fn` expects a
-`Session` first followed by the remaining `P` parameters; `wrapped`
-hides the session from the call site.
+`Concatenate[Session, P]` tells the checker that `fn` expects a `Session` first
+followed by the remaining `P` parameters; `wrapped` hides the session from the
+call site.
 
 ## When not to write a decorator
 
@@ -86,18 +85,16 @@ hides the session from the call site.
 
 ## Decorating classes
 
-`@dataclass`, `@dataclass_transform`, and `@runtime_checkable` are the
-common cases. Custom class decorators belong in libraries; in
-application code, prefer `__init_subclass__` or a metaclass when the
-behaviour must run at class-creation time.
+`@dataclass`, `@dataclass_transform`, and `@runtime_checkable` are the common
+cases. Custom class decorators belong in libraries; in application code, prefer
+`__init_subclass__` or a metaclass when the behaviour must run at
+class-creation time.
 
 ## Common mistakes
 
 - Forgetting `@wraps`: callers lose `__name__`, `inspect.signature`
-  reports the wrong shape, and `pickle`/`functools.partial` interact
-  badly.
+  reports the wrong shape, and `pickle`/`functools.partial` interact badly.
 - Writing `def wrapped(*args, **kwargs):` without `P.args` and
-  `P.kwargs`: the type checker collapses the signature to
-  `(*Any, **Any) -> R`.
+  `P.kwargs`: the type checker collapses the signature to `(*Any, **Any) -> R`.
 - Returning a `functools.partial` and calling it a decorator: it is a
   partial; the call site does not document the wrap.

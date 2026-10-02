@@ -15,6 +15,15 @@ SKILLS_REF := uv run --group dev skills-ref
 YAMLLINT := uv run --group dev yamllint
 SKILL_YAMLLINT_CONFIG := {extends: default, rules: {line-length: disable}}
 
+# `make fmt` and `make check-fmt` call mdtablefix directly. `--git` selects the
+# Markdown files Git tracks and `--include-untracked` adds the untracked files
+# Git does not ignore, so a new document is formatted before it is staged.
+# Both modes need mdtablefix 0.6.1 or later.
+MDLINT ?= markdownlint-cli2
+MDTABLEFIX ?= mdtablefix
+MDTABLEFIX_SELECT = --git --include-untracked
+MDTABLEFIX_RULES = --wrap --renumber --breaks --ellipsis --fences
+
 .PHONY: help fmt markdownlint nixie lint check check-fmt typecheck test \
 	skill-frontmatter-lint skill-manifest-validate skill-manifest-check
 
@@ -23,13 +32,11 @@ help: ## Show this help
 	  | awk 'BEGIN {FS = ":.*## "}; {printf "  %-14s %s\n", $$1, $$2}'
 
 fmt: ## Reflow Markdown tables and apply markdownlint fixes in place
-	git ls-files -z '*.md' '*.markdown' \
-	  | xargs -0 --no-run-if-empty \
-	    mdtablefix --wrap --renumber --breaks --ellipsis --fences --in-place --
-	markdownlint --fix '$(MD_GLOB)'
+	$(MDTABLEFIX) --in-place $(MDTABLEFIX_SELECT) $(MDTABLEFIX_RULES)
+	$(MDLINT) --fix "**/*.md"
 
 markdownlint: ## Lint every Markdown file
-	markdownlint '$(MD_GLOB)'
+	$(MDLINT) '$(MD_GLOB)'
 
 nixie: ## Validate every Mermaid diagram
 	nixie .
@@ -55,6 +62,7 @@ skill-manifest-validate: ## Validate each skill against the Agent Skills schema
 skill-manifest-check: skill-frontmatter-lint skill-manifest-validate ## Verify every skill manifest
 
 check-fmt: markdownlint ## Formatting gate
+	$(MDTABLEFIX) --check $(MDTABLEFIX_SELECT) $(MDTABLEFIX_RULES)
 
 typecheck: ## Type-check the test suite
 	uv run --group dev mypy

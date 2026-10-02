@@ -1,7 +1,7 @@
 # Logging recipes
 
-Patterns for the everyday questions: which logger, which level, where to
-catch, and how to keep payloads useful without leaking secrets.
+Patterns for the everyday questions: which logger, which level, where to catch,
+and how to keep payloads useful without leaking secrets.
 
 ## Module logger, never the root
 
@@ -11,10 +11,9 @@ import logging
 logger = logging.getLogger(__name__)
 ```
 
-`logger = logging.getLogger(__name__)` lets operators tune levels per
-package and gives every record a `name` field that downstream
-aggregators can index. `logging.warning(...)` (no logger) targets the
-root logger and is `LOG015`.
+`logger = logging.getLogger(__name__)` lets operators tune levels per package
+and gives every record a `name` field that downstream aggregators can index.
+`logging.warning(...)` (no logger) targets the root logger and is `LOG015`.
 
 ## Lazy interpolation
 
@@ -23,8 +22,8 @@ logger.info("Dispatched order_id=%s to shop_id=%s", order_id, shop_id)
 logger.error("Task %s crashed after %d retries", task_id, attempts)
 ```
 
-The format string is evaluated only when the level is enabled. f-strings
-and `%`-formatting in the message string defeat that.
+The format string is evaluated only when the level is enabled. f-strings and
+`%`-formatting in the message string defeat that.
 
 ## Logging the active exception
 
@@ -37,8 +36,8 @@ except ValueError:
 ```
 
 `logger.exception(...)` is a shortcut for `logger.error(..., exc_info=True)`
-and only makes sense inside an `except` block. Do not append the exception
-to the format arguments — the traceback already carries it (`TRY401`).
+and only makes sense inside an `except` block. Do not append the exception to
+the format arguments — the traceback already carries it (`TRY401`).
 
 ## Boundary logging
 
@@ -56,8 +55,8 @@ def worker_main() -> None:
 ```
 
 Log once, at the outermost layer that has context (request handler, worker
-loop, CLI `main`). Inner layers either resolve the problem or propagate
-it; double-logging is a frequent operational headache.
+loop, CLI `main`). Inner layers either resolve the problem or propagate it;
+double-logging is a frequent operational headache.
 
 ## Structured payloads
 
@@ -68,16 +67,15 @@ logger.info(
 )
 ```
 
-The `extra` mapping is merged into the log record. With a JSON formatter
-this gives operators searchable fields without parsing message strings.
-Do not put secrets in the message or in `extra`; tag the logger or use a
-filter to redact them.
+The `extra` mapping is merged into the log record. With a JSON formatter this
+gives operators searchable fields without parsing message strings. Do not put
+secrets in the message or in `extra`; tag the logger or use a filter to redact
+them.
 
 ## Custom levels
 
 Avoid them. The five built-in levels (`DEBUG`, `INFO`, `WARNING`, `ERROR`,
-`CRITICAL`) cover every operational need and stay legible across the
-ecosystem.
+`CRITICAL`) cover every operational need and stay legible across the ecosystem.
 
 ## Tests
 
@@ -90,9 +88,8 @@ def test_warns_once(caplog):
     assert [r.message for r in caplog.records] == ["expected once"]
 ```
 
-Assert on `record.message` and `record.args` rather than the rendered
-output; the renderer changes with handler configuration but the record
-is stable.
+Assert on `record.message` and `record.args` rather than the rendered output;
+the renderer changes with handler configuration but the record is stable.
 
 ## What to log, what not to log
 

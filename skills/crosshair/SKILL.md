@@ -6,10 +6,10 @@ description: Run symbolic execution on Python functions with CrossHair to find c
 # CrossHair symbolic execution for Python
 
 CrossHair runs Python under symbolic execution backed by Z3. It explores
-reachable paths through a function (within a per-call budget) and
-reports concrete counter-examples when contracts or assertions fail.
-Where Hypothesis searches by random sampling and shrinks, CrossHair
-searches by satisfiability and reports a satisfying assignment.
+reachable paths through a function (within a per-call budget) and reports
+concrete counter-examples when contracts or assertions fail. Where Hypothesis
+searches by random sampling and shrinks, CrossHair searches by satisfiability
+and reports a satisfying assignment.
 
 ## When to apply
 
@@ -54,9 +54,8 @@ per_condition_timeout = 30
 uv run crosshair check mypkg.parse
 ```
 
-CrossHair walks each branch of `mypkg.parse` and reports any input
-that violates an `assert` or contract. PEP 316 docstring contracts
-look like:
+CrossHair walks each branch of `mypkg.parse` and reports any input that
+violates an `assert` or contract. PEP 316 docstring contracts look like:
 
 ```python
 def withdraw(balance: int, amount: int) -> int:
@@ -68,8 +67,8 @@ def withdraw(balance: int, amount: int) -> int:
     return balance - amount
 ```
 
-`icontract` and `deal` use decorators (`@require`, `@ensure`) — both
-are supported.
+`icontract` and `deal` use decorators (`@require`, `@ensure`) — both are
+supported.
 
 ### `cover` — find inputs that drive a function down each branch
 
@@ -77,9 +76,9 @@ are supported.
 uv run crosshair cover mypkg.parse
 ```
 
-Useful for filling coverage holes the random generator missed.
-CrossHair prints concrete inputs that reach previously unexplored
-branches; promote these to named regression tests.
+Useful for filling coverage holes the random generator missed. CrossHair prints
+concrete inputs that reach previously unexplored branches; promote these to
+named regression tests.
 
 ### `diffbehavior` — find an input where two functions disagree
 
@@ -87,16 +86,16 @@ branches; promote these to named regression tests.
 uv run crosshair diffbehavior mypkg.parse_old mypkg.parse_new
 ```
 
-The single most useful refactor tool: rename `parse` to `parse_old`,
-write `parse_new`, run `diffbehavior`. If CrossHair finds a
-disagreement within the budget, the refactor changed behaviour; if it
-finds none, behaviour is unchanged within the limits of the search.
+The single most useful refactor tool: rename `parse` to `parse_old`, write
+`parse_new`, run `diffbehavior`. If CrossHair finds a disagreement within the
+budget, the refactor changed behaviour; if it finds none, behaviour is
+unchanged within the limits of the search.
 
 ## Hypothesis backend
 
-`hypothesis-crosshair` registers CrossHair as a Hypothesis backend.
-Use it when Hypothesis cannot find a falsifying example and you
-suspect one exists in a narrow corner:
+`hypothesis-crosshair` registers CrossHair as a Hypothesis backend. Use it when
+Hypothesis cannot find a falsifying example and you suspect one exists in a
+narrow corner:
 
 ```python
 from hypothesis import given, settings, strategies as st
@@ -107,8 +106,8 @@ def test_property(x: int) -> None:
     assert invariant(x)
 ```
 
-CrossHair searches more thoroughly within the budget; the cost is
-time. Use sparingly.
+CrossHair searches more thoroughly within the budget; the cost is time. Use
+sparingly.
 
 ## Limits
 
@@ -133,17 +132,15 @@ time. Use sparingly.
 ## Hard-won lessons
 
 - **Search budget matters.** A 30-second per-condition budget catches
-  the everyday bugs; longer budgets find rarer cases. Tune in
-  `pyproject.toml`, not per-run.
+  the everyday bugs; longer budgets find rarer cases. Tune in `pyproject.toml`,
+  not per-run.
 - **Pure functions only.** Wrapping an impure function in a "pretend
-  pure" shell to make CrossHair work usually means the shell is the
-  bug.
+  pure" shell to make CrossHair work usually means the shell is the bug.
 - **`diffbehavior` after every non-trivial refactor.** It is the
-  cheapest insurance against accidentally changing semantics during
-  a "cosmetic" rewrite.
+  cheapest insurance against accidentally changing semantics during a
+  "cosmetic" rewrite.
 - **CrossHair and Hypothesis are complements.** Hypothesis covers the
-  vast input space cheaply; CrossHair covers the narrow corners
-  exhaustively.
+  vast input space cheaply; CrossHair covers the narrow corners exhaustively.
 
 ## References
 

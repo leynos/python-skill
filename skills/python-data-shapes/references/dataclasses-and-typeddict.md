@@ -1,7 +1,7 @@
 # Dataclasses, attrs, NamedTuple, TypedDict
 
-The stdlib and near-stdlib containers cover the cases where `msgspec`
-is the wrong weight. Use this map to pick.
+The stdlib and near-stdlib containers cover the cases where `msgspec` is the
+wrong weight. Use this map to pick.
 
 ## dataclasses.dataclass
 
@@ -23,8 +23,8 @@ Reach for `dataclasses` when:
   and nothing more.
 
 Combine `frozen=True`, `slots=True`, `kw_only=True` for safe defaults.
-`__post_init__` covers the single-line validations; richer rules
-suggest `attrs` or `msgspec`.
+`__post_init__` covers the single-line validations; richer rules suggest
+`attrs` or `msgspec`.
 
 ## attrs
 
@@ -38,10 +38,10 @@ class Address:
     postcode: str = attrs.field(validator=attrs.validators.matches_re(r"^[A-Z0-9 ]+$"))
 ```
 
-`attrs` is dataclasses with extra knobs: converters, validators,
-slotted by default in `attrs.frozen`, `__attrs_post_init__` for
-cross-field checks. Pick it when validation and conversion logic
-multiply and you do not want to rebuild it on every container.
+`attrs` is dataclasses with extra knobs: converters, validators, slotted by
+default in `attrs.frozen`, `__attrs_post_init__` for cross-field checks. Pick
+it when validation and conversion logic multiply and you do not want to rebuild
+it on every container.
 
 ## NamedTuple
 
@@ -93,8 +93,8 @@ Use when:
 
 ## Mutable defaults
 
-The dataclass trap repeats in every container. Mutable defaults are
-shared across instances unless wrapped in a factory:
+The dataclass trap repeats in every container. Mutable defaults are shared
+across instances unless wrapped in a factory:
 
 ```python
 @dataclass
@@ -106,18 +106,17 @@ class Good:
     tags: list[str] = field(default_factory=list)
 ```
 
-`msgspec.Struct` uses `msgspec.field(default_factory=list)`. `attrs`
-uses `attrs.field(factory=list)`. The error mode is identical
-everywhere; the syntax differs.
+`msgspec.Struct` uses `msgspec.field(default_factory=list)`. `attrs` uses
+`attrs.field(factory=list)`. The error mode is identical everywhere; the syntax
+differs.
 
 ## Picking between containers
 
 - Cross-the-wire, must validate on decode: `msgspec.Struct`.
-- In-process domain shape, no decode: `dataclass(frozen, slots,
-  kw_only)`.
+- In-process domain shape, no decode: `dataclass(frozen, slots, kw_only)`.
 - In-process with rich validators: `attrs.frozen`.
 - Small positional tuple: `NamedTuple`.
 - Typed view over a `dict`: `TypedDict`.
 
-The wrong move is to mix three containers in one module. Pick one for
-each layer (wire, domain, helpers) and stick to it.
+The wrong move is to mix three containers in one module. Pick one for each
+layer (wire, domain, helpers) and stick to it.

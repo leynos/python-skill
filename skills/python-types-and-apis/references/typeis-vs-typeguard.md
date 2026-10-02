@@ -5,9 +5,9 @@ checker can infer in the false branch.
 
 ## TypeIs (PEP 742, Python 3.13+)
 
-`TypeIs[T]` says "this predicate is an honest equivalence". The type
-checker narrows to `T` in the true branch and removes `T` from the union in
-the false branch.
+`TypeIs[T]` says "this predicate is an honest equivalence". The type checker
+narrows to `T` in the true branch and removes `T` from the union in the false
+branch.
 
 ```python
 from typing import TypeIs
@@ -22,14 +22,14 @@ def handle(x: int | str) -> None:
         reveal_type(x)   # int
 ```
 
-Prefer `TypeIs` whenever the predicate genuinely characterizes membership
-in a type (`isinstance` checks, schema validators that return the parsed
-value, structural sniffs that cover the entire union).
+Prefer `TypeIs` whenever the predicate genuinely characterizes membership in a
+type (`isinstance` checks, schema validators that return the parsed value,
+structural sniffs that cover the entire union).
 
 ## TypeGuard
 
-`TypeGuard[T]` says "the true branch narrows to `T`". The false branch
-carries no information; the parameter keeps its original type.
+`TypeGuard[T]` says "the true branch narrows to `T`". The false branch carries
+no information; the parameter keeps its original type.
 
 ```python
 from typing import TypeGuard

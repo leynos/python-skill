@@ -1,8 +1,8 @@
 # Context manager extraction
 
 `with` blocks are the right home for any pair of "set up, then guarantee
-cleanup" operations: locks, transactions, temporary files, mocked time,
-spans, observation contexts.
+cleanup" operations: locks, transactions, temporary files, mocked time, spans,
+observation contexts.
 
 ## Function form: @contextmanager
 
@@ -64,10 +64,9 @@ Use when:
 
 ## Refactoring by extracting a context manager
 
-The smell: a function opens a resource, does work, and closes it, with
-the close path repeated in two or three places. The fix is to extract
-the open/close pair behind a context manager and let the caller hold
-the `with`.
+The smell: a function opens a resource, does work, and closes it, with the
+close path repeated in two or three places. The fix is to extract the
+open/close pair behind a context manager and let the caller hold the `with`.
 
 ```python
 # Before: cleanup repeated three times
@@ -116,9 +115,9 @@ The caller no longer mentions cleanup; the manager handles it once.
 
 ## Async managers
 
-`@asynccontextmanager` and the `__aenter__`/`__aexit__` pair mirror the
-sync forms. The body must not call blocking I/O on the event loop;
-acquire and release asynchronously.
+`@asynccontextmanager` and the `__aenter__`/`__aexit__` pair mirror the sync
+forms. The body must not call blocking I/O on the event loop; acquire and
+release asynchronously.
 
 ```python
 from contextlib import asynccontextmanager
@@ -134,8 +133,8 @@ async def session() -> AsyncIterator[Session]:
 
 ## Composing managers
 
-`contextlib.ExitStack` (and `AsyncExitStack`) lets a single block manage
-a dynamic set of resources:
+`contextlib.ExitStack` (and `AsyncExitStack`) lets a single block manage a
+dynamic set of resources:
 
 ```python
 from contextlib import ExitStack
@@ -146,17 +145,15 @@ def merge(paths: list[str]) -> None:
         write_merged(files)
 ```
 
-`ExitStack` is the right answer when the number of resources is not
-known at compile time, or when one resource depends on the value of an
-earlier one.
+`ExitStack` is the right answer when the number of resources is not known at
+compile time, or when one resource depends on the value of an earlier one.
 
 ## Common mistakes
 
 - A `@contextmanager` whose body spans many branches with custom cleanup
-  per branch. Promote to a class-based manager and put the logic in
-  `__exit__`.
+  per branch. Promote to a class-based manager and put the logic in `__exit__`.
 - A class-based manager whose `__exit__` returns `True` to swallow every
-  exception. Suppression is a deliberate decision; always document the
-  rule in a comment.
+  exception. Suppression is a deliberate decision; always document the rule in
+  a comment.
 - A manager that opens a resource in `__init__` instead of `__enter__`.
   The resource then leaks when the `with` is never reached.

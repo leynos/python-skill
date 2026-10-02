@@ -1,13 +1,13 @@
 # Descriptors
 
-A descriptor is any class that defines `__get__`, `__set__`, or
-`__delete__`. The descriptor protocol sits underneath `@property`,
-`@classmethod`, `@staticmethod`, and `functools.cached_property`.
+A descriptor is any class that defines `__get__`, `__set__`, or `__delete__`.
+The descriptor protocol sits underneath `@property`, `@classmethod`,
+`@staticmethod`, and `functools.cached_property`.
 
-Reach for a custom descriptor when an attribute pattern (validation,
-lazy computation, per-instance caching) repeats across many classes
-or many attributes of one class, and `@property` would force a
-hand-written copy each time.
+Reach for a custom descriptor when an attribute pattern (validation, lazy
+computation, per-instance caching) repeats across many classes or many
+attributes of one class, and `@property` would force a hand-written copy each
+time.
 
 ## Pattern: validated field
 
@@ -34,10 +34,9 @@ class Order:
     pence = Positive()
 ```
 
-`__set_name__` runs when the class body is executed; it captures the
-attribute name so the descriptor can store per-instance state on the
-owning object (`_quantity`, `_pence`) rather than on the descriptor
-itself.
+`__set_name__` runs when the class body is executed; it captures the attribute
+name so the descriptor can store per-instance state on the owning object
+(`_quantity`, `_pence`) rather than on the descriptor itself.
 
 ## Pattern: lazy attribute (cached_property style)
 
@@ -63,20 +62,19 @@ class Report:
         return compute_summary()
 ```
 
-Writing the computed value into `obj.__dict__` makes the next access
-skip the descriptor entirely; this is exactly how
-`functools.cached_property` works. Prefer the stdlib version unless
-the descriptor needs custom invalidation or shared cache.
+Writing the computed value into `obj.__dict__` makes the next access skip the
+descriptor entirely; this is exactly how `functools.cached_property` works.
+Prefer the stdlib version unless the descriptor needs custom invalidation or
+shared cache.
 
 ## Data vs non-data descriptors
 
-A descriptor that defines `__set__` (or `__delete__`) is a **data**
-descriptor; it wins over the instance `__dict__`. A descriptor that
-only defines `__get__` is a **non-data** descriptor; the instance
-`__dict__` wins.
+A descriptor that defines `__set__` (or `__delete__`) is a **data** descriptor;
+it wins over the instance `__dict__`. A descriptor that only defines `__get__`
+is a **non-data** descriptor; the instance `__dict__` wins.
 
-`cached_property` is non-data on purpose: the cached value lives in
-`__dict__` and shadows the descriptor on every subsequent access.
+`cached_property` is non-data on purpose: the cached value lives in `__dict__`
+and shadows the descriptor on every subsequent access.
 
 ## Where descriptors do not belong
 
@@ -90,8 +88,8 @@ only defines `__get__` is a **non-data** descriptor; the instance
 ## Common mistakes
 
 - Storing per-instance state on the descriptor object: every instance
-  of the owning class shares one slot, so values leak between
-  instances. Use `__set_name__` plus instance attributes.
+  of the owning class shares one slot, so values leak between instances. Use
+  `__set_name__` plus instance attributes.
 - Forgetting the `obj is None` branch in `__get__`: access on the
   class (`Order.quantity`) crashes.
 - Defining `__set__` when only lazy read was intended; that turns the

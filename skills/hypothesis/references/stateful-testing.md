@@ -1,10 +1,10 @@
 # Stateful testing with RuleBasedStateMachine
 
-`RuleBasedStateMachine` generates sequences of operations against a
-reference model and a system under test, checks invariants after every
-step, and shrinks failing sequences to the smallest counter-example.
-The pattern shines on collections, caches, allocators, and protocol
-clients where the bug needs a particular history to surface.
+`RuleBasedStateMachine` generates sequences of operations against a reference
+model and a system under test, checks invariants after every step, and shrinks
+failing sequences to the smallest counter-example. The pattern shines on
+collections, caches, allocators, and protocol clients where the bug needs a
+particular history to surface.
 
 ## Anatomy
 
@@ -51,8 +51,8 @@ TestCache = CacheTest.TestCase
 What each piece does:
 
 - `Bundle` threads values produced by one rule into later rules. The
-  `target=keys` argument on `add_key` says "the return value of this
-  rule joins the `keys` bundle".
+  `target=keys` argument on `add_key` says "the return value of this rule joins
+  the `keys` bundle".
 - `@rule` defines an operation; the runner picks rules at random,
   respecting `precondition` and the bundles.
 - `@invariant` runs after every rule; if it fails, the runner shrinks
@@ -85,14 +85,14 @@ state.set_value(k=v1, v=1)
 state.get_value(k=v1)
 ```
 
-Reproduce locally, then promote to a named unit test that pins the
-trace. The trace is the spec; the bug is whatever the trace shows.
+Reproduce locally, then promote to a named unit test that pins the trace. The
+trace is the spec; the bug is whatever the trace shows.
 
 ## Common mistakes
 
 - A `precondition` that filters most cases. Each rule should be
-  generally applicable; preconditions are for "this rule needs a key
-  in the bundle" not "this rule needs a specific value".
+  generally applicable; preconditions are for "this rule needs a key in the
+  bundle" not "this rule needs a specific value".
 - An invariant that depends on which rule ran last. Invariants should
   hold after every step.
 - A bundle without a `target`. The bundle stays empty and rules that

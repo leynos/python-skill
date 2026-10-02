@@ -7,9 +7,9 @@ https://deepwiki.com/leynos/python-skill)
 work without drowning out the work itself.*
 
 This repository carries an advanced Python skill set modelled on the
-`rust-skill` catalogue: a single router, a handful of focused language
-skills, a verification selector with three deep dives, and a quality-tools
-skill for the scanners and profilers beyond unit testing and type-checking.
+`rust-skill` catalogue: a single router, a handful of focused language skills,
+a verification selector with three deep dives, and a quality-tools skill for
+the scanners and profilers beyond unit testing and type-checking.
 
 ______________________________________________________________________
 
@@ -57,19 +57,18 @@ ______________________________________________________________________
 - One router, focused language skills, and dedicated domain and quality skills.
 - Short `SKILL.md` files, with references for the longer comparison material.
 - Coverage for typing (PEP 612, PEP 695, PEP 696, PEP 698, PEP 742),
-  exceptions and logging (Ruff TRY/BLE/EM/LOG/N818/PERF203/B017),
-  decorators and descriptors, context-manager extraction, iterator
-  refactors, msgspec-shaped data, dataclass and TypedDict choices, and
-  PEP 734 subinterpreters.
+  exceptions and logging (Ruff TRY/BLE/EM/LOG/N818/PERF203/B017), decorators
+  and descriptors, context-manager extraction, iterator refactors,
+  msgspec-shaped data, dataclass and TypedDict choices, and PEP 734
+  subinterpreters.
 - Verification skills covering selection plus deep dives for
   `hypothesis`, `crosshair`, and `mutmut`.
 - Quality-tool skill for `deadcode`, `pyscn`, and Pyinstrument.
 - Skylos dead-code management: safe deletion, implicit runtime callers,
   precise entrypoint exceptions, and merge-aware configuration contracts.
 - Ruff 0.16 skill covering the 413-rule default set, `ruff: ignore`
-  suppression comments, Markdown formatting, and the documented
-  settings, CLI, and rule deltas since 0.14.0 — the material most
-  models predate.
+  suppression comments, Markdown formatting, and the documented settings, CLI,
+  and rule deltas since 0.14.0 — the material most models predate.
 
 ______________________________________________________________________
 
@@ -78,8 +77,8 @@ ______________________________________________________________________
 - [Users' guide](docs/users-guide.md) — installation, invocation, routing,
   and when to reach for the verification or quality-tool skills.
 - [Developers' guide](docs/developers-guide.md) — working on this
-  repository: prerequisites, the `Makefile` gates, and what the test
-  suite covers.
+  repository: prerequisites, the `Makefile` gates, and what the test suite
+  covers.
 - [Skill catalogue status](docs/skill-catalogue-status.md) — what is
   active and what is research input.
 - [Initial-skill execplan](docs/execplans/initial-skill.md) — design,
@@ -98,27 +97,25 @@ ______________________________________________________________________
 
 ## Development
 
-The catalogue combines Markdown content with a small Python test suite.
-Run the gates through the `Makefile` rather than invoking the tools
-directly:
+The catalogue combines Markdown content with a small Python test suite. Run the
+gates through the `Makefile` rather than invoking the tools directly:
 
-| Target                      | What it does                                |
-| --------------------------- | ------------------------------------------- |
-| `make fmt`                  | Reflow tables and apply markdownlint fixes  |
-| `make markdownlint`         | Lint every Markdown file                    |
-| `make nixie`                | Validate every Mermaid diagram              |
-| `make lint`                 | Markdown, Mermaid, and skill manifest lint  |
-| `make skill-manifest-check` | Validate every shipped `SKILL.md`           |
-| `make test`                 | Run the pytest suite via `uv`               |
-| `make typecheck`            | Run mypy via `uv`                           |
-| `make check`                | Default goal; the full commit gate          |
+| Target                      | What it does                               |
+| --------------------------- | ------------------------------------------ |
+| `make fmt`                  | Reflow tables and apply markdownlint fixes |
+| `make markdownlint`         | Lint every Markdown file                   |
+| `make nixie`                | Validate every Mermaid diagram             |
+| `make lint`                 | Markdown, Mermaid, and skill manifest lint |
+| `make skill-manifest-check` | Validate every shipped `SKILL.md`          |
+| `make test`                 | Run the pytest suite via `uv`              |
+| `make typecheck`            | Run mypy via `uv`                          |
+| `make check`                | Default goal; the full commit gate         |
 
-`make test` and `make typecheck` require `uv`; the `dev` dependency
-group in `pyproject.toml` supplies pytest, `cmd-mox`, mypy, Hypothesis,
-PyYAML, `skills-ref`, and `yamllint`. The test suite stubs the external
-Markdown tools with `cmd-mox`. The
-[developers' guide](docs/developers-guide.md) covers the gates in full,
-and [scripting standards](docs/scripting-standards.md) gives the
+`make test` and `make typecheck` require `uv`; the `dev` dependency group in
+`pyproject.toml` supplies pytest, `cmd-mox`, mypy, Hypothesis, PyYAML,
+`skills-ref`, and `yamllint`. The test suite stubs the external Markdown tools
+with `cmd-mox`. The [developers' guide](docs/developers-guide.md) covers the
+gates in full, and [scripting standards](docs/scripting-standards.md) gives the
 conventions any new Python must follow.
 
 ______________________________________________________________________
@@ -129,16 +126,15 @@ This catalogue draws on the Python rules and guides shipped with
 `agent-template-python` (exceptions and logging, typing, context managers,
 generators, return discipline, pyproject layout) and on the structure
 established by the [`rust-skill`](https://github.com/leynos/rust-skill)
-catalogue. The verification skills lean on the documentation and source
-of [Hypothesis](https://github.com/HypothesisWorks/hypothesis),
-[CrossHair](https://github.com/pschanely/CrossHair), and
-[mutmut](https://github.com/boxed/mutmut); the quality-tool skill leans
-on [`deadcode`](https://github.com/albertas/deadcode),
+catalogue. The verification skills lean on the documentation and source of
+[Hypothesis](https://github.com/HypothesisWorks/hypothesis), [CrossHair](https://github.com/pschanely/CrossHair),
+and [mutmut](https://github.com/boxed/mutmut); the quality-tool skill leans on
+[`deadcode`](https://github.com/albertas/deadcode),
 [`pyscn`](https://github.com/ludo-technologies/pyscn), and
-[Pyinstrument](https://github.com/joerick/pyinstrument). The Ruff skill
-draws on [Ruff](https://github.com/astral-sh/ruff). The Skylos skill draws
-on [Skylos](https://github.com/duriantaco/skylos) documentation and pinned
-source, together with a maintainer-supplied dead-code triage case.
+[Pyinstrument](https://github.com/joerick/pyinstrument). The Ruff skill draws on
+[Ruff](https://github.com/astral-sh/ruff). The Skylos skill draws on
+[Skylos](https://github.com/duriantaco/skylos) documentation and pinned source,
+together with a maintainer-supplied dead-code triage case.
 
 ______________________________________________________________________
 
@@ -150,9 +146,9 @@ ______________________________________________________________________
 
 ## Contributing
 
-Contributions are welcome. Read [AGENTS.md](AGENTS.md) before changing
-tracked files: it lists the commit gates and the rules for changes under
-`skills/`. Keep new material under `skills/`, prefer short first-class
-skills with references for longer detail, and update
-[docs/skill-catalogue-status.md](docs/skill-catalogue-status.md) when adding
-or retiring a skill.
+Contributions are welcome. Read [AGENTS.md](AGENTS.md) before changing tracked
+files: it lists the commit gates and the rules for changes under `skills/`.
+Keep new material under `skills/`, prefer short first-class skills with
+references for longer detail, and update
+[docs/skill-catalogue-status.md](docs/skill-catalogue-status.md) when adding or
+retiring a skill.
