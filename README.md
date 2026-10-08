@@ -111,12 +111,15 @@ gates through the `Makefile` rather than invoking the tools directly:
 | `make typecheck`            | Run mypy via `uv`                          |
 | `make check`                | Default goal; the full commit gate         |
 
-`make test` and `make typecheck` require `uv`; the `dev` dependency group in
-`pyproject.toml` supplies pytest, `cmd-mox`, mypy, Hypothesis, PyYAML,
-`skills-ref`, and `yamllint`. The test suite stubs the external Markdown tools
-with `cmd-mox`. The [developers' guide](docs/developers-guide.md) covers the
-gates in full, and [scripting standards](docs/scripting-standards.md) gives the
-conventions any new Python must follow.
+`make test` also needs `mdtablefix` 0.6.1 or later on `PATH`, because the
+end-to-end formatting tests run it for real; `make test` and `make typecheck`
+require `uv`; the `dev` dependency group in `pyproject.toml` supplies pytest,
+`cmd-mox`, mypy, Hypothesis, PyYAML, `skills-ref`, and `yamllint`. The Makefile
+tests stub the external Markdown tools with `cmd-mox`, except `mdtablefix`,
+which the end-to-end tests run. The
+[developers' guide](docs/developers-guide.md) covers the gates in full, and
+[scripting standards](docs/scripting-standards.md) gives the conventions any
+new Python must follow.
 
 ______________________________________________________________________
 

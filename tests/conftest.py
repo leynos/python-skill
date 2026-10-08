@@ -23,6 +23,24 @@ pytest_plugins = ("cmd_mox.pytest_plugin",)
 REPO_ROOT = Path(__file__).resolve().parent.parent
 
 
+@pytest.fixture(autouse=True)
+def _isolate_git_location(monkeypatch: pytest.MonkeyPatch) -> None:
+    """Drop inherited Git location variables so scratch repositories stay isolated.
+
+    When pytest runs under a Git hook, ``GIT_DIR`` and friends point at the
+    outer checkout, and ``git`` and ``mdtablefix --git`` would act on it
+    instead of the scratch repository.
+    """
+    for name in (
+        "GIT_DIR",
+        "GIT_WORK_TREE",
+        "GIT_INDEX_FILE",
+        "GIT_OBJECT_DIRECTORY",
+        "GIT_COMMON_DIR",
+    ):
+        monkeypatch.delenv(name, raising=False)
+
+
 @pytest.fixture(scope="session")
 def repo_root() -> Path:
     """Locate the catalogue's checkout root.

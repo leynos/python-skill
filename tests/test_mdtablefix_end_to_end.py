@@ -73,11 +73,19 @@ def test_check_fmt_fails_on_unformatted_files_and_passes_once_formatted(
 def test_check_fmt_ignores_an_unformatted_git_ignored_file(
     scratch_repo: ScratchRepo,
 ) -> None:
-    """With only an ignored file unformatted, `check-fmt` has nothing to flag."""
+    """With only an ignored file unformatted, `check-fmt` has nothing to flag.
+
+    An untracked, unignored control file first shows the check can fail here, so
+    the later pass is not the check passing for some other reason.
+    """
     scratch_repo.write(".gitignore", "ignored.md\n")
-    scratch_repo.write("ignored.md", UNWRAPPED)
+    scratch_repo.write("control.md", UNWRAPPED)
     scratch_repo.track(".gitignore")
 
+    flagged = scratch_repo.make("check-fmt", NO_LINTER)
+    (scratch_repo.path / "control.md").unlink()
+    scratch_repo.write("ignored.md", UNWRAPPED)
     result = scratch_repo.make("check-fmt", NO_LINTER)
 
+    assert flagged.returncode != 0, "an untracked control file was not flagged"
     assert result.returncode == 0, result.stdout + result.stderr
