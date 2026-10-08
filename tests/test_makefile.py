@@ -31,6 +31,8 @@ if t.TYPE_CHECKING:  # pragma: no cover - typing only
 
 EXTERNAL_TOOLS = ("mdtablefix", "markdownlint-cli2", "nixie", "uv")
 LINTER = "markdownlint-cli2"
+# The one glob the linter must receive, so narrowing it cannot pass unnoticed.
+MARKDOWN_GLOB = "**/*.md"
 # `--git --include-untracked` choose the files (mdtablefix does the selecting,
 # so the Makefile builds no file list); the rest choose the rewrites.
 ESTATE_FLAGS = (
@@ -177,6 +179,7 @@ def test_check_fmt_runs_markdownlint(
     cmd_mox.verify()
     assert result.returncode == 0, result.stderr
     assert spy.call_count == 1, f"the linter ran {spy.call_count} times, not once"
+    assert list(spy.invocations[0].args) == [MARKDOWN_GLOB], "the linter must lint every file"
 
 
 # --- mdtablefix invocation --------------------------------------------------
@@ -223,7 +226,7 @@ def test_fmt_rewrites_with_every_estate_flag_then_lints_with_fix(
     argv = _argv_of(spy, "--in-place")
     assert set(ESTATE_FLAGS) <= set(argv), f"missing flags in {argv}"
     assert "--check" not in argv, f"fmt would only check: {argv}"
-    assert "--fix" in _argv_of(lint, "--fix"), "the linter was not asked to fix"
+    assert _argv_of(lint, "--fix") == ["--fix", MARKDOWN_GLOB], "the linter must fix every file"
 
 
 def test_fmt_lints_after_it_rewrites(tmp_path: Path, repo_root: Path) -> None:
