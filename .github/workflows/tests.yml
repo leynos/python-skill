@@ -27,8 +27,14 @@ jobs:
       - name: Install uv
         uses: astral-sh/setup-uv@d0cc045d04ccac9d8b7881df0226f9e82c39688e # v6.8.0
 
-      # The Makefile tests drive the real recipes against recording stubs for
-      # mdtablefix and the linter, so neither tool is installed here. They broke
-      # unnoticed once because nothing ran them.
+      # The Makefile tests drive the real recipes against recording stubs, and
+      # the end-to-end tests run them against the real mdtablefix, so it is
+      # installed here. 0.6.1 is the first release that supports --git selection.
+      - name: Install mdtablefix
+        uses: >-
+          leynos/shared-actions/.github/actions/install-mdtablefix@a5765019912a8ab6882b12db049c7cde635f3a85
+        with:
+          version: '0.6.1'
+
       - name: Run the tests
         run: make test

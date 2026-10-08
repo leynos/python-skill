@@ -23,8 +23,9 @@ versions of every `dev` dependency without a separate installation step. The
 `dev` group supplies seven packages:
 
 - `pytest` — the test runner.
-- `cmd-mox` — stubs external commands, so the test suite never invokes
-  a real Markdown tool.
+- `cmd-mox` — stubs external commands, so the Makefile tests do not invoke
+  the Markdown tools. The one exception is `mdtablefix` in the end-to-end tests
+  (see "What the tests cover").
 - `mypy` — strict-mode type-checking of `tests/`.
 - `hypothesis` — property-based testing, used for one test over
   arbitrary tracked Markdown filenames.
@@ -108,6 +109,14 @@ repository so the real `Makefile` is exercised end to end, and stubs the
 external Markdown tools with `cmd-mox`, so no third-party tool actually runs
 during a unit test. A `hypothesis` property test drives the file-selection
 logic over arbitrary tracked Markdown filenames.
+
+`tests/test_mdtablefix_end_to_end.py` runs the real `make fmt` and
+`make check-fmt` with the real `mdtablefix` (0.6.1 or later, on `PATH`) in a
+scratch repository holding a tracked, an untracked and a Git-ignored unwrapped
+document. It asserts that `fmt` wraps the first two and leaves the ignored one
+alone, and that `check-fmt` fails until `fmt` has run. The linter is replaced by
+`true` (`MDLINT=true`). The tests fail, not skip, when `mdtablefix` is
+missing, and the tests workflow installs it.
 
 The manifest tests are the exception: they run `make` in the checkout itself
 rather than in a scratch repository, because both targets resolve their tools
