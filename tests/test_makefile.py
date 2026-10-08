@@ -8,6 +8,7 @@ the build rather than being swallowed, and that the file list handed to
 
 from __future__ import annotations
 
+import os
 import shutil
 import subprocess
 import typing as t
@@ -26,7 +27,7 @@ from tests._scratch import (
 )
 
 if t.TYPE_CHECKING:  # pragma: no cover - typing only
-    from cmd_mox import CmdMox
+    from cmd_mox import CmdMox, CommandDouble
 
 EXTERNAL_TOOLS = ("mdtablefix", "markdownlint-cli2", "nixie", "uv")
 LINTER = "markdownlint-cli2"
@@ -181,7 +182,7 @@ def test_check_fmt_runs_markdownlint(
 # --- mdtablefix invocation --------------------------------------------------
 
 
-def _argv_of(spy: t.Any, flag: str) -> list[str]:
+def _argv_of(spy: CommandDouble, flag: str) -> list[str]:
     """Return the one recorded argument list that carries ``flag``."""
     (matching,) = [list(call.args) for call in spy.invocations if flag in call.args]
     return matching
@@ -240,7 +241,7 @@ def test_fmt_lints_after_it_rewrites(tmp_path: Path, repo_root: Path) -> None:
     result = repo.make(
         "fmt",
         env={
-            "PATH": f"{bin_dir}:{Path('/usr/bin')}:{Path('/bin')}",
+            "PATH": f"{bin_dir}{os.pathsep}{os.environ['PATH']}",
             RECORD_ENV: str(record),
         },
     )
@@ -350,7 +351,7 @@ def test_fmt_argv_is_independent_of_tracked_markdown_names(
     result = repo.make(
         "fmt",
         env={
-            "PATH": f"{bin_dir}:{Path('/usr/bin')}:{Path('/bin')}",
+            "PATH": f"{bin_dir}{os.pathsep}{os.environ['PATH']}",
             RECORD_ENV: str(record),
         },
     )
