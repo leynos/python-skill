@@ -50,8 +50,8 @@ Use this when the router's question list does not resolve to one skill.
   unclear. Choose one primary adversary; add `mutmut` only when the separate
   question is test-suite sensitivity.
 - Do not load `ruff-016` to explain a single diagnostic whose family is
-  already covered by a language skill; load it when the question is about
-  Ruff itself: configuration, defaults, suppression, or a version delta.
+  already covered by a language skill; load it when the question is about Ruff
+  itself: configuration, defaults, suppression, or a version delta.
 - Route Skylos findings and configuration repairs directly to `skylos`;
-  use `python-quality-tools` when choosing a scanner or profiler. Do not
-  load another analyser merely to avoid the repository's existing gate.
+  use `python-quality-tools` when choosing a scanner or profiler. Do not load
+  another analyser merely to avoid the repository's existing gate.

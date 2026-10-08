@@ -13,15 +13,15 @@ matrix chooses an escalation target; it is not a reason to escalate.
 
 ## At a glance
 
-| Concern                | Hypothesis                     | CrossHair                          | mutmut                      |
-| ---------------------- | ------------------------------ | ---------------------------------- | --------------------------- |
-| Engine                 | Generation plus shrinking      | Symbolic execution with Z3         | Mutation of production code |
-| Answers                | Does the property survive?     | Can a path violate the contract?   | Would the suite notice?     |
-| Best on                | Data and operation spaces      | Small pure, branchy functions      | Fast, stable test suites    |
-| Worst on               | Slow external effects          | Floats, strings, heap-heavy code   | Slow or flaky suites        |
-| Typical cadence        | Every CI run                   | Targeted or slower CI              | Nightly or pre-release      |
-| Counter-example shape  | Shrunk small input             | Concrete satisfying assignment     | Diff of surviving mutant    |
-| Pairs naturally with   | Pytest examples and mutmut     | Hypothesis and pytest regressions  | Any existing test style     |
+| Concern               | Hypothesis                 | CrossHair                         | mutmut                      |
+| --------------------- | -------------------------- | --------------------------------- | --------------------------- |
+| Engine                | Generation plus shrinking  | Symbolic execution with Z3        | Mutation of production code |
+| Answers               | Does the property survive? | Can a path violate the contract?  | Would the suite notice?     |
+| Best on               | Data and operation spaces  | Small pure, branchy functions     | Fast, stable test suites    |
+| Worst on              | Slow external effects      | Floats, strings, heap-heavy code  | Slow or flaky suites        |
+| Typical cadence       | Every CI run               | Targeted or slower CI             | Nightly or pre-release      |
+| Counter-example shape | Shrunk small input         | Concrete satisfying assignment    | Diff of surviving mutant    |
+| Pairs naturally with  | Pytest examples and mutmut | Hypothesis and pytest regressions | Any existing test style     |
 
 ## Pick by question
 

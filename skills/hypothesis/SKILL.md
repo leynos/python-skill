@@ -5,8 +5,8 @@ description: Write lightweight and advanced Hypothesis property-based tests for 
 
 # Hypothesis property-based testing for Python
 
-Hypothesis generates inputs against a property and shrinks failures towards
-a small counter-example. Treat it as ordinary pytest when the code is cheap to
+Hypothesis generates inputs against a property and shrinks failures towards a
+small counter-example. Treat it as ordinary pytest when the code is cheap to
 run, repeatable, and governed by a clear invariant. Start with `@given`, a
 built-in strategy, and one semantic assertion. Custom strategies, settings
 profiles, and state machines are escalation tools, not an entrance fee.
@@ -164,8 +164,8 @@ Stop at the first rung that answers the question:
    carries a contract and every reachable branch matters more than broad input
    sampling.
 6. **Suite sensitivity:** add mutmut when the question is whether the tests
-   would notice a defect. Mutation testing audits the suite; it does not replace
-   the property.
+   would notice a defect. Mutation testing audits the suite; it does not
+   replace the property.
 
 Escalate from light Hypothesis when the strategy starts encoding substantial
 domain rules, rejection dominates generation, the failure depends on history,
@@ -240,5 +240,4 @@ examples live in
 - [`references/stateful-testing.md`](references/stateful-testing.md) for
   `RuleBasedStateMachine`.
 - Selection and escalation between Hypothesis and other verification tools
-  live in
-  [`../python-verification/SKILL.md`](../python-verification/SKILL.md).
+  live in [`../python-verification/SKILL.md`](../python-verification/SKILL.md).

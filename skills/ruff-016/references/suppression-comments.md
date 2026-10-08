@@ -1,8 +1,8 @@
 # Suppression comments in Ruff 0.16
 
-Ruff now has a native suppression syntax alongside `noqa`. All four
-forms below are stable in 0.16.0. `noqa` and `# flake8: noqa` continue
-to work; nothing is deprecated.
+Ruff now has a native suppression syntax alongside `noqa`. All four forms below
+are stable in 0.16.0. `noqa` and `# flake8: noqa` continue to work; nothing is
+deprecated.
 
 ## The four forms
 
@@ -12,8 +12,8 @@ to work; nothing is deprecated.
 import math  # ruff: ignore[F401]
 ```
 
-Placed on its own line *above* a statement, it covers the whole
-**logical** line — the entire multi-line signature, call, or literal:
+Placed on its own line *above* a statement, it covers the whole **logical**
+line — the entire multi-line signature, call, or literal:
 
 ```python
 # ruff: ignore[ARG001]  covers the entire function signature
@@ -23,8 +23,8 @@ def foo(
 ): ...
 ```
 
-Placed *inside* a multi-line construct or at the end of a physical
-line, it covers only that physical line:
+Placed *inside* a multi-line construct or at the end of a physical line, it
+covers only that physical line:
 
 ```python
 def foo(
@@ -43,9 +43,9 @@ Comments stack; intervening comments do not break the association:
 i = 1
 ```
 
-This is the capability `noqa` lacks: `noqa` binds to a physical line
-only, so suppressing a diagnostic reported against a multi-line
-statement means guessing which line Ruff anchors it to.
+This is the capability `noqa` lacks: `noqa` binds to a physical line only, so
+suppressing a diagnostic reported against a multi-line statement means guessing
+which line Ruff anchors it to.
 
 ### `ruff: file-ignore[...]` — whole file
 
@@ -53,8 +53,8 @@ statement means guessing which line Ruff anchors it to.
 # ruff: file-ignore[F401, ARG001] Re-exports are intentional
 ```
 
-Own-line, at module scope, preferably near the top. Trailing prose
-after the closing bracket is the reason and is ignored by the parser.
+Own-line, at module scope, preferably near the top. Trailing prose after the
+closing bracket is the reason and is ignored by the parser.
 
 ### `ruff: disable[...]` / `ruff: enable[...]` — block range
 
@@ -72,32 +72,29 @@ Rules:
 - no blanket form — at least one code is required;
 - an `enable` cannot turn on a rule the configuration did not select;
 - a `disable` with no matching `enable` becomes an *implicit* range
-  running until a scope indented less than the comment, and raises
-  **`RUF104`** (`unmatched-suppression-comment`). Prefer explicit
-  ranges; at module scope an implicit range can silently swallow the
-  rest of the file.
+  running until a scope indented less than the comment, and raises **`RUF104`**
+  (`unmatched-suppression-comment`). Prefer explicit ranges; at module scope an
+  implicit range can silently swallow the rest of the file.
 
 Block suppressions were introduced in 0.15.0.
 
 ### `noqa` — unchanged
 
 `# noqa`, `# noqa: F401`, `# ruff: noqa`, `# ruff: noqa: F841`, and
-`# flake8: noqa` behave as before. For multi-line strings the `noqa`
-goes after the closing quotes; for an import block it goes on the first
-line.
+`# flake8: noqa` behave as before. For multi-line strings the `noqa` goes after
+the closing quotes; for an import block it goes on the first line.
 
 ## Syntax notes
 
 - The canonical spelling has a space after the colon —
-  `# ruff: ignore[F401]`. 0.16.0 makes Ruff insert one when it writes
-  these comments; the parser accepts `#ruff:ignore[...]` too.
+  `# ruff: ignore[F401]`. 0.16.0 makes Ruff insert one when it writes these
+  comments; the parser accepts `#ruff:ignore[...]` too.
 - The `#ruff:` prefix is **case sensitive**; `noqa` matching is not.
 - Codes are separated by commas, optional whitespace, optional trailing
   comma.
 - **Rule names** (`unused-import` instead of `F401`) are accepted in
-  `ruff: ignore`, `ruff: file-ignore`, `ruff: disable`, and
-  `ruff: enable` **in preview mode only**, and in rule selectors in
-  preview. On stable, use codes.
+  `ruff: ignore`, `ruff: file-ignore`, `ruff: disable`, and `ruff: enable` **in
+  preview mode only**, and in rule selectors in preview. On stable, use codes.
 
 ## Inserting and cleaning up
 
@@ -115,8 +112,8 @@ ruff check path/ --extend-select RUF100 --fix   # remove dead ones
 
 ## The suppression-hygiene rules
 
-These fire on suppression comments themselves and are worth selecting
-on any project that uses them heavily:
+These fire on suppression comments themselves and are worth selecting on any
+project that uses them heavily:
 
 | Code     | Name                                 | Status in 0.16     |
 | -------- | ------------------------------------ | ------------------ |
@@ -129,13 +126,13 @@ on any project that uses them heavily:
 | `RUF106` | `rule-codes-in-suppression-comments` | preview            |
 | `RUF201` | `rule-codes-in-selectors`            | preview            |
 
-Since 0.15.3, `RUF100` ignores unknown rule codes and `RUF102` reports
-them instead. `RUF105` rewrites `noqa` to `ruff: ignore`; `RUF106` and
-`RUF201` push codes towards human-readable names, in comments and in
-configuration selectors respectively.
+Since 0.15.3, `RUF100` ignores unknown rule codes and `RUF102` reports them
+instead. `RUF105` rewrites `noqa` to `ruff: ignore`; `RUF106` and `RUF201` push
+codes towards human-readable names, in comments and in configuration selectors
+respectively.
 
 ## isort action comments
 
-`# isort: skip_file`, `# isort: on`, `# isort: off`, `# isort: skip`,
-and `# isort: split` are respected, as are `# ruff: isort: …` variants.
-Not respected inside docstrings.
+`# isort: skip_file`, `# isort: on`, `# isort: off`, `# isort: skip`, and
+`# isort: split` are respected, as are `# ruff: isort: …` variants. Not
+respected inside docstrings.

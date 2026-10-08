@@ -7,10 +7,10 @@ metadata:
 
 # Python Verification
 
-Use this when the required evidence is unclear or the task has outgrown ordinary
-examples and a lightweight property. Do not insert a selector ceremony between
-a clear, cheap invariant and a five-line `@given` test; load `hypothesis`
-directly for that case.
+Use this when the required evidence is unclear or the task has outgrown
+ordinary examples and a lightweight property. Do not insert a selector ceremony
+between a clear, cheap invariant and a five-line `@given` test; load
+`hypothesis` directly for that case.
 
 The tools here answer different questions. They form an escalation map, not a
 single scale from weak to strong.
@@ -22,8 +22,8 @@ single scale from weak to strong.
 - One invariant over a broad, cheap, repeatable input space belongs directly
   in `hypothesis`.
 - Load this selector when valid data needs a substantial model, operation
-  history matters, every reachable path matters, or the question is whether
-  the suite would detect wrong code.
+  history matters, every reachable path matters, or the question is whether the
+  suite would detect wrong code.
 
 ## The three questions
 
@@ -36,23 +36,23 @@ single scale from weak to strong.
   counter-example when possible. It suits small pure functions where path
   coverage matters.
 - **mutmut**: *Would the test suite notice if the production code were
-  wrong?* Mutation testing changes production code one small step at a time
-  and runs the suite. It measures test sensitivity, not program correctness.
+  wrong?* Mutation testing changes production code one small step at a time and
+  runs the suite. It measures test sensitivity, not program correctness.
 
 ## Decision surface
 
 - **Stay with lightweight Hypothesis** when built-in strategies can describe
   the input and one semantic assertion states the property.
 - **Escalate within Hypothesis** when valid fields depend on one another, the
-  data is recursive, or a bug depends on a sequence of operations.
-  `st.builds`, `st.from_type`, `@st.composite`, recursive strategies, and
+  data is recursive, or a bug depends on a sequence of operations. `st.builds`,
+  `st.from_type`, `@st.composite`, recursive strategies, and
   `RuleBasedStateMachine` are successive tools, not prerequisites.
 - **Pick CrossHair** when a small pure function has a contract, missed branch,
   or narrow boundary that broad generated search may not reach. Use
   `diffbehavior` when a critical refactor should preserve behaviour.
 - **Pick mutmut** when the suite passes consistently but confidence in its
-  assertions remains low. Mutation testing can audit example and property
-  tests alike.
+  assertions remains low. Mutation testing can audit example and property tests
+  alike.
 - **Leave this cluster** for real-service integration, race conditions,
   performance, resource leaks, and native undefined behaviour.
 

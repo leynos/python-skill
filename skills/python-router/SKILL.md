@@ -50,9 +50,8 @@ follow-on skill.
 - Choosing a dead-code scanner, clone and complexity scans, or profiling:
   `python-quality-tools`
 - Ruff configuration, settings and CLI changes, selector rewrites,
-  suppression comments, the 0.16 default rule set, formatter and
-  Markdown behaviour, nullable JSON output, or an upgrade from
-  0.14/0.15: `ruff-016`
+  suppression comments, the 0.16 default rule set, formatter and Markdown
+  behaviour, nullable JSON output, or an upgrade from 0.14/0.15: `ruff-016`
 
 ## Testing hierarchy
 
@@ -80,13 +79,13 @@ evidence matches the question, and stop there.
    `diffbehavior`, not as a replacement for ordinary unit tests.
 
 Mutation testing sits beside the hierarchy rather than above it. Choose
-`mutmut` when the production behaviour is already specified and the question
-is whether the suite would notice a plausible defect.
+`mutmut` when the production behaviour is already specified and the question is
+whether the suite would notice a plausible defect.
 
 Leave this hierarchy when the failure depends primarily on a real service,
 process boundary, schedule, load, memory use, or native undefined behaviour.
-Use integration tests, concurrency or stress tooling, benchmarks and
-profilers, or native sanitizers instead.
+Use integration tests, concurrency or stress tooling, benchmarks and profilers,
+or native sanitizers instead.
 
 ## Testing selection rubric
 
@@ -124,9 +123,9 @@ because a generator can rediscover it.
   unclear, then choose one primary adversary. `mutmut` may pair with any rung
   because it audits the suite rather than generating production inputs.
 - Ruff rule-family semantics, such as selecting `BLE001` for exception
-  handling, belong to `python-errors-and-logging` for the TRY, BLE, EM,
-  and LOG families; `ruff-016` covers configuration, defaults,
-  suppression, and version deltas.
+  handling, belong to `python-errors-and-logging` for the TRY, BLE, EM, and LOG
+  families; `ruff-016` covers configuration, defaults, suppression, and version
+  deltas.
 
 ## Escalate when
 
@@ -143,5 +142,5 @@ because a generator can rediscover it.
 - performance claims appear before measurements, or
 - `except Exception:` survives review without a documented reason.
 
-Read [routing-matrix.md](references/routing-matrix.md) only when the route
-is still unclear.
+Read [routing-matrix.md](references/routing-matrix.md) only when the route is
+still unclear.

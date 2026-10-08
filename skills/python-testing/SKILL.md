@@ -31,8 +31,8 @@ testing is itself the problem.
 
 ## Parametrize or property
 
-Choose `pytest.mark.parametrize` when each row belongs in the specification:
-a protocol example, truth table, supported version, error mapping, or exact
+Choose `pytest.mark.parametrize` when each row belongs in the specification: a
+protocol example, truth table, supported version, error mapping, or exact
 input/output pair. Give rows readable `ids=` and expect reviewers to reason
 about each one.
 
@@ -42,8 +42,8 @@ table labelled "edge cases", manual cross-products of independent dimensions,
 and a new row for every escaped bug. Keep exact normative examples and named
 regressions alongside the property.
 
-A property test is not automatically superior. For a four-row standard, a
-slow integration boundary, or distinct expected messages and side effects,
+A property test is not automatically superior. For a four-row standard, a slow
+integration boundary, or distinct expected messages and side effects,
 parametrization is clearer and cheaper.
 
 ## Decision surface
@@ -122,6 +122,6 @@ test.
 - `@pytest.fixture(autouse=True)` introduced to fix one test.
 - Snapshot tests with no review step on regenerate; the snapshot is the spec.
 
-Read [fixtures-and-parametrize.md](references/fixtures-and-parametrize.md)
-and [pytest-plugins.md](references/pytest-plugins.md) for the patterns that
-recur across suites.
+Read [fixtures-and-parametrize.md](references/fixtures-and-parametrize.md) and
+[pytest-plugins.md](references/pytest-plugins.md) for the patterns that recur
+across suites.

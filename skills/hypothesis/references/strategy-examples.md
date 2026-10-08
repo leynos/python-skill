@@ -22,8 +22,7 @@ needed.
 
 ## Several independent fields
 
-Keep independent fields independent. Hypothesis will explore their
-combinations:
+Keep independent fields independent. Hypothesis will explore their combinations:
 
 ```python
 @given(
@@ -34,8 +33,7 @@ def test_area_is_symmetric(width: int, height: int) -> None:
     assert area(width, height) == area(height, width)
 ```
 
-Do not build a tuple or composite strategy merely to make the decorator
-shorter.
+Do not build a tuple or composite strategy merely to make the decorator shorter.
 
 ## Building structured values
 
@@ -66,8 +64,7 @@ default strategy from type annotations when the inferred domain is suitable.
 
 ## Dependent values justify `@st.composite`
 
-Use a composite strategy when one generated field genuinely constrains
-another:
+Use a composite strategy when one generated field genuinely constrains another:
 
 ```python
 @st.composite

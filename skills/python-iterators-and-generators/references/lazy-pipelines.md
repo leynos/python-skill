@@ -1,8 +1,8 @@
 # Lazy pipelines
 
-A lazy pipeline is a sequence of generators where each stage pulls from
-the previous one. Memory is bounded by the largest single item; the
-input can be infinite.
+A lazy pipeline is a sequence of generators where each stage pulls from the
+previous one. Memory is bounded by the largest single item; the input can be
+infinite.
 
 ## Building blocks
 
@@ -42,8 +42,8 @@ def first_n_active(n: int, source: Iterable[str]) -> Iterator[UserId]:
     return islice(active, n)
 ```
 
-`first_n_active` reads the source on demand; consuming five items
-processes the smallest prefix that produces five active users.
+`first_n_active` reads the source on demand; consuming five items processes the
+smallest prefix that produces five active users.
 
 ## When laziness costs more than it gives
 
@@ -56,10 +56,10 @@ processes the smallest prefix that produces five active users.
 
 ## `tee` is rarely the answer
 
-`itertools.tee(it, n)` looks like it duplicates an iterator. Under the
-hood it buffers items between the slowest and fastest consumer; if one
-consumer falls far behind, the buffer grows without bound. Reach for a
-real second pass over the source instead.
+`itertools.tee(it, n)` looks like it duplicates an iterator. Under the hood it
+buffers items between the slowest and fastest consumer; if one consumer falls
+far behind, the buffer grows without bound. Reach for a real second pass over
+the source instead.
 
 ## Async pipelines
 

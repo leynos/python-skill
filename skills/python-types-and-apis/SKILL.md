@@ -24,11 +24,10 @@ in type hints, protocols, and public signatures.
 ## Decision surface
 
 - `TypeVar`: a function or class needs to preserve a relationship between
-  inputs and outputs (`def first[T](xs: list[T]) -> T`). Prefer PEP 695
-  inline syntax in Python 3.12+ for new code.
+  inputs and outputs (`def first[T](xs: list[T]) -> T`). Prefer PEP 695 inline
+  syntax in Python 3.12+ for new code.
 - `ParamSpec`: a decorator must preserve the wrapped function's signature.
-  Pair with `typing.Concatenate` when the wrapper injects a prefix
-  argument.
+  Pair with `typing.Concatenate` when the wrapper injects a prefix argument.
 - `TypeIs` (PEP 742): a predicate is an honest equivalence — `is_str(x)`
   returning `True` proves `x: str` in the true branch and `not str` in the
   false branch.
@@ -40,8 +39,8 @@ in type hints, protocols, and public signatures.
   `.read()` and `.close()`") and an explicit base class would over-constrain
   callers.
 - `@overload`: a function takes a closed set of argument shapes and the
-  return type depends on the shape; the implementation `def` stays
-  unannotated for the union and the overloads carry the precise types.
+  return type depends on the shape; the implementation `def` stays unannotated
+  for the union and the overloads carry the precise types.
 - `TypedDict` or `Unpack[TypedDict]`: kwargs are a fixed schema that needs
   type-checker enforcement at the call site.
 
@@ -63,8 +62,11 @@ in type hints, protocols, and public signatures.
 - generic parameters appear in the public signature for purely internal
   flexibility.
 
-Read [paramspec-and-typevars.md](references/paramspec-and-typevars.md),
-[typeis-vs-typeguard.md](references/typeis-vs-typeguard.md),
-[generics-and-newtypes.md](references/generics-and-newtypes.md), and
-[overloads-and-typed-kwargs.md](references/overloads-and-typed-kwargs.md)
+<!-- markdownlint-disable MD013 -->
+
+Read
+[paramspec-and-typevars.md](references/paramspec-and-typevars.md), [typeis-vs-typeguard.md](references/typeis-vs-typeguard.md), [generics-and-newtypes.md](references/generics-and-newtypes.md),
+and [overloads-and-typed-kwargs.md](references/overloads-and-typed-kwargs.md)
 when one of those forks becomes the main design pressure.
+
+<!-- markdownlint-enable MD013 -->
