@@ -160,8 +160,12 @@ the helper in
 [shared-actions](https://github.com/leynos/shared-actions/tree/main/uv_gate).
 It cleans the environment, uses the global uv cache, runs offline first, and
 goes online at most once, only when uv proves a cache entry, a managed Python
-or a Git source is missing. Do not edit it: the concordat `uv-gate-baseline`
-rule audits its digest. `make prepare` installs the locked environment, and the
-gates that need it depend on it. A Git-sourced tool that is not cached yet
-needs uv 0.11.28 or newer; with an older uv, run the tool once with `uvx` to
-warm the cache. Run `uv lock` by hand to change `uv.lock`; the gates never do.
+or a Git source is missing. The copy is vendored byte for byte and is never
+edited in place: the concordat `uv-gate-baseline` rule audits its digest, so
+the repository's file-length and scripting-stack conventions do not apply to
+it, and Ruff excludes it. `make prepare` installs the locked environment, and
+every gate that runs the project depends on it. A caller's `UV=/path/to/uv` is
+honoured by putting that uv's directory on `PATH`. A Git-sourced tool that is
+not cached yet needs uv 0.11.28 or newer; with an older uv, running the tool
+once with `uvx` warms the cache. `uv.lock` changes only through a manual
+`uv lock`; the gates never change it.
