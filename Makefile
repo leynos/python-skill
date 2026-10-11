@@ -2,6 +2,10 @@
 # uses the global uv cache, runs offline first and goes online at most once. See
 # https://github.com/leynos/shared-actions/tree/main/uv_gate for the contract.
 UV_GATE ?= python3 scripts/uv_gate.py
+UV ?= uv
+# The helper finds uv on PATH, so a caller's UV=/path/to/uv is honoured by putting
+# that uv's directory first on PATH for every recipe.
+export PATH := $(if $(findstring /,$(UV)),$(patsubst %/,%,$(dir $(UV))):)$(PATH)
 .DEFAULT_GOAL := check
 
 # A pipeline reports only its last command's status by default, so a failing
