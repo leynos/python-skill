@@ -24,16 +24,20 @@ MAKEFILE = (ROOT / "Makefile").read_text(encoding="utf-8")
 HELPER_DIGEST = "fe7671d8663ec89ce1076ebb857847802e46c8d6607ab1e012daa443e335e66e"
 EXPECTED_PREPARE = "prepare --group dev"
 EXPECTED_DEFAULT_GOAL = "check"
-# The targets that run the project through the helper.
-GATE_TARGETS: tuple[str, ...] = (
-    "lint",
-    "skill-frontmatter-lint",
-    "skill-manifest-validate",
-    "skill-manifest-check",
-    "typecheck",
-    "test",
-    "check",
+# The targets that call the helper: (target, tools it runs, runs the project, and
+# whether make's own prerequisite graph must reach prepare; a target that reaches
+# the project only through a recursive $(MAKE) is covered by that sub-target).
+GATES: tuple[tuple[str, tuple[str, ...], bool, bool], ...] = (
+    ("check", ("mypy", "pytest", "skills-ref", "yamllint"), True, True),
+    ("skill-frontmatter-lint", ("yamllint",), True, True),
+    ("lint", ("skills-ref", "yamllint"), True, True),
+    ("typecheck", ("mypy",), True, True),
+    ("test", ("pytest",), True, True),
+    ("skill-manifest-validate", ("skills-ref",), True, True),
+    ("skill-manifest-check", ("skills-ref", "yamllint"), True, True),
 )
+# The targets whose own recipe runs the helper's prepare.
+PREPARE_TARGETS: tuple[str, ...] = ("prepare",)
 # Every Makefile line that mentions uv without going through the helper. A new
 # mention fails the test until it is reviewed and added here.
 ALLOWED_UV_LINES: tuple[str, ...] = (
@@ -46,6 +50,7 @@ NEEDS_MAKE = pytest.mark.skipif(MAKE is None, reason="make is not installed")
 UV_WORD = re.compile(r"(?<![A-Za-z0-9_-])uvx?(?![A-Za-z0-9_-])|\$[({]UV[)}]")
 COMMENT = re.compile(r"(?<!\\)(?:^|\s)#.*$")
 SEGMENT_SPLIT = re.compile(r"&&|\|\||[;|]")
+XARGS_VALUED = {"-n", "-I", "-P", "-L", "-s", "-d", "-E", "-a"}
 LEADING_WORDS = {"if", "then", "else", "elif", "do", "!", "time", "exec", "env"}
 GATE_ASSIGNMENT = re.compile(
     r"^\s*(?:(?:override|export)\s+)*UV_GATE\s*[:?+!]*=", re.MULTILINE
@@ -73,14 +78,56 @@ def helper_calls(printed: str) -> list[str]:
                 or not words[0].lstrip("@+-")
             ):
                 words = words[1:]
+            if words[:1] == ["xargs"]:
+                words = words[1:]
+                while words and words[0].startswith("-"):
+                    flag = words.pop(0)
+                    if flag in XARGS_VALUED and words:
+                        words.pop(0)
             if words and words[0].lstrip("@+-") == MARKER:
                 calls.append(" ".join(words).lstrip("@+-"))
     return calls
 
 
-def make(*arguments: str) -> subprocess.CompletedProcess[str]:
-    """Run GNU make in the repository root and capture its output."""
-    return subprocess.run(
+def tools_run(calls: list[str]) -> set[str]:
+    """Return the first word after `--` in each helper run or tool call."""
+    return {
+        call.split(" -- ", 1)[1].split()[0]
+        for call in calls
+        if call.split()[1] in {"run", "tool"}
+        and " -- " in call
+        and call.split(" -- ", 1)[1].strip()
+    }
+
+
+def database_prerequisites() -> dict[str, set[str]]:
+    """Return make's rule database as a target to prerequisites map."""
+    rules: dict[str, set[str]] = {}
+    for line in make("-qp", "--", ok=(0, 1)).stdout.splitlines():
+        rule = re.match(r"^([^\s#:=%][^:=%]*):(?![:=])([^|;]*)", line)
+        if rule:
+            rules.setdefault(rule[1].strip(), set()).update(rule[2].split())
+    return rules
+
+
+def reaches(name: str, rules: dict[str, set[str]], goals: tuple[str, ...]) -> bool:
+    """Say whether ``name`` is, or depends transitively on, one of ``goals``."""
+    pending, seen = [name], set()
+    while pending:
+        current = pending.pop()
+        if current in goals:
+            return True
+        if current not in seen:
+            seen.add(current)
+            pending.extend(rules.get(current, ()))
+    return False
+
+
+def make(
+    *arguments: str, ok: tuple[int, ...] = (0,)
+) -> subprocess.CompletedProcess[str]:
+    """Run GNU make in the repository root; fail on an unexpected exit status."""
+    done = subprocess.run(
         [MAKE or "make", "--no-print-directory", "-f", "Makefile", *arguments],
         cwd=ROOT,
         capture_output=True,
@@ -88,6 +135,10 @@ def make(*arguments: str) -> subprocess.CompletedProcess[str]:
         check=False,
         timeout=120,
     )
+    assert done.returncode in ok, (
+        f"make {arguments} exited {done.returncode}: {done.stderr}"
+    )
+    return done
 
 
 def test_the_vendored_helper_is_the_reviewed_release() -> None:
@@ -101,7 +152,7 @@ def test_the_vendored_helper_is_the_reviewed_release() -> None:
 def test_the_gate_variable_is_assigned_once_to_the_helper() -> None:
     """UV_GATE has one assignment, and make's effective value is the helper."""
     assignments = GATE_ASSIGNMENT.findall(MAKEFILE)
-    database = make("-qp", "--").stdout
+    database = make("-qp", "--", ok=(0, 1)).stdout
 
     assert len(assignments) == 1, f"UV_GATE is assigned {len(assignments)} times"
     assert re.search(
@@ -193,20 +244,20 @@ def test_prepare_is_phony_and_runs_the_helper_prepare() -> None:
 
 
 @NEEDS_MAKE
-@pytest.mark.parametrize("target", GATE_TARGETS)
-def test_a_gate_prepares_before_it_runs_and_separates_every_command(
-    target: str,
+@pytest.mark.parametrize(("target", "tools", "runs_project", "graph"), GATES)
+def test_a_gate_runs_its_tools_prepared_and_separated(
+    target: str, tools: tuple[str, ...], *, runs_project: bool, graph: bool
 ) -> None:
-    """Each gate prepares before its first project run, and `--` ends options."""
+    """Each gate runs its tools through the helper, prepared first, with `--`."""
     printed = make("-nB", target, f"UV_GATE={MARKER}").stdout
     calls = helper_calls(printed)
     subcommands = [call.split()[1] for call in calls]
     prepare = f"{MARKER} {EXPECTED_PREPARE}"
 
-    assert {"run", "tool"} & set(subcommands), (
-        f"make {target} must run its commands through the helper: {printed!r}"
+    assert set(tools) <= tools_run(calls), (
+        f"make {target} must run {tools} through the helper, ran {tools_run(calls)}"
     )
-    if "run" in subcommands:
+    if runs_project:
         first_run = subcommands.index("run")
         assert prepare in calls[:first_run], (
             f"make {target} must prepare before it runs the project: {calls}"
@@ -218,9 +269,32 @@ def test_a_gate_prepares_before_it_runs_and_separates_every_command(
 
 
 @NEEDS_MAKE
+@pytest.mark.parametrize(
+    "target", [name for name, _, runs_project, graph in GATES if runs_project and graph]
+)
+def test_a_project_gate_depends_on_prepare(target: str) -> None:
+    """Make's own prerequisite graph orders prepare first, even under `make -j`."""
+    rules = database_prerequisites()
+
+    assert reaches(target, rules, PREPARE_TARGETS), (
+        f"{target} must depend, directly or not, on one of {PREPARE_TARGETS}"
+    )
+
+
+def test_a_failing_helper_call_is_not_ignored() -> None:
+    """No recipe line tolerates a failing helper call."""
+    ignored = re.compile(
+        r"^\t[@+]*-\s*\$\(UV_GATE\)|\$\(UV_GATE\)[^\n]*\|\|\s*(?:true|:)\s*$"
+    )
+    offenders = [line.strip() for line in MAKEFILE.splitlines() if ignored.search(line)]
+
+    assert not offenders, f"helper failures are ignored: {offenders}"
+
+
+@NEEDS_MAKE
 def test_the_default_goal_is_unchanged() -> None:
     """Adding `prepare` must not change what a bare `make` runs."""
-    database = make("-qp", "--").stdout
+    database = make("-qp", "--", ok=(0, 1)).stdout
 
     assert f".DEFAULT_GOAL := {EXPECTED_DEFAULT_GOAL}" in database, (
         f"a bare make must still run {EXPECTED_DEFAULT_GOAL}"
