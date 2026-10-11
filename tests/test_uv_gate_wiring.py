@@ -3,6 +3,8 @@
 The helper (``scripts/uv_gate.py``) is copied byte for byte from
 leynos/shared-actions and audited by concordat's ``uv-gate-baseline`` rule.
 These checks keep this repository's wiring to it from drifting between audits.
+They ask GNU make what it would run (``make -nB`` with a marker standing in for
+the helper) instead of pattern-matching recipe text.
 """
 
 from __future__ import annotations
@@ -20,115 +22,73 @@ MAKEFILE = (ROOT / "Makefile").read_text(encoding="utf-8")
 # The reviewed helper release (uv_gate 0.2.1). Update the digest when moving to a
 # newer release, never to accept an edited copy.
 HELPER_DIGEST = "fe7671d8663ec89ce1076ebb857847802e46c8d6607ab1e012daa443e335e66e"
-EXPECTED_PREPARE = "$(UV_GATE) prepare --group dev"
+EXPECTED_PREPARE = "prepare --group dev"
 EXPECTED_DEFAULT_GOAL = "check"
-# Commands the spelling baseline requires to stay direct (empty when none).
-DIRECT_EXEMPTIONS: tuple[str, ...] = ()
-GATE_LINE = re.compile(r"^UV_GATE \?= python3 scripts/uv_gate\.py$", re.MULTILINE)
-CACHE_OVERRIDE = re.compile(r"UV_(?:CACHE|TOOL)_DIR\s*(?:[:?+]{0,2}=|:)")
-UV_WORD = r"(?:(?:\S*/)?uvx?|\$[({]UV[)}])"
-# A command that starts with uv (after env and assignments), or a uv subcommand
-# anywhere on the line.
-BARE_UV = re.compile(
-    rf"^[@+\-\s]*(?:env\s+(?:-\S+\s+)*)?(?:\w+=\S+\s+)*{UV_WORD}(?=\s|$)"
-    rf"|(?<![A-Za-z0-9_.$-]){UV_WORD}[ \t]+(?:--?\S+[ \t]+)*"
-    r"(?:run|sync|tool|pip|lock|build|venv|export|add|remove|python|cache|init)\b"
+# The targets that run the project through the helper.
+GATE_TARGETS: tuple[str, ...] = (
+    "lint",
+    "skill-frontmatter-lint",
+    "skill-manifest-validate",
+    "skill-manifest-check",
+    "typecheck",
+    "test",
+    "check",
 )
+# Every Makefile line that mentions uv without going through the helper. A new
+# mention fails the test until it is reviewed and added here.
+ALLOWED_UV_LINES: tuple[str, ...] = (
+    "UV ?= uv",
+    "export PATH := $(if $(findstring /,$(UV)),$(patsubst %/,%,$(dir $(UV))):)$(PATH)",
+)
+MARKER = "UV-GATE-MARKER"
+UV_WORD = re.compile(r"(?<![A-Za-z0-9_-])uvx?(?![A-Za-z0-9_-])|\$[({]UV[)}]")
+COMMENT = re.compile(r"(?<!\\)(?:^|\s)#.*$")
 SEGMENT_SPLIT = re.compile(r"&&|\|\||[;|]")
-COMMENT = re.compile(r"(?<!\\)\s#.*$")
-RULE = re.compile(r"^(?P<names>[^\s#:=][^:=]*?)\s*:(?![:=])(?P<prerequisites>[^#]*)")
-RUNS_PROJECT = "$(UV_GATE) run"
-HELPER_PREPARE = "$(UV_GATE) prepare"
-GATED_CALL = re.compile(r"\$\(UV_GATE\) (?:run|tool)\b")
-Rules = dict[str, tuple[set[str], str]]
+LEADING_WORDS = {"if", "then", "else", "elif", "do", "!", "time", "exec", "env"}
+GATE_ASSIGNMENT = re.compile(
+    r"^\s*(?:(?:override|export)\s+)*UV_GATE\s*[:?+!]*=", re.MULTILINE
+)
+CACHE_OVERRIDE = re.compile(r"UV_(?:CACHE|TOOL)_DIR\s*(?:[:?+]{0,2}=|:)")
 
 
-def bare_uv_calls(makefile: str) -> list[str]:
-    """Return the command segments that call uv without the helper."""
-    offenders = []
-    for line in makefile.replace("\\\n", " ").splitlines():
-        if line.lstrip().startswith("#"):
-            continue
+def uv_mentions(makefile: str) -> list[str]:
+    """Return the normalised Makefile lines that mention uv, comments removed."""
+    lines = (
+        COMMENT.sub("", line) for line in makefile.replace("\\\n", " ").splitlines()
+    )
+    return [" ".join(line.split()) for line in lines if UV_WORD.search(line)]
+
+
+def helper_calls(printed: str) -> list[str]:
+    """Return the commands in make's printed recipes that run the marker."""
+    calls = []
+    for line in printed.splitlines():
         for segment in SEGMENT_SPLIT.split(COMMENT.sub("", line)):
-            if not BARE_UV.search(segment) or segment.lstrip().startswith("UV "):
-                continue
-            if any(exempt in segment for exempt in DIRECT_EXEMPTIONS):
-                continue
-            offenders.append(segment.strip())
-    return offenders
+            words = segment.replace("(", " ").replace("{", " ").split()
+            while words and (
+                words[0].lstrip("@+-") in LEADING_WORDS
+                or re.fullmatch(r"\w+=\S*", words[0])
+                or not words[0].lstrip("@+-")
+            ):
+                words = words[1:]
+            if words and words[0].lstrip("@+-") == MARKER:
+                calls.append(" ".join(words).lstrip("@+-"))
+    return calls
 
 
-def parse_rules(makefile: str) -> Rules:
-    """Map each rule name to its prerequisites and its recipe text."""
-    rules: Rules = {}
-    name = None
-    for line in makefile.replace("\\\n", " ").splitlines():
-        if line.startswith("\t") and name is not None:
-            prerequisites, recipe = rules[name]
-            rules[name] = (prerequisites, f"{recipe}\n{line.strip()}")
-            continue
-        rule = RULE.match(line)
-        name = None
-        if rule:
-            name = rule["names"].strip()
-            rules[name] = (set(rule["prerequisites"].split()), "")
-    return rules
-
-
-def project_runners(makefile: str) -> list[str]:
-    """Return the variable and macro references that run the project."""
-    assignments = re.findall(r"^(\w+)\s*[:?]?=\s*(.*)$", makefile, re.MULTILINE)
-    macros = re.findall(
-        r"^define (\w+)\n(.*?)^endef", makefile, re.DOTALL | re.MULTILINE
-    )
-    return [
-        RUNS_PROJECT,
-        *(f"$({n})" for n, value in assignments if value.startswith(RUNS_PROJECT)),
-        *(f"$(call {n}" for n, body in macros if RUNS_PROJECT in body),
-    ]
-
-
-def reaches_prepare(
-    name: str, rules: Rules, seen: frozenset[str] = frozenset()
-) -> bool:
-    """Say whether building ``name`` runs the helper's prepare, via its own recipe."""
-    if name in seen or name not in rules:
-        return False
-    prerequisites, recipe = rules[name]
-    return EXPECTED_PREPARE in recipe or any(
-        reaches_prepare(item, rules, seen | {name}) for item in prerequisites
-    )
-
-
-def unprepared_gates(makefile: str) -> list[str]:
-    """Return the targets that run the project without a prepared environment."""
-    rules = parse_rules(makefile)
-    runners = project_runners(makefile)
-    return [
-        name
-        for name, (prerequisites, recipe) in rules.items()
-        if name != "prepare"
-        and any(runner in recipe for runner in runners)
-        and not any(
-            item == "prepare" or reaches_prepare(item, rules) for item in prerequisites
-        )
-    ]
-
-
-def make_database(*arguments: str) -> str:
-    """Return GNU make's printed database for the Makefile, without running a recipe."""
-    make = shutil.which("make")
-    if make is None:
+def make(*arguments: str) -> subprocess.CompletedProcess[str]:
+    """Run GNU make in the repository root and capture its output."""
+    executable = shutil.which("make")
+    if executable is None:
         pytest.skip("make is not installed")
-    done = subprocess.run(
-        [make, "-qp", "-f", "Makefile", *arguments, "--"],
+    return subprocess.run(
+        [executable, "--no-print-directory", "-f", "Makefile", *arguments],
         cwd=ROOT,
         capture_output=True,
         text=True,
         check=False,
-        timeout=60,
+        timeout=120,
     )
-    return done.stdout
 
 
 def test_the_vendored_helper_is_the_reviewed_release() -> None:
@@ -138,9 +98,15 @@ def test_the_vendored_helper_is_the_reviewed_release() -> None:
     assert digest == HELPER_DIGEST, f"scripts/uv_gate.py has digest {digest}"
 
 
-def test_the_gate_variable_is_the_helper() -> None:
-    """UV_GATE holds exactly the helper command."""
-    assert GATE_LINE.search(MAKEFILE), "UV_GATE must default to the helper"
+def test_the_gate_variable_is_assigned_once_to_the_helper() -> None:
+    """UV_GATE has one assignment, and make's effective value is the helper."""
+    assignments = GATE_ASSIGNMENT.findall(MAKEFILE)
+    database = make("-qp", "--").stdout
+
+    assert len(assignments) == 1, f"UV_GATE is assigned {len(assignments)} times"
+    assert re.search(
+        r"^UV_GATE = python3 scripts/uv_gate\.py$", database, re.MULTILINE
+    ), "make's effective UV_GATE must be the helper command"
 
 
 def test_no_uv_cache_override_remains() -> None:
@@ -151,108 +117,118 @@ def test_no_uv_cache_override_remains() -> None:
     assert not offenders, f"a uv cache location is overridden: {offenders}"
 
 
-def test_recipes_reach_uv_only_through_the_helper() -> None:
-    """No bare uv command remains, bar the one the spelling baseline keeps direct."""
-    offenders = bare_uv_calls(MAKEFILE)
+def test_every_remaining_mention_of_uv_is_reviewed() -> None:
+    """A uv mention that is not routed through the helper must be on the list."""
+    unreviewed = [
+        line for line in uv_mentions(MAKEFILE) if line not in ALLOWED_UV_LINES
+    ]
 
-    assert not offenders, f"bare uv calls remain: {offenders}"
+    assert not unreviewed, f"unreviewed uv mentions (use the helper): {unreviewed}"
 
 
 @pytest.mark.parametrize(
-    "recipe",
+    "line",
     [
         "\tuv run pytest",
-        "\t@uv sync --group dev",
+        "RUNNER = uvx ruff check",
+        "RUNNER = uv --directory . run pytest",
         "\t${UV} run pytest",
         "\t$(UV) --offline run pytest",
-        "\t/usr/bin/uv run pytest",
-        "\tenv uv --offline run pytest",
+        "\t'/usr/bin/uv' run pytest",
         "\tenv uvx ruff check",
-        "\tFOO=1 uvx ruff check",
         "\ttrue && uv lock",
-        "\tuv sync; echo typos-config-builder.git@v1  # typos-config-builder.git@v1",
+        "\tuv sync  # $(UV_GATE) run --",
+        "ifeq ($(shell command -v uv),)",
     ],
 )
-def test_the_detector_rejects_bare_uv_forms(recipe: str) -> None:
-    """The scan catches the spellings a careless edit could use."""
-    assert bare_uv_calls(f"check:\n{recipe}\n")
+def test_the_scan_finds_a_mention(line: str) -> None:
+    """Every spelling of a direct uv call is found."""
+    assert uv_mentions(f"check:\n{line}\n")
 
 
 @pytest.mark.parametrize(
-    "recipe",
+    "line",
     [
         "\t$(UV_GATE) run -- pytest",
         "\t$(UV_GATE) tool --from ruff@0.9.0 -- ruff check",
-        "UV ?= uv",
         "# uv run is described here",
-        "\t@echo uv is required",
+        "\t@echo done  # uv is not needed",
     ],
 )
-def test_the_detector_accepts_gated_forms(recipe: str) -> None:
-    """The scan leaves the helper's own spellings alone."""
-    assert not bare_uv_calls(f"check:\n{recipe}\n")
+def test_the_scan_ignores_gated_calls_and_comments(line: str) -> None:
+    """The helper's own spellings and comments are not mentions."""
+    assert not uv_mentions(f"check:\n{line}\n")
 
 
-def test_every_helper_run_and_tool_call_has_a_separator() -> None:
-    """`run` and `tool` take the command after `--`, so it cannot be read as a flag."""
-    offenders = [
-        line.strip()
-        for line in MAKEFILE.replace("\\\n", " ").splitlines()
-        if GATED_CALL.search(line) and " -- " not in line
-    ]
+@pytest.mark.parametrize(
+    ("printed", "expected"),
+    [
+        (f"{MARKER} prepare --group dev", [f"{MARKER} prepare --group dev"]),
+        (f"@{MARKER} run -- pytest -q", [f"{MARKER} run -- pytest -q"]),
+        (f"echo {MARKER} prepare --group dev", []),
+        (f"# {MARKER} run -- pytest", []),
+        (f"true && {MARKER} run -- pytest", [f"{MARKER} run -- pytest"]),
+        (f"echo hi; {MARKER} tool --from x@1 -- x", [f"{MARKER} tool --from x@1 -- x"]),
+        (f"if ! {MARKER} run -- x; then echo no; fi", [f"{MARKER} run -- x"]),
+    ],
+)
+def test_the_printed_recipe_parser_finds_only_executed_helper_calls(
+    printed: str, expected: list[str]
+) -> None:
+    """Only a helper call in command position counts, not echoed or commented text."""
+    assert helper_calls(printed) == expected
 
-    assert not offenders, f"helper calls without `--`: {offenders}"
 
+def test_prepare_is_phony_and_runs_the_helper_prepare() -> None:
+    """`make prepare` is phony and executes exactly the expected helper command."""
+    printed = make("-nB", "prepare", f"UV_GATE={MARKER}").stdout
 
-def test_prepare_installs_the_locked_environment() -> None:
-    """`make prepare` is phony and itself runs, or builds, the helper's prepare."""
-    rules = parse_rules(MAKEFILE)
-
-    assert "prepare" in rules, "the Makefile must define a prepare target"
     assert re.search(r"^\.PHONY:.*\bprepare\b", MAKEFILE, re.MULTILINE), (
         "prepare must be phony"
     )
-    assert reaches_prepare("prepare", rules), (
-        f"prepare must reach `{EXPECTED_PREPARE}` through its recipe or prerequisites"
+    assert f"{MARKER} {EXPECTED_PREPARE}" in helper_calls(printed), (
+        f"make prepare must run `{EXPECTED_PREPARE}` as a command: {printed!r}"
     )
 
 
-def test_every_gate_that_runs_the_project_depends_on_prepare() -> None:
-    """The helper's run is offline, so the environment must exist beforehand."""
-    offenders = unprepared_gates(MAKEFILE)
+@pytest.mark.parametrize("target", GATE_TARGETS)
+def test_a_gate_prepares_before_it_runs_and_separates_every_command(
+    target: str,
+) -> None:
+    """Each gate prepares before its first project run, and `--` ends options."""
+    printed = make("-nB", target, f"UV_GATE={MARKER}").stdout
+    calls = helper_calls(printed)
+    subcommands = [call.split()[1] for call in calls]
+    prepare = f"{MARKER} {EXPECTED_PREPARE}"
 
-    assert not offenders, f"these targets run the project unprepared: {offenders}"
-
-
-def test_an_empty_prepare_target_is_detected() -> None:
-    """Moving the preparation out of `prepare` fails the contract."""
-    makefile = "\n".join(
-        [
-            "prepare:",
-            "test: prepare",
-            "\t$(UV_GATE) run -- pytest",
-            "build:",
-            f"\t{EXPECTED_PREPARE}",
-        ]
+    assert {"run", "tool"} & set(subcommands), (
+        f"make {target} must run its commands through the helper: {printed!r}"
     )
-    rules = parse_rules(makefile)
-
-    assert not reaches_prepare("prepare", rules)
+    if "run" in subcommands:
+        first_run = subcommands.index("run")
+        assert prepare in calls[:first_run], (
+            f"make {target} must prepare before it runs the project: {calls}"
+        )
+    unseparated = [
+        c for c in calls if c.split()[1] in {"run", "tool"} and " -- " not in c
+    ]
+    assert not unseparated, f"helper calls without `--`: {unseparated}"
 
 
 def test_the_default_goal_is_unchanged() -> None:
-    """Adding `prepare` must not turn it into what a bare `make` runs."""
-    database = make_database()
+    """Adding `prepare` must not change what a bare `make` runs."""
+    database = make("-qp", "--").stdout
 
     assert f".DEFAULT_GOAL := {EXPECTED_DEFAULT_GOAL}" in database, (
         f"a bare make must still run {EXPECTED_DEFAULT_GOAL}"
     )
 
 
-def test_a_selected_uv_leads_the_path() -> None:
-    """`make UV=/dir/uv` puts that uv's directory first on PATH for the helper."""
-    database = make_database("UV=/opt/selected-uv/uv")
+def test_a_selected_uv_leads_the_exported_path() -> None:
+    """`make UV=/dir/uv` hands recipes a PATH that starts with that directory."""
+    probe = ".PHONY: __uv_path\n__uv_path:\n\t@printf '%s' \"$$PATH\""
+    done = make("UV=/opt/selected-uv/uv", f"--eval={probe}", "__uv_path")
 
-    assert re.search(r"^PATH := /opt/selected-uv:", database, re.MULTILINE), (
-        "the Makefile must export the selected uv's directory on PATH"
+    assert done.stdout.startswith("/opt/selected-uv:"), (
+        f"recipes must see the selected uv first on PATH, got {done.stdout!r}"
     )
