@@ -144,9 +144,11 @@ def test_lint_fails_when_skill_manifest_check_fails(
         cmd_mox.stub(tool).returns(exit_code=0)
 
     def uv_result(invocation: Invocation) -> tuple[str, str, int]:
-        if invocation.args[3:4] == ["yamllint"]:
+        if invocation.args[0] == "prepare":
             return "", "", 0
-        if invocation.args[3:5] == ["skills-ref", "validate"]:
+        if invocation.args[4:5] == ["yamllint"]:
+            return "", "", 0
+        if invocation.args[4:6] == ["skills-ref", "validate"]:
             return "", "", 1
         pytest.fail(f"unexpected uv invocation: {invocation.args!r}")
 
@@ -157,12 +159,10 @@ def test_lint_fails_when_skill_manifest_check_fails(
 
     cmd_mox.verify()
     assert result.returncode != 0, "a failed skill-manifest gate was swallowed"
-    assert [invocation.args[3] for invocation in uv_spy.invocations] == [
-        "yamllint",
-        "skills-ref",
-    ]
+    runs = [i for i in uv_spy.invocations if i.args[0] == "run"]
+    assert [invocation.args[4] for invocation in runs] == ["yamllint", "skills-ref"]
     uv_spy.assert_called_with(
-        "run", "--group", "dev", "skills-ref", "validate", "skills/example/"
+        "run", "--group", "dev", "--", "skills-ref", "validate", "skills/example/"
     )
 
 

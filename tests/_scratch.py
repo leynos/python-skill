@@ -111,10 +111,13 @@ class ScratchRepo:
         Side effects
         ------------
         Runs make, which executes recipes against the scratch repository.
+        The helper wrapper is replaced by plain ``uv`` (``UV_GATE=uv`` and
+        ``UV=uv``) so the recipes reach the recorded stand-in; the wrapper
+        itself is covered by ``tests/test_uv_gate_wiring.py``.
         """
         merged = {**os.environ, **(env or {})}
         return subprocess.run(  # noqa: S603 - fixed argv, no shell
-            ["make", *args],
+            ["make", *args, "UV_GATE=uv", "UV=uv"],
             cwd=self.path,
             capture_output=True,
             text=True,

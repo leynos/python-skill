@@ -1,3 +1,11 @@
+# Every uv call goes through the vendored helper, which cleans the environment,
+# uses the global uv cache, runs offline first and goes online at most once. See
+# https://github.com/leynos/shared-actions/tree/main/uv_gate for the contract.
+UV_GATE ?= python3 scripts/uv_gate.py
+UV ?= uv
+# The helper finds uv on PATH, so a caller's UV=/path/to/uv is honoured by putting
+# that uv's directory first on PATH for every recipe.
+export PATH := $(if $(findstring /,$(UV)),$(patsubst %/,%,$(dir $(UV))):)$(PATH)
 .DEFAULT_GOAL := check
 
 # A pipeline reports only its last command's status by default, so a failing
@@ -11,8 +19,8 @@ MD_GLOB := **/*.md
 # can be overridden to check one skill or a test fixture, for example
 # `make skill-manifest-check SKILL_DIRS=skills/ruff-016/`.
 SKILL_DIRS ?= $(sort $(dir $(wildcard skills/*/SKILL.md)))
-SKILLS_REF := uv run --group dev skills-ref
-YAMLLINT := uv run --group dev yamllint
+SKILLS_REF := $(UV_GATE) run --group dev -- skills-ref
+YAMLLINT := $(UV_GATE) run --group dev -- yamllint
 SKILL_YAMLLINT_CONFIG := {extends: default, rules: {line-length: disable}}
 
 # `make fmt` and `make check-fmt` call mdtablefix directly. `--git` selects the
@@ -24,8 +32,11 @@ MDTABLEFIX ?= mdtablefix
 MDTABLEFIX_SELECT = --git --include-untracked
 MDTABLEFIX_RULES = --wrap --renumber --breaks --ellipsis --fences
 
-.PHONY: help fmt markdownlint nixie lint check check-fmt typecheck test \
+.PHONY: prepare help fmt markdownlint nixie lint check check-fmt typecheck test \
 	skill-frontmatter-lint skill-manifest-validate skill-manifest-check
+
+prepare: ## Install the locked development environment, offline first
+	$(UV_GATE) prepare --group dev
 
 help: ## Show this help
 	@grep -hE '^[a-zA-Z_-]+:.*## ' $(MAKEFILE_LIST) \
@@ -45,7 +56,7 @@ lint: markdownlint nixie skill-manifest-check ## Run all lint gates
 
 # `set -e` matters: without it the loop exits with the status of its final
 # iteration, so a conformant trailing skill would mask a malformed earlier one.
-skill-frontmatter-lint: ## Lint each skill manifest's YAML frontmatter
+skill-frontmatter-lint: prepare ## Lint each skill manifest's YAML frontmatter
 	@set -euo pipefail; for skill_dir in $(SKILL_DIRS); do \
 		skill_file="$${skill_dir%/}/SKILL.md"; \
 		echo "yamllint $$skill_file frontmatter"; \
@@ -53,7 +64,7 @@ skill-frontmatter-lint: ## Lint each skill manifest's YAML frontmatter
 		  | $(YAMLLINT) -d '$(SKILL_YAMLLINT_CONFIG)' -; \
 	done
 
-skill-manifest-validate: ## Validate each skill against the Agent Skills schema
+skill-manifest-validate: prepare ## Validate each skill against the Agent Skills schema
 	@set -eu; for skill_dir in $(SKILL_DIRS); do \
 		echo "skills-ref validate $$skill_dir"; \
 		$(SKILLS_REF) validate "$$skill_dir"; \
@@ -64,10 +75,10 @@ skill-manifest-check: skill-frontmatter-lint skill-manifest-validate ## Verify e
 check-fmt: markdownlint ## Formatting gate
 	$(MDTABLEFIX) --check $(MDTABLEFIX_SELECT) $(MDTABLEFIX_RULES)
 
-typecheck: ## Type-check the test suite
-	uv run --group dev mypy
+typecheck: prepare ## Type-check the test suite
+	$(UV_GATE) run --group dev -- mypy
 
-test: ## Run the test suite
-	uv run --group dev pytest
+test: prepare ## Run the test suite
+	$(UV_GATE) run --group dev -- pytest
 
 check: lint check-fmt typecheck test ## Run every commit gate
