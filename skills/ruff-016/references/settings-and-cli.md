@@ -50,8 +50,17 @@ Custom section names are accepted as additional keys.
 ### `lint.flake8-tidy-imports.ban-lazy` and `require-lazy` (0.16.0)
 
 Both only apply when targeting **Python 3.15 or newer**, where the
-`lazy import` statement exists. Each takes either `"all"` or an include/exclude
-selector:
+`lazy import` statement exists. Each accepts one of three forms:
+
+| Value                                             | Meaning                           |
+| ------------------------------------------------- | --------------------------------- |
+| `"all"`                                           | Every module                      |
+| `["django", "mypkg.plugins"]`                     | The listed module names           |
+| `{ include = "all", exclude = ["mypkg.config"] }` | The include set, minus exclusions |
+
+The table form takes `include` — either `"all"` or a `list[str]` of module
+names — and an optional `exclude`, a `list[str]` of module names to subtract
+from the include set.
 
 ```toml
 [tool.ruff.lint.flake8-tidy-imports]

@@ -13,7 +13,7 @@ dev = [
 ]
 
 [tool.mutmut]
-paths_to_mutate = ["src/"]
+source_paths = ["src/"]
 pytest_add_cli_args_test_selection = ["tests/"]
 runner = "uv run pytest -x --no-header -q -p no:cacheprovider"
 do_not_mutate = [
@@ -26,9 +26,11 @@ also_copy = ["src/mypkg/data/*.json"]
 
 What each option buys:
 
-- `paths_to_mutate` (array) — restrict mutation to your code, not
-  vendored dependencies. Must be a TOML array under `[tool.mutmut]`; a scalar
-  string is silently rejected.
+- `source_paths` (array) — restrict mutation to your code, not
+  vendored dependencies. Must be a TOML array under `[tool.mutmut]`, because
+  mutmut iterates over a list of paths; a scalar string does not work. mutmut
+  renamed this key in 3.6: releases before 3.6 use `paths_to_mutate`, and 3.6
+  still reads that key as a deprecated fallback with a warning.
 - `pytest_add_cli_args_test_selection` (array) — extra arguments
   passed through to the runner to narrow test discovery. Also an array under
   `[tool.mutmut]`.

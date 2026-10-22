@@ -6,10 +6,11 @@ description: Run symbolic execution on Python functions with CrossHair to find c
 # CrossHair symbolic execution for Python
 
 CrossHair runs Python under symbolic execution backed by Z3. It explores
-reachable paths through a function (within a per-call budget) and reports
-concrete counter-examples when contracts or assertions fail. Where Hypothesis
-searches by random sampling and shrinks, CrossHair searches by satisfiability
-and reports a satisfying assignment.
+reachable paths through a function, bounded by per-path timeouts, per-condition
+timeouts and an iteration limit, and reports concrete counter-examples when
+contracts or assertions fail. Where Hypothesis searches by random sampling and
+shrinks, CrossHair searches by satisfiability and reports a satisfying
+assignment.
 
 ## When to apply
 
@@ -17,7 +18,7 @@ Apply when the function under scrutiny:
 
 - is pure (no I/O, no time, no randomness),
 - has a small reachable state space (low loop depth, few collections),
-- carries a contract you would rather see proved than sampled
+- carries a contract you would rather search symbolically than sample
   (`assert`, PEP 316 docstrings, `icontract`, `deal`),
 - has a sibling implementation you want to compare against
   (`diffbehavior`).
@@ -54,8 +55,9 @@ per_condition_timeout = 30
 uv run crosshair check mypkg.parse
 ```
 
-CrossHair walks each branch of `mypkg.parse` and reports any input that
-violates an `assert` or contract. PEP 316 docstring contracts look like:
+CrossHair explores the branches of `mypkg.parse` it reaches within the budget
+and reports an input that violates an `assert` or contract. PEP 316 docstring
+contracts look like:
 
 ```python
 def withdraw(balance: int, amount: int) -> int:
@@ -106,8 +108,8 @@ def test_property(x: int) -> None:
     assert invariant(x)
 ```
 
-CrossHair searches more thoroughly within the budget; the cost is time. Use
-sparingly.
+CrossHair explores more of the path space within the budget, at the cost of
+time. Use sparingly.
 
 ## Limits
 
@@ -139,8 +141,9 @@ sparingly.
 - **`diffbehavior` after every non-trivial refactor.** It is the
   cheapest insurance against accidentally changing semantics during a
   "cosmetic" rewrite.
-- **CrossHair and Hypothesis are complements.** Hypothesis covers the
-  vast input space cheaply; CrossHair covers the narrow corners exhaustively.
+- **CrossHair and Hypothesis are complements.** Hypothesis samples the vast
+  input space cheaply; CrossHair explores the narrow corners within its budget.
+  Finding no counter-example within the budget does not prove the property.
 
 ## References
 
