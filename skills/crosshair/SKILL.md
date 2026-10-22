@@ -18,7 +18,7 @@ Apply when the function under scrutiny:
 
 - is pure (no I/O, no time, no randomness),
 - has a small reachable state space (low loop depth, few collections),
-- carries a contract you would rather search symbolically than sample
+- carries a contract worth searching symbolically rather than sampling
   (`assert`, PEP 316 docstrings, `icontract`, `deal`),
 - has a sibling implementation you want to compare against
   (`diffbehavior`).

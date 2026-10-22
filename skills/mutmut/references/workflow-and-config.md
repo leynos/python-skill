@@ -8,7 +8,7 @@ Project setup and the day-to-day triage routine.
 # pyproject.toml
 [dependency-groups]
 dev = [
-  "mutmut>=3",
+  "mutmut>=3.6",                     # 3.6 renamed paths_to_mutate
   "pytest-xdist>=3",                 # for parallel test runs
 ]
 
