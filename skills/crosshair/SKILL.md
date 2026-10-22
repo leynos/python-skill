@@ -7,10 +7,10 @@ description: Run symbolic execution on Python functions with CrossHair to find c
 
 CrossHair runs Python under symbolic execution backed by Z3. It explores
 reachable paths through a function, bounded by per-path timeouts, per-condition
-timeouts and an iteration limit, and reports concrete counter-examples when
-contracts or assertions fail. Where Hypothesis searches by random sampling and
-shrinks, CrossHair searches by satisfiability and reports a satisfying
-assignment.
+timeouts and a cap on consecutive iterations that make no progress, and reports
+concrete counter-examples when contracts or assertions fail. Where Hypothesis
+searches by random sampling and shrinks, CrossHair searches by satisfiability
+and reports a satisfying assignment.
 
 ## When to apply
 

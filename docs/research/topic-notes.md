@@ -57,8 +57,9 @@ TypedDict guidance.
 
 CrossHair runs Python under symbolic execution backed by Z3. It explores
 reachable paths through a function, bounded by per-path timeouts, per-condition
-timeouts and an iteration limit, and reports counter-examples when contracts or
-assertions fail. Finding none within the budget does not prove the property.
+timeouts and a cap on consecutive iterations that make no progress, and reports
+counter-examples when contracts or assertions fail. Finding none within the
+budget does not prove the property.
 
 Modes:
 
