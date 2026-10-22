@@ -58,13 +58,14 @@ also_copy = [
 ]
 ```
 
-In `pyproject.toml`, mutmut requires `source_paths` to be a TOML array, because
+In `pyproject.toml`, mutmut requires `source_paths` to be a TOML array because
 mutmut iterates over a list of paths: `source_paths = "src/"` (a scalar string)
 does not name a directory the way it might in `setup.cfg`; keep the brackets.
 
-mutmut renamed this key in 3.6. Releases before 3.6 use `paths_to_mutate`; 3.6
-still reads that key as a deprecated fallback and warns when it does. Pin
-`mutmut>=3.6` and use `source_paths`; the older key only buys a warning.
+mutmut renamed this key in 3.6. Releases before 3.6 use `paths_to_mutate`;
+version 3.6 still reads that key as a deprecated fallback and warns when it
+does. Pin `mutmut>=3.6` and use `source_paths`; the older key only buys a
+warning.
 
 `runner` is the suite invocation. `-x` and `-q` speed the per-mutant run.
 `do_not_mutate` skips generated code, version files, and boilerplate where

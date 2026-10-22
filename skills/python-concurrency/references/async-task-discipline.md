@@ -22,9 +22,10 @@ async with asyncio.TaskGroup() as tg:
     tg.create_task(fetch_user(user_id))
     tg.create_task(fetch_orders(user_id))
     tg.create_task(fetch_addresses(user_id))
-# On exit: all three results are available, or a group is raised carrying the
+# On exit: all three tasks have completed, or a group is raised carrying the
 # non-cancellation failures, with the surviving tasks already cancelled.
 # KeyboardInterrupt and SystemExit are re-raised directly instead.
+# Keep the Task handles if the results are needed; create_task returns them.
 ```
 
 `asyncio.gather` predates structured concurrency. Two failure modes make it the
