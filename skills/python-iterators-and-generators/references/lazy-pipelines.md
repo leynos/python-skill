@@ -42,8 +42,20 @@ def first_n_active(n: int, source: Iterable[str]) -> Iterator[UserId]:
     return islice(active, n)
 ```
 
-`first_n_active` reads the source on demand; consuming five items processes the
-smallest prefix that produces five active users.
+`first_n_active` is only partly lazy. The `sorted` inside `by_user` drains the
+whole source before the first group is yielded, so requesting five active users
+still reads every event upstream. What `islice` limits is downstream work: it
+stops the grouping and filtering after five active users, rather than
+exhausting the groups and then slicing the results.
+
+Given input already grouped by user, drop the `sorted` and stream with
+`groupby` instead: upstream reads then stop shortly after the last group you
+need. Note that `list(group)` still materializes each group, one group at a
+time.
+
+This is the sorting case described under
+[When laziness costs more than it gives](#when-laziness-costs-more-than-it-gives):
+the intermediate stage needs random access, so it must buffer.
 
 ## When laziness costs more than it gives
 

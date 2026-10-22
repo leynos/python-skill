@@ -9,18 +9,21 @@ is suspected.
 
 `asyncio.TaskGroup` (3.11+) is structured concurrency in the standard library.
 The context manager creates tasks via `tg.create_task(...)` and awaits them at
-exit. If any task raises, the remaining siblings are cancelled and the group
-re-raises an `ExceptionGroup` (or `BaseExceptionGroup` if a `BaseException`
-such as `KeyboardInterrupt` escapes). Handlers use `except*` to match by
-exception type without losing the rest of the group.
+exit. The first non-cancellation failure cancels the remaining siblings and the
+group waits for them to finish. It then raises an `ExceptionGroup` — or a
+`BaseExceptionGroup` when a non-cancellation `BaseException` is among the
+failures — carrying those failures. `KeyboardInterrupt` and `SystemExit` cancel
+and await the siblings too, but are re-raised directly rather than wrapped in a
+group. Handlers use `except*` to match by exception type without losing the
+rest of the group.
 
 ```python
 async with asyncio.TaskGroup() as tg:
     tg.create_task(fetch_user(user_id))
     tg.create_task(fetch_orders(user_id))
     tg.create_task(fetch_addresses(user_id))
-# On exit: all three results are available, or an ExceptionGroup is raised
-# with every failure and the surviving tasks already cancelled.
+# On exit: all three results are available, or a group is raised carrying the
+# non-cancellation failures, with the surviving tasks already cancelled.
 ```
 
 `asyncio.gather` predates structured concurrency. Two failure modes make it the

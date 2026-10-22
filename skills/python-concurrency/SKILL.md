@@ -33,12 +33,15 @@ to keep state safe across it.
   I/O libraries (database drivers, OS file calls) that cannot be made async.
   Threads share memory; protect mutable state with `Lock`, `RLock`, or a queue.
 - **`multiprocessing` / `ProcessPoolExecutor`**: CPU-bound pure
-  Python today. Each process is its own interpreter and its own GIL; pay the
-  pickling and fork cost on every task.
+  Python today. Each process is its own interpreter and its own GIL. Pay the
+  fork or spawn start-up once per worker, not once per task: a pool keeps its
+  workers alive for its lifetime. What each task pays is pickling the callable,
+  its arguments and its result.
 - **PEP 734 subinterpreters (Python 3.14+)**: CPU-bound pure Python
-  without the fork cost. `concurrent.interpreters` and
+  with a cheaper start-up than processes. `concurrent.interpreters` and
   `InterpreterPoolExecutor` give a per-interpreter GIL with a single process
-  and an explicit cross-interpreter `queue.Queue`.
+  and an explicit cross-interpreter `queue.Queue`; each fresh interpreter still
+  imports its own modules, so amortize that cost through a pool.
 - **Free-threaded CPython (PEP 703)**: experimental in 3.13, supported
   in 3.14. One interpreter, no GIL. Useful when C extensions are thread-safe
   and the build is acceptable to operators.
@@ -68,8 +71,11 @@ What changes versus a thread pool:
 ## Async discipline
 
 - Default to `asyncio.TaskGroup` (3.11+) for fan-out. Structured
-  concurrency means a failure cancels siblings deterministically and the
-  context manager re-raises an `ExceptionGroup` containing every task failure.
+  concurrency means the first non-cancellation failure cancels the siblings
+  deterministically; once every task has finished, the context manager
+  re-raises the non-cancellation failures grouped into an `ExceptionGroup`.
+  `KeyboardInterrupt` and `SystemExit` cancel and await the siblings, then
+  re-raise directly rather than inside a group.
 - Reach for `asyncio.gather` only when the call is *tolerant fan-out*:
   pass `return_exceptions=True` and inspect the result list. Bare `gather(...)`
   leaks unfinished tasks on the first failure.
