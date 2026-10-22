@@ -9,13 +9,14 @@ is suspected.
 
 `asyncio.TaskGroup` (3.11+) is structured concurrency in the standard library.
 The context manager creates tasks via `tg.create_task(...)` and awaits them at
-exit. The first non-cancellation failure cancels the remaining siblings and the
-group waits for them to finish. It then raises an `ExceptionGroup` — or a
-`BaseExceptionGroup` when a non-cancellation `BaseException` is among the
-failures — carrying those failures. `KeyboardInterrupt` and `SystemExit` cancel
-and await the siblings too, but are re-raised directly rather than wrapped in a
-group. Handlers use `except*` to match by exception type without losing the
-rest of the group.
+exit. A non-cancellation failure cancels the remaining siblings as soon as the
+event loop observes it — concurrent failures race, so which one triggers the
+cancellation depends on scheduling — and the group waits for the siblings to
+finish. It then raises an `ExceptionGroup` — or a `BaseExceptionGroup` when a
+non-cancellation `BaseException` is among the failures — carrying those
+failures. `KeyboardInterrupt` and `SystemExit` cancel and await the siblings
+too, but are re-raised directly rather than wrapped in a group. Handlers use
+`except*` to match by exception type without losing the rest of the group.
 
 ```python
 async with asyncio.TaskGroup() as tg:

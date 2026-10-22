@@ -47,7 +47,7 @@ local-folder = "Local"
 
 Custom section names are accepted as additional keys.
 
-### `lint.flake8-tidy-imports.ban-lazy` and `require-lazy` (0.16.0)
+### `lint.flake8-tidy-imports.ban-lazy` and `require-lazy` (0.16.0; rules preview since 0.15.6)
 
 Both only apply when targeting **Python 3.15 or newer**, where the
 `lazy import` statement exists. Each accepts one of three forms:
@@ -76,6 +76,14 @@ ban-lazy = ["django", "mypkg.plugins"]
 Both drive **`TID254`** (`lazy-import-mismatch`, preview). The related
 **`TID255`** (`lazy-import-immediately-resolved`, preview) flags a lazy import
 whose binding is used eagerly anyway.
+
+Both rules are preview from 0.15.6 and stabilised in 0.17.0. On 0.16.0 they
+require `lint.preview = true`; naming `TID254` in `select` or `extend-select`
+is not enough, because a preview rule can only be selected once preview mode is
+enabled.
+
+Also note that `require-lazy` and `ban-lazy` must not overlap after exclusions
+are applied.
 
 ### `lint.pylint.max-statements-in-try` (0.16.0)
 

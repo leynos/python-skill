@@ -33,10 +33,12 @@ to keep state safe across it.
   I/O libraries (database drivers, OS file calls) that cannot be made async.
   Threads share memory; protect mutable state with `Lock`, `RLock`, or a queue.
 - **`multiprocessing` / `ProcessPoolExecutor`**: CPU-bound pure
-  Python today. Each process is its own interpreter and its own GIL. Pay the
-  fork or spawn start-up once per worker, not once per task: a pool keeps its
-  workers alive for its lifetime. What each task pays is pickling the callable,
-  its arguments and its result.
+  Python today. Each process is its own interpreter and its own GIL. With
+  `max_tasks_per_child=None` (the default) a pool pays fork or spawn start-up
+  once per worker, not once per task: workers live as long as the pool. Setting
+  `max_tasks_per_child` replaces a worker after that many tasks, so start-up
+  recurs. What each task pays is pickling the callable, its arguments and its
+  result.
 - **PEP 734 subinterpreters (Python 3.14+)**: CPU-bound pure Python
   with a cheaper start-up than processes. `concurrent.interpreters` and
   `InterpreterPoolExecutor` give a per-interpreter GIL with a single process
@@ -71,8 +73,9 @@ What changes versus a thread pool:
 ## Async discipline
 
 - Default to `asyncio.TaskGroup` (3.11+) for fan-out. Structured
-  concurrency means the first non-cancellation failure cancels the siblings
-  deterministically; once every task has finished, the context manager
+  concurrency means a non-cancellation failure cancels the siblings as soon as
+  the event loop observes it; concurrent failures race, so which one that is
+  depends on scheduling. Once every task has finished, the context manager
   re-raises the non-cancellation failures grouped into a `BaseExceptionGroup`,
   or an `ExceptionGroup` when every failure is an `Exception`.
   `KeyboardInterrupt` and `SystemExit` cancel and await the siblings, then

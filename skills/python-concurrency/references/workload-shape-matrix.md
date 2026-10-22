@@ -24,10 +24,11 @@ from the work's shape, not from convenience.
   serializes bytecode execution; extra workers add scheduling overhead without
   throughput. Use a process or interpreter pool.
 - **`ProcessPoolExecutor` when each task's serialization outweighs its
-  work.** A pool forks or spawns each worker once and reuses it, so start-up is
-  an up-front cost, not a per-task one — but the callable, every argument and
-  every result is pickled for each submission. Batch the work, raise
-  `chunksize` on `map`, or use subinterpreters.
+  work.** By default a pool starts each worker once and reuses it, so start-up
+  is an up-front cost rather than a per-task one; set `max_tasks_per_child` and
+  a worker is replaced after that many tasks, so start-up recurs. Either way
+  the callable, every argument and every result is pickled for each submission.
+  Batch the work, raise `chunksize` on `map`, or use subinterpreters.
 - **Shared mutable state across threads without a lock.** Even
   primitive operations are not always atomic in CPython; use `queue.Queue`,
   `threading.Lock`, or atomic patterns (compare-and-swap via `Lock`).
