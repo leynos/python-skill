@@ -55,9 +55,10 @@ TypedDict guidance.
 
 ## CrossHair — Core deep dive
 
-CrossHair runs Python under symbolic execution backed by Z3. It explores all
-reachable paths through a function (within an interpreter timeout) and reports
-counter-examples when contracts or assertions fail.
+CrossHair runs Python under symbolic execution backed by Z3. It explores
+reachable paths through a function, bounded by per-path timeouts, per-condition
+timeouts and an iteration limit, and reports counter-examples when contracts or
+assertions fail. Finding none within the budget does not prove the property.
 
 Modes:
 
@@ -100,8 +101,9 @@ Mutation testing tool. v3 rewrote the engine; the workflow is:
 - `mutmut run` (forks per mutant on POSIX; on Windows uses WSL).
 - `mutmut browse` opens a TUI that shows surviving mutants per file.
 - `mutmut show <id>` displays the diff; `mutmut apply <id>` writes it.
-- Configuration in `[tool.mutmut]` of `pyproject.toml`: `paths_to_mutate`,
-  `tests_dir`, `runner`, `do_not_mutate`, `also_copy`.
+- Configuration in `[tool.mutmut]` of `pyproject.toml`: `source_paths` (renamed
+  from `paths_to_mutate` in 3.6), `tests_dir`, `runner`, `do_not_mutate`,
+  `also_copy`.
 - `# pragma: no mutate` excludes a line.
 - Pair with type-checker filtering: mutants caught by mypy/pyright count
   for "the type system already enforces this" but should be filtered out of the
