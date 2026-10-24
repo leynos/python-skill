@@ -62,8 +62,11 @@ decoded = msgspec.json.decode(payload, type=Payment)
 ```
 
 Tagged unions remove the "read a `dict`, then branch on a string field"
-pattern. The decoder validates the discriminator and rejects unknown variants
-when `forbid_unknown_fields=True`.
+pattern. The decoder selects the variant from the discriminator tag before it
+validates the remaining fields, and rejects a tag matching no variant whatever
+the other settings. That rejection is separate from
+`forbid_unknown_fields=True`, which governs the *keys* of a `Struct`: with it
+off (the default) a `Struct` silently skips keys it does not declare.
 
 ## Red flags
 

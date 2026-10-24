@@ -44,8 +44,10 @@ def test_parse_smoke(payload: bytes) -> None:
     parse(payload)         # property: does not crash
 ```
 
-`cover` is the cheap way to find inputs Hypothesis missed. Pair it with
-`pytest --cov-branch` to confirm coverage holes have closed.
+Use `cover` to search for additional test inputs within its configured budget.
+It can complement generated examples but does not guarantee additional
+coverage. Use `pytest --cov-branch` to measure test-run branch coverage
+separately; it does not measure CrossHair's opcode reachability.
 
 ## `diffbehavior` in detail
 
@@ -77,17 +79,10 @@ Tips:
 
 ## Tuning the budget
 
-The cheapest tuning lives in `pyproject.toml`:
-
-```toml
-[tool.crosshair]
-per_path_timeout = 4
-per_condition_timeout = 30
-analysis_kind = "asserts,pep316,icontract"
-```
-
-In CI, run with these defaults for the touched modules; once a month, run a
-longer "deep" job with `per_condition_timeout = 300`.
+Tune `per_path_timeout`, `per_condition_timeout`, and `analysis_kind` with CLI
+options or matching `# crosshair:` source directives. CrossHair does not read
+`[tool.crosshair]` from `pyproject.toml`. For a longer CI run, pass
+`--per_condition_timeout 300`.
 
 ## Pairing with Hypothesis
 
@@ -100,9 +95,11 @@ def test_inverse(x: int) -> None:
     assert f(g(x)) == x
 ```
 
-Hypothesis explores the random space; CrossHair fills in the corners when the
-random generator misses. Use the `crosshair` backend for specific properties,
-not the whole suite.
+Hypothesis samples inputs and shrinks failures; CrossHair searches feasible
+paths symbolically within its configured budget. These are complementary
+strategies; neither guarantees broader coverage. Finding no counter-example
+within CrossHair's budget is not proof. Use the `crosshair` backend for
+targeted properties, not the whole suite.
 
 ## Common mistakes
 

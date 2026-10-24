@@ -33,12 +33,27 @@ to keep state safe across it.
   I/O libraries (database drivers, OS file calls) that cannot be made async.
   Threads share memory; protect mutable state with `Lock`, `RLock`, or a queue.
 - **`multiprocessing` / `ProcessPoolExecutor`**: CPU-bound pure
-  Python today. Each process is its own interpreter and its own GIL; pay the
-  pickling and fork cost on every task.
+  Python today. Each worker process runs its own interpreter, with a separate
+  GIL in GIL-enabled CPython builds. Worker start-up follows the selected start
+  method — `fork`, `spawn`, or `forkserver`; on Unix other than macOS the
+  Python 3.14 default changed from `fork` to `forkserver`. By default, a worker
+  starts once and is reused for the life of the pool, so start-up is an
+  up-front cost, not a per-task one. To cap that lifetime, pass
+  `max_tasks_per_child` to `ProcessPoolExecutor` or `maxtasksperchild` to
+  `multiprocessing.Pool`; the worker is then replaced after that many tasks and
+  start-up recurs. In `ProcessPoolExecutor`, setting `max_tasks_per_child`
+  defaults to `spawn` when `mp_context` is omitted and is incompatible with
+  `fork`. Submitted work is pickled between processes and may be batched;
+  `ProcessPoolExecutor.map` with `chunksize > 1` submits each chunk of input
+  argument tuples as one task and yields results in input order. Constructing a
+  new pool per call repeats worker start-up for every call.
 - **PEP 734 subinterpreters (Python 3.14+)**: CPU-bound pure Python
-  without the fork cost. `concurrent.interpreters` and
-  `InterpreterPoolExecutor` give a per-interpreter GIL with a single process
-  and an explicit cross-interpreter `queue.Queue`.
+  with a cheaper start-up than processes. `concurrent.interpreters` and
+  `InterpreterPoolExecutor` give a per-interpreter GIL with a single process.
+  `concurrent.interpreters.create_queue()` returns a cross-interpreter
+  `concurrent.interpreters.Queue`, which implements `queue.Queue` methods except
+  `task_done()`, `join()` and `shutdown()`. Each fresh interpreter still
+  imports its own modules, so amortize that cost through a pool.
 - **Free-threaded CPython (PEP 703)**: experimental in 3.13, supported
   in 3.14. One interpreter, no GIL. Useful when C extensions are thread-safe
   and the build is acceptable to operators.
@@ -59,17 +74,23 @@ What changes versus a thread pool:
   Python scales.
 - No Python objects are shared. Arguments are serialized across the
   boundary; return values likewise.
-- `concurrent.interpreters.create_queue()` returns a cross-interpreter
-  `queue.Queue` implementation for streaming or fan-in/fan-out work when
-  futures are not enough.
+- `concurrent.interpreters.create_queue()` returns a
+  `concurrent.interpreters.Queue` for streaming or fan-in/fan-out when futures
+  are not enough.
 - C extensions must opt in to per-interpreter GIL support
   (`Py_mod_multiple_interpreters`); pure-Python work always works.
 
 ## Async discipline
 
 - Default to `asyncio.TaskGroup` (3.11+) for fan-out. Structured
-  concurrency means a failure cancels siblings deterministically and the
-  context manager re-raises an `ExceptionGroup` containing every task failure.
+  concurrency means a non-cancellation failure cancels the siblings as soon as
+  the event loop observes it. Scheduling can affect which failure starts
+  sibling cancellation and which siblings fail before cancellation reaches
+  them, so it can affect the resulting exception group. Once every task has
+  finished, the context manager groups other non-cancellation failures in a
+  `BaseExceptionGroup`, or an `ExceptionGroup` when every failure is an
+  `Exception`. `KeyboardInterrupt` and `SystemExit` cancel and await the
+  siblings, then re-raise directly rather than inside a group.
 - Reach for `asyncio.gather` only when the call is *tolerant fan-out*:
   pass `return_exceptions=True` and inspect the result list. Bare `gather(...)`
   leaks unfinished tasks on the first failure.

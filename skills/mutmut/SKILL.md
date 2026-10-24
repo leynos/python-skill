@@ -34,7 +34,7 @@ Do not apply when:
 ```toml
 [dependency-groups]
 dev = [
-  "mutmut>=3",
+  "mutmut>=3.6",
 ]
 ```
 
@@ -46,7 +46,7 @@ On Windows, mutmut v3 uses WSL; on POSIX it forks per mutant.
 
 ```toml
 [tool.mutmut]
-paths_to_mutate = ["src/"]
+source_paths = ["src/"]
 pytest_add_cli_args_test_selection = ["tests/"]
 runner = "uv run pytest -x --no-header -q"
 do_not_mutate = [
@@ -58,9 +58,14 @@ also_copy = [
 ]
 ```
 
-In `pyproject.toml`, mutmut v3 requires path-shaped settings to be arrays.
-`paths_to_mutate = "src/"` (a scalar string) is accepted in `setup.cfg` but
-rejected or silently ignored under `[tool.mutmut]`; keep the brackets.
+In `pyproject.toml`, mutmut requires `source_paths` to be a TOML array because
+mutmut iterates over a list of paths: `source_paths = "src/"` (a scalar string)
+does not name a directory the way it might in `setup.cfg`; keep the brackets.
+
+mutmut renamed this key in version 3.6. Releases before 3.6 use
+`paths_to_mutate`; the mutmut 3.6 release still reads that key as a deprecated
+fallback and warns when it does. Require at least `mutmut>=3.6` and use
+`source_paths`; the older key only buys a warning.
 
 `runner` is the suite invocation. `-x` and `-q` speed the per-mutant run.
 `do_not_mutate` skips generated code, version files, and boilerplate where

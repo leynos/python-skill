@@ -47,15 +47,24 @@ local-folder = "Local"
 
 Custom section names are accepted as additional keys.
 
-### `lint.flake8-tidy-imports.ban-lazy` and `require-lazy` (0.16.0)
+### `lint.flake8-tidy-imports.ban-lazy` and `require-lazy` (0.16.0; TID254 preview from 0.15.6)
 
 Both only apply when targeting **Python 3.15 or newer**, where the
-`lazy import` statement exists. Each takes either `"all"` or an include/exclude
-selector:
+`lazy import` statement exists. Each accepts one of three forms:
+
+| Value                                             | Meaning                           |
+| ------------------------------------------------- | --------------------------------- |
+| `"all"`                                           | Every module                      |
+| `["django", "mypkg.plugins"]`                     | The listed module names           |
+| `{ include = "all", exclude = ["mypkg.config"] }` | The include set, minus exclusions |
+
+The table form takes `include` — either `"all"` or a `list[str]` of module
+names — and an optional `exclude`, a `list[str]` of module names to subtract
+from the include set.
 
 ```toml
 [tool.ruff.lint.flake8-tidy-imports]
-require-lazy = { include = "all", exclude = ["mypkg.config"] }
+require-lazy = { include = "all", exclude = ["django", "mypkg.plugins"] }
 ban-lazy = ["django", "mypkg.plugins"]
 ```
 
@@ -67,6 +76,14 @@ ban-lazy = ["django", "mypkg.plugins"]
 Both drive **`TID254`** (`lazy-import-mismatch`, preview). The related
 **`TID255`** (`lazy-import-immediately-resolved`, preview) flags a lazy import
 whose binding is used eagerly anyway.
+
+`TID254` arrived preview in 0.15.6; `TID255` followed preview in 0.15.13. Both
+stabilized in 0.17.0. On 0.16.0 they require `lint.preview = true`; naming
+`TID254` in `select` or `extend-select` is not enough because a preview rule
+can only be selected once preview mode is enabled.
+
+Also note that `require-lazy` and `ban-lazy` must not overlap after exclusions
+are applied.
 
 ### `lint.pylint.max-statements-in-try` (0.16.0)
 

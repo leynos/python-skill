@@ -23,9 +23,18 @@ from the work's shape, not from convenience.
 - **`ThreadPoolExecutor` for CPU-bound pure Python.** The GIL
   serializes bytecode execution; extra workers add scheduling overhead without
   throughput. Use a process or interpreter pool.
-- **`ProcessPoolExecutor` for tasks shorter than the fork cost.**
-  Forking and pickling per task can cost more than the work. Batch the work or
-  use subinterpreters.
+- **`ProcessPoolExecutor` when each task's serialization outweighs its
+  work.** By default a pool starts each worker once and reuses it, so start-up
+  is an up-front cost rather than a per-task one; creating a new pool per call
+  repeats that cost for each call. Set `max_tasks_per_child` and a worker is
+  replaced after that many tasks, so start-up recurs. In `ProcessPoolExecutor`,
+  this setting defaults to `spawn` when `mp_context` is omitted and is
+  incompatible with `fork`. Submitted work is pickled between processes and may
+  be batched; `map` with `chunksize > 1` submits each chunk of input argument
+  tuples as one task and yields results in input order. Batch the work or raise
+  `chunksize` on `map` when serialization dominates. If process start-up is the
+  concern, use subinterpreters: their start-up can be cheaper, but each
+  interpreter still imports its own modules.
 - **Shared mutable state across threads without a lock.** Even
   primitive operations are not always atomic in CPython; use `queue.Queue`,
   `threading.Lock`, or atomic patterns (compare-and-swap via `Lock`).

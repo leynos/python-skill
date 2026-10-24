@@ -6,7 +6,8 @@ description: Run symbolic execution on Python functions with CrossHair to find c
 # CrossHair symbolic execution for Python
 
 CrossHair runs Python under symbolic execution backed by Z3. It explores
-reachable paths through a function (within a per-call budget) and reports
+reachable paths through a function, bounded by per-path timeouts, per-condition
+timeouts and a cap on consecutive iterations that make no progress, and reports
 concrete counter-examples when contracts or assertions fail. Where Hypothesis
 searches by random sampling and shrinks, CrossHair searches by satisfiability
 and reports a satisfying assignment.
@@ -17,7 +18,7 @@ Apply when the function under scrutiny:
 
 - is pure (no I/O, no time, no randomness),
 - has a small reachable state space (low loop depth, few collections),
-- carries a contract you would rather see proved than sampled
+- carries a contract worth searching symbolically rather than sampling
   (`assert`, PEP 316 docstrings, `icontract`, `deal`),
 - has a sibling implementation you want to compare against
   (`diffbehavior`).
@@ -38,24 +39,29 @@ Do not apply when:
 uv add --dev crosshair-tool
 ```
 
-Per-test timeouts live in `pyproject.toml`:
+To use the Hypothesis backend below, also install `hypothesis-crosshair` with
+`uv add --dev hypothesis-crosshair`.
 
-```toml
-[tool.crosshair]
-per_path_timeout = 4
-per_condition_timeout = 30
-```
+Set per-path and per-condition timeouts with the `--per_path_timeout` and
+`--per_condition_timeout` CLI flags, or matching `# crosshair:` source
+directives. CrossHair does not read `[tool.crosshair]` from `pyproject.toml`.
 
 ## Three modes
 
-### `check` — verify contracts and asserts
+### `check` — verify contracts and selected assertions
 
 ```bash
 uv run crosshair check mypkg.parse
 ```
 
-CrossHair walks each branch of `mypkg.parse` and reports any input that
-violates an `assert` or contract. PEP 316 docstring contracts look like:
+By default, `crosshair check` checks PEP 316, `deal`, and `icontract`
+contracts. Include `asserts` in `--analysis_kind` to check Python `assert`
+statements as contracts. CrossHair analyzes only code reachable from a function
+with a contract; a targeted function needs at least one pre- or postcondition.
+In `asserts` mode, leading `assert` statements can supply those conditions.
+CrossHair explores paths within the budget and reports a counter-example when
+an active contract or selected assertion fails. PEP 316 docstring contracts
+look like:
 
 ```python
 def withdraw(balance: int, amount: int) -> int:
@@ -70,15 +76,16 @@ def withdraw(balance: int, amount: int) -> int:
 `icontract` and `deal` use decorators (`@require`, `@ensure`) — both are
 supported.
 
-### `cover` — find inputs that drive a function down each branch
+### `cover` — find inputs for previously uncovered opcodes
 
 ```bash
 uv run crosshair cover mypkg.parse
 ```
 
-Useful for filling coverage holes the random generator missed. CrossHair prints
-concrete inputs that reach previously unexplored branches; promote these to
-named regression tests.
+Use `cover` to search for additional test inputs within its configured budget.
+It can complement generated examples but does not guarantee additional
+coverage. Measure the results, then promote useful candidates to named
+regression tests.
 
 ### `diffbehavior` — find an input where two functions disagree
 
@@ -93,9 +100,8 @@ unchanged within the limits of the search.
 
 ## Hypothesis backend
 
-`hypothesis-crosshair` registers CrossHair as a Hypothesis backend. Use it when
-Hypothesis cannot find a falsifying example and you suspect one exists in a
-narrow corner:
+`hypothesis-crosshair` registers CrossHair as a Hypothesis backend. Use it for
+a targeted property when symbolic path search complements generated examples:
 
 ```python
 from hypothesis import given, settings, strategies as st
@@ -106,8 +112,8 @@ def test_property(x: int) -> None:
     assert invariant(x)
 ```
 
-CrossHair searches more thoroughly within the budget; the cost is time. Use
-sparingly.
+This backend uses CrossHair's symbolic search under its configured limits. Use
+it for targeted properties, not as a guarantee of broader coverage.
 
 ## Limits
 
@@ -131,16 +137,21 @@ sparingly.
 
 ## Hard-won lessons
 
-- **Search budget matters.** A 30-second per-condition budget catches
-  the everyday bugs; longer budgets find rarer cases. Tune in `pyproject.toml`,
-  not per-run.
+- **Search budget matters.** Longer per-path and per-condition timeouts may
+  permit more path exploration, at a runtime cost. Set them with the
+  `--per_path_timeout` and `--per_condition_timeout` CLI flags or the matching
+  `# crosshair:` source directives; CrossHair does not read them from
+  `pyproject.toml`.
 - **Pure functions only.** Wrapping an impure function in a "pretend
   pure" shell to make CrossHair work usually means the shell is the bug.
 - **`diffbehavior` after every non-trivial refactor.** It is the
   cheapest insurance against accidentally changing semantics during a
   "cosmetic" rewrite.
-- **CrossHair and Hypothesis are complements.** Hypothesis covers the
-  vast input space cheaply; CrossHair covers the narrow corners exhaustively.
+- **CrossHair and Hypothesis are complements.** Hypothesis samples inputs and
+  shrinks failures; CrossHair searches feasible paths symbolically. Their
+  different strategies can produce different counter-examples, and neither is
+  generally more thorough. Finding no counter-example within CrossHair's budget
+  does not prove the property.
 
 ## References
 

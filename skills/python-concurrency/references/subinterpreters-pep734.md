@@ -13,7 +13,8 @@ pickle cost of `multiprocessing`.
 - Python objects are not shared. Anything crossing the boundary is
   serialized and reconstructed on the other side.
 - Communication uses queues: `concurrent.interpreters.create_queue()`
-  returns a cross-interpreter `queue.Queue` implementation.
+  returns `concurrent.interpreters.Queue`, which implements `queue.Queue`
+  methods except `task_done()`, `join()` and `shutdown()`.
 - Start-up cost is real (a fresh interpreter must import its modules);
   amortize it via a pool, not per-task spin-up.
 
@@ -54,9 +55,9 @@ requests.put({"task": "compute", "n": 100})
 result = results.get()
 ```
 
-`create_queue()` returns a `queue.Queue` implementation that is safe to share
-across interpreters. Use queues when futures do not fit (long-running workers,
-streaming results, fan-in/fan-out).
+`create_queue()` returns a `concurrent.interpreters.Queue` that is safe to
+share across interpreters. Use queues when futures do not fit (long-running
+workers, streaming results, fan-in/fan-out).
 
 ## What does and does not work
 

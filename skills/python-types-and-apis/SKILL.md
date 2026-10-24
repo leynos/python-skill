@@ -39,8 +39,11 @@ in type hints, protocols, and public signatures.
   `.read()` and `.close()`") and an explicit base class would over-constrain
   callers.
 - `@overload`: a function takes a closed set of argument shapes and the
-  return type depends on the shape; the implementation `def` stays unannotated
-  for the union and the overloads carry the precise types.
+  return type depends on the shape; keep the precise caller-facing types on the
+  overloads. The implementation may be annotated or unannotated. Annotating it
+  is optional and, when done, must accept every argument combination the
+  overloads accept and return something covering every return type they
+  declare, so a union is the usual choice.
 - `TypedDict` or `Unpack[TypedDict]`: kwargs are a fixed schema that needs
   type-checker enforcement at the call site.
 

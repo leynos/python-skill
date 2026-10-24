@@ -55,20 +55,27 @@ TypedDict guidance.
 
 ## CrossHair — Core deep dive
 
-CrossHair runs Python under symbolic execution backed by Z3. It explores all
-reachable paths through a function (within an interpreter timeout) and reports
+CrossHair runs Python under symbolic execution backed by Z3. It explores
+reachable paths through a function, bounded by per-path timeouts, per-condition
+timeouts and a cap on consecutive iterations that make no progress, and reports
 counter-examples when contracts or assertions fail.
 
 Modes:
 
-- `crosshair check <module>` — verify contracts (icontract / deal / PEP 316
-  docstring contracts) or `assert` statements.
-- `crosshair cover <function>` — find inputs that drive a function down
-  unexplored branches; useful for filling coverage holes.
+- `crosshair check <module>` — check PEP 316, `deal`, and `icontract`
+  contracts by default; include `asserts` in `--analysis_kind` to check Python
+  `assert` statements as contracts. CrossHair analyzes only code reachable from
+  a function with a contract; a targeted function needs at least one pre- or
+  postcondition. In `asserts` mode, leading `assert` statements can supply
+  those conditions.
+- `crosshair cover <function>` — search within CrossHair's budget for inputs
+  reaching previously uncovered opcodes; use `--coverage_type path` to target
+  execution paths, and measure coverage to verify any improvement.
 - `crosshair diffbehavior old.f new.f` — find an input where two implementations
   disagree.
-- Hypothesis backend: `@given` strategies can dispatch to CrossHair as a
-  search engine when Hypothesis cannot find a falsifying example.
+- Hypothesis backend: `hypothesis-crosshair` lets a `@given` property use
+  CrossHair's symbolic path search alongside Hypothesis's usual example
+  generation and shrinking.
 
 Limits: pure Python only, slow on heap-heavy code, weak on string and float
 arithmetic, no support for `ctypes`, threads, or I/O. It pairs with mutmut
@@ -100,8 +107,9 @@ Mutation testing tool. v3 rewrote the engine; the workflow is:
 - `mutmut run` (forks per mutant on POSIX; on Windows uses WSL).
 - `mutmut browse` opens a TUI that shows surviving mutants per file.
 - `mutmut show <id>` displays the diff; `mutmut apply <id>` writes it.
-- Configuration in `[tool.mutmut]` of `pyproject.toml`: `paths_to_mutate`,
-  `tests_dir`, `runner`, `do_not_mutate`, `also_copy`.
+- Configuration in `[tool.mutmut]` of `pyproject.toml`: `source_paths` (renamed
+  from `paths_to_mutate` in 3.6), `pytest_add_cli_args_test_selection`,
+  `runner`, `do_not_mutate`, `also_copy`.
 - `# pragma: no mutate` excludes a line.
 - Pair with type-checker filtering: mutants caught by mypy/pyright count
   for "the type system already enforces this" but should be filtered out of the

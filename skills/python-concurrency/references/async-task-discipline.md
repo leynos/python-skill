@@ -9,18 +9,26 @@ is suspected.
 
 `asyncio.TaskGroup` (3.11+) is structured concurrency in the standard library.
 The context manager creates tasks via `tg.create_task(...)` and awaits them at
-exit. If any task raises, the remaining siblings are cancelled and the group
-re-raises an `ExceptionGroup` (or `BaseExceptionGroup` if a `BaseException`
-such as `KeyboardInterrupt` escapes). Handlers use `except*` to match by
-exception type without losing the rest of the group.
+exit. A non-cancellation failure cancels the remaining siblings as soon as the
+event loop observes it — concurrent failures race, so which one triggers the
+cancellation depends on scheduling — and the group waits for the siblings to
+finish. `KeyboardInterrupt` and `SystemExit` are special: the group cancels and
+awaits the siblings, then re-raises either exception directly. Other
+non-cancellation failures are grouped in an `ExceptionGroup` when every failure
+is an `Exception`. If a failure is a `BaseException` that is not an
+`Exception`, they are grouped in a `BaseExceptionGroup`. Handlers use `except*`
+to match by exception type without losing the rest of the group.
 
 ```python
 async with asyncio.TaskGroup() as tg:
     tg.create_task(fetch_user(user_id))
     tg.create_task(fetch_orders(user_id))
     tg.create_task(fetch_addresses(user_id))
-# On exit: all three results are available, or an ExceptionGroup is raised
-# with every failure and the surviving tasks already cancelled.
+# On exit, all three tasks have completed. Other non-cancellation failures
+# are grouped after sibling cancellation is requested.
+# TaskGroup waits for them even if a task suppresses cancellation.
+# KeyboardInterrupt and SystemExit are re-raised directly instead.
+# Keep the Task handles if the results are needed; create_task returns them.
 ```
 
 `asyncio.gather` predates structured concurrency. Two failure modes make it the

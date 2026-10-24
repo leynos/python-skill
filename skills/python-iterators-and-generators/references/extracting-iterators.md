@@ -48,15 +48,18 @@ call extra methods (`peek`, `seek`, `reset`).
 
 ```python
 def lines(path: str) -> Iterator[str]:
-    with open(path) as fh:                  # closes when the generator finishes
+    with open(path) as fh:            # closes on exhaustion or explicit close
         for line in fh:
             yield line.rstrip()
 ```
 
 `with` inside a generator works because the `try/finally` runs when the
-generator is closed (either by the consumer stopping or by garbage collection).
-For deterministic close, hand the file to the caller via a context manager and
-yield from an inner generator:
+generator is exhausted, explicitly closed, or finalized by the interpreter —
+and the timing of that last case is implementation-dependent, so do not rely on
+it for prompt cleanup. In particular, a `break` out of a `for` loop over the
+generator does **not** call `generator.close()`. For deterministic close, hand
+the file to the caller via a context manager that yields one inner generator
+expression:
 
 ```python
 @contextmanager
