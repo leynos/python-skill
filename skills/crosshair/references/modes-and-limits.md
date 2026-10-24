@@ -44,8 +44,9 @@ def test_parse_smoke(payload: bytes) -> None:
     parse(payload)         # property: does not crash
 ```
 
-`cover` is the cheap way to find inputs Hypothesis missed. Pair it with
-`pytest --cov-branch` to confirm coverage holes have closed.
+Use `cover` to search for additional test inputs within its configured budget.
+It can complement generated examples but does not guarantee additional
+coverage. Measure the results with `pytest --cov-branch`.
 
 ## `diffbehavior` in detail
 

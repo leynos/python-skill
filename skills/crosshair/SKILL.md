@@ -78,9 +78,10 @@ supported.
 uv run crosshair cover mypkg.parse
 ```
 
-Useful for filling coverage holes the random generator missed. CrossHair prints
-concrete inputs that reach previously unexplored branches; promote these to
-named regression tests.
+Use `cover` to search for additional test inputs within its configured budget.
+It can complement generated examples but does not guarantee additional
+coverage. Measure the results, then promote useful candidates to named
+regression tests.
 
 ### `diffbehavior` — find an input where two functions disagree
 
