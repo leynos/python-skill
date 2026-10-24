@@ -78,17 +78,10 @@ Tips:
 
 ## Tuning the budget
 
-The cheapest tuning lives in `pyproject.toml`:
-
-```toml
-[tool.crosshair]
-per_path_timeout = 4
-per_condition_timeout = 30
-analysis_kind = "asserts,pep316,icontract"
-```
-
-In CI, run with these defaults for the touched modules; once a month, run a
-longer "deep" job with `per_condition_timeout = 300`.
+Tune `per_path_timeout`, `per_condition_timeout`, and `analysis_kind` with CLI
+options or matching `# crosshair:` source directives. CrossHair does not read
+`[tool.crosshair]` from `pyproject.toml`. For a longer CI run, pass
+`--per_condition_timeout 300`.
 
 ## Pairing with Hypothesis
 

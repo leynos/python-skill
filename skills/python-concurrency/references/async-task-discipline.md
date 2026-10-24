@@ -14,10 +14,10 @@ event loop observes it — concurrent failures race, so which one triggers the
 cancellation depends on scheduling — and the group waits for the siblings to
 finish. `KeyboardInterrupt` and `SystemExit` are special: the group cancels and
 awaits the siblings, then re-raises either exception directly. Other
-non-cancellation failures are grouped in an `ExceptionGroup`, or a
-`BaseExceptionGroup` when a non-cancellation `BaseException` other than those
-two is among the failures. Handlers use `except*` to match by exception type
-without losing the rest of the group.
+non-cancellation failures are grouped in an `ExceptionGroup` when every failure
+is an `Exception`. If a failure is a `BaseException` that is not an
+`Exception`, they are grouped in a `BaseExceptionGroup`. Handlers use `except*`
+to match by exception type without losing the rest of the group.
 
 ```python
 async with asyncio.TaskGroup() as tg:

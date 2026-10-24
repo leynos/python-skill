@@ -39,13 +39,12 @@ Do not apply when:
 uv add --dev crosshair-tool
 ```
 
-Per-test timeouts live in `pyproject.toml`:
+To use the Hypothesis backend below, also install `hypothesis-crosshair` with
+`uv add --dev hypothesis-crosshair`.
 
-```toml
-[tool.crosshair]
-per_path_timeout = 4
-per_condition_timeout = 30
-```
+Set per-path and per-condition timeouts with the `--per_path_timeout` and
+`--per_condition_timeout` CLI flags, or matching `# crosshair:` source
+directives. CrossHair does not read `[tool.crosshair]` from `pyproject.toml`.
 
 ## Three modes
 
@@ -72,7 +71,7 @@ def withdraw(balance: int, amount: int) -> int:
 `icontract` and `deal` use decorators (`@require`, `@ensure`) — both are
 supported.
 
-### `cover` — find inputs that drive a function down each branch
+### `cover` — find inputs for previously uncovered opcodes
 
 ```bash
 uv run crosshair cover mypkg.parse
@@ -134,8 +133,10 @@ it for targeted properties, not as a guarantee of broader coverage.
 ## Hard-won lessons
 
 - **Search budget matters.** Longer per-path and per-condition timeouts may
-  permit more path exploration, at a runtime cost. Tune them in
-  `pyproject.toml`, not per run.
+  permit more path exploration, at a runtime cost. Set them with the
+  `--per_path_timeout` and `--per_condition_timeout` CLI flags or the matching
+  `# crosshair:` source directives; CrossHair does not read them from
+  `pyproject.toml`.
 - **Pure functions only.** Wrapping an impure function in a "pretend
   pure" shell to make CrossHair work usually means the shell is the bug.
 - **`diffbehavior` after every non-trivial refactor.** It is the

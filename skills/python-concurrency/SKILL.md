@@ -84,13 +84,13 @@ What changes versus a thread pool:
 
 - Default to `asyncio.TaskGroup` (3.11+) for fan-out. Structured
   concurrency means a non-cancellation failure cancels the siblings as soon as
-  the event loop observes it; concurrent failures race to be observed first, so
-  scheduling determines which failure starts sibling cancellation, not which
-  failures are ultimately grouped. Once every task has finished, the context
-  manager groups other non-cancellation failures in a `BaseExceptionGroup`, or
-  an `ExceptionGroup` when every failure is an `Exception`. `KeyboardInterrupt`
-  and `SystemExit` cancel and await the siblings, then re-raise directly rather
-  than inside a group.
+  the event loop observes it. Scheduling can affect which failure starts
+  sibling cancellation and which siblings fail before cancellation reaches
+  them, so it can affect the resulting exception group. Once every task has
+  finished, the context manager groups other non-cancellation failures in a
+  `BaseExceptionGroup`, or an `ExceptionGroup` when every failure is an
+  `Exception`. `KeyboardInterrupt` and `SystemExit` cancel and await the
+  siblings, then re-raise directly rather than inside a group.
 - Reach for `asyncio.gather` only when the call is *tolerant fan-out*:
   pass `return_exceptions=True` and inspect the result list. Bare `gather(...)`
   leaks unfinished tasks on the first failure.

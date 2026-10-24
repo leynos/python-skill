@@ -49,7 +49,7 @@ stops the grouping and filtering after five active users, rather than
 exhausting the groups and then slicing the results.
 
 Given input already grouped by user, drop the `sorted` and stream with
-`groupby` instead: upstream reads then stop shortly after the last group
+`groupby` instead: upstream reads can then stop shortly after the last group
 needed. Note that `list(group)` still materializes each group, one group at a
 time.
 

@@ -65,7 +65,8 @@ Modes:
 - `crosshair check <module>` — verify contracts (icontract / deal / PEP 316
   docstring contracts) or `assert` statements.
 - `crosshair cover <function>` — search within CrossHair's budget for inputs
-  reaching unexplored branches; measure coverage to verify any improvement.
+  reaching previously uncovered opcodes; use `--coverage_type path` to target
+  execution paths, and measure coverage to verify any improvement.
 - `crosshair diffbehavior old.f new.f` — find an input where two implementations
   disagree.
 - Hypothesis backend: `hypothesis-crosshair` lets a `@given` property use
