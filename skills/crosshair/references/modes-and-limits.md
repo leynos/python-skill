@@ -100,9 +100,11 @@ def test_inverse(x: int) -> None:
     assert f(g(x)) == x
 ```
 
-Hypothesis explores the random space; CrossHair fills in the corners when the
-random generator misses. Use the `crosshair` backend for specific properties,
-not the whole suite.
+Hypothesis samples inputs and shrinks failures; CrossHair searches feasible
+paths symbolically within its configured budget. These are complementary
+strategies; neither guarantees broader coverage. Finding no counter-example
+within CrossHair's budget is not proof. Use the `crosshair` backend for
+targeted properties, not the whole suite.
 
 ## Common mistakes
 
