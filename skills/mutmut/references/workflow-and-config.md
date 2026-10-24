@@ -29,8 +29,9 @@ What each option buys:
 - `source_paths` (array) — restrict mutation to your code, not
   vendored dependencies. Must be a TOML array under `[tool.mutmut]` because
   mutmut iterates over a list of paths; a scalar string does not work. mutmut
-  renamed this key in version 3.6: releases before 3.6 use `paths_to_mutate`,
-  and version 3.6 still reads that key as a deprecated fallback with a warning.
+  renamed this key in version 3.6: releases before version 3.6 use
+  `paths_to_mutate`, and version 3.6 still reads that key as a deprecated
+  fallback with a warning.
 - `pytest_add_cli_args_test_selection` (array) — extra arguments
   passed through to the runner to narrow test discovery. Also an array under
   `[tool.mutmut]`.

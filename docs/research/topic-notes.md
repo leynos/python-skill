@@ -103,8 +103,8 @@ Mutation testing tool. v3 rewrote the engine; the workflow is:
 - `mutmut browse` opens a TUI that shows surviving mutants per file.
 - `mutmut show <id>` displays the diff; `mutmut apply <id>` writes it.
 - Configuration in `[tool.mutmut]` of `pyproject.toml`: `source_paths` (renamed
-  from `paths_to_mutate` in 3.6), `tests_dir`, `runner`, `do_not_mutate`,
-  `also_copy`.
+  from `paths_to_mutate` in 3.6), `pytest_add_cli_args_test_selection`,
+  `runner`, `do_not_mutate`, `also_copy`.
 - `# pragma: no mutate` excludes a line.
 - Pair with type-checker filtering: mutants caught by mypy/pyright count
   for "the type system already enforces this" but should be filtered out of the

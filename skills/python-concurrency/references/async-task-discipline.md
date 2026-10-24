@@ -24,7 +24,8 @@ async with asyncio.TaskGroup() as tg:
     tg.create_task(fetch_orders(user_id))
     tg.create_task(fetch_addresses(user_id))
 # On exit: all three tasks have completed, or a group is raised carrying the
-# non-cancellation failures, with the surviving tasks already cancelled.
+# non-cancellation failures after cancellation was requested for siblings.
+# TaskGroup waits for them even if a task suppresses cancellation.
 # KeyboardInterrupt and SystemExit are re-raised directly instead.
 # Keep the Task handles if the results are needed; create_task returns them.
 ```

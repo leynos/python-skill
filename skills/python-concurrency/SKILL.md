@@ -33,15 +33,20 @@ to keep state safe across it.
   I/O libraries (database drivers, OS file calls) that cannot be made async.
   Threads share memory; protect mutable state with `Lock`, `RLock`, or a queue.
 - **`multiprocessing` / `ProcessPoolExecutor`**: CPU-bound pure
-  Python today. Each process is its own interpreter and its own GIL. Worker
-  start-up follows the selected start method — `fork`, `spawn`, or
-  `forkserver`; on Unix other than macOS the Python 3.14 default changed from
-  `fork` to `forkserver`. By default a worker starts once and is reused for the
-  life of the pool, so start-up is an up-front cost, not a per-task one. To cap
-  that lifetime, pass `max_tasks_per_child` to `ProcessPoolExecutor` or
-  `maxtasksperchild` to `multiprocessing.Pool`; the worker is then replaced
-  after that many tasks and start-up recurs. What each task pays is pickling
-  the callable, its arguments and its result.
+  Python today. Each worker process runs its own interpreter, with a separate
+  GIL in GIL-enabled CPython builds. Worker start-up follows the selected start
+  method — `fork`, `spawn`, or `forkserver`; on Unix other than macOS the
+  Python 3.14 default changed from `fork` to `forkserver`. By default a worker
+  starts once and is reused for the life of the pool, so start-up is an
+  up-front cost, not a per-task one. To cap that lifetime, pass
+  `max_tasks_per_child` to `ProcessPoolExecutor` or `maxtasksperchild` to
+  `multiprocessing.Pool`; the worker is then replaced after that many tasks and
+  start-up recurs. In `ProcessPoolExecutor`, setting `max_tasks_per_child`
+  defaults to `spawn` when `mp_context` is omitted and is incompatible with
+  `fork`. Submitted work is pickled between processes and may be batched;
+  `ProcessPoolExecutor.map` with `chunksize > 1` groups argument tuples and
+  result values into work items. Constructing a new pool per call repeats
+  worker start-up for every call.
 - **PEP 734 subinterpreters (Python 3.14+)**: CPU-bound pure Python
   with a cheaper start-up than processes. `concurrent.interpreters` and
   `InterpreterPoolExecutor` give a per-interpreter GIL with a single process
