@@ -36,7 +36,7 @@ to keep state safe across it.
   Python today. Each worker process runs its own interpreter, with a separate
   GIL in GIL-enabled CPython builds. Worker start-up follows the selected start
   method — `fork`, `spawn`, or `forkserver`; on Unix other than macOS the
-  Python 3.14 default changed from `fork` to `forkserver`. By default a worker
+  Python 3.14 default changed from `fork` to `forkserver`. By default, a worker
   starts once and is reused for the life of the pool, so start-up is an
   up-front cost, not a per-task one. To cap that lifetime, pass
   `max_tasks_per_child` to `ProcessPoolExecutor` or `maxtasksperchild` to
