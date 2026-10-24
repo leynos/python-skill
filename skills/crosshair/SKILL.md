@@ -48,15 +48,20 @@ directives. CrossHair does not read `[tool.crosshair]` from `pyproject.toml`.
 
 ## Three modes
 
-### `check` — verify contracts and asserts
+### `check` — verify contracts and selected assertions
 
 ```bash
 uv run crosshair check mypkg.parse
 ```
 
-CrossHair explores the branches of `mypkg.parse` it reaches within the budget
-and reports an input that violates an `assert` or contract. PEP 316 docstring
-contracts look like:
+By default, `crosshair check` checks PEP 316, `deal`, and `icontract`
+contracts. Include `asserts` in `--analysis_kind` to check Python `assert`
+statements as contracts. CrossHair analyzes only code reachable from a function
+with a contract; a targeted function needs at least one pre- or postcondition.
+In `asserts` mode, leading `assert` statements can supply those conditions.
+CrossHair explores paths within the budget and reports a counter-example when
+an active contract or selected assertion fails. PEP 316 docstring contracts
+look like:
 
 ```python
 def withdraw(balance: int, amount: int) -> int:

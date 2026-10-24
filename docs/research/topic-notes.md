@@ -62,8 +62,12 @@ counter-examples when contracts or assertions fail.
 
 Modes:
 
-- `crosshair check <module>` — verify contracts (icontract / deal / PEP 316
-  docstring contracts) or `assert` statements.
+- `crosshair check <module>` — check PEP 316, `deal`, and `icontract`
+  contracts by default; include `asserts` in `--analysis_kind` to check Python
+  `assert` statements as contracts. CrossHair analyzes only code reachable from
+  a function with a contract; a targeted function needs at least one pre- or
+  postcondition. In `asserts` mode, leading `assert` statements can supply
+  those conditions.
 - `crosshair cover <function>` — search within CrossHair's budget for inputs
   reaching previously uncovered opcodes; use `--coverage_type path` to target
   execution paths, and measure coverage to verify any improvement.

@@ -46,7 +46,8 @@ def test_parse_smoke(payload: bytes) -> None:
 
 Use `cover` to search for additional test inputs within its configured budget.
 It can complement generated examples but does not guarantee additional
-coverage. Measure the results with `pytest --cov-branch`.
+coverage. Use `pytest --cov-branch` to measure test-run branch coverage
+separately; it does not measure CrossHair's opcode reachability.
 
 ## `diffbehavior` in detail
 

@@ -44,9 +44,9 @@ to keep state safe across it.
   start-up recurs. In `ProcessPoolExecutor`, setting `max_tasks_per_child`
   defaults to `spawn` when `mp_context` is omitted and is incompatible with
   `fork`. Submitted work is pickled between processes and may be batched;
-  `ProcessPoolExecutor.map` with `chunksize > 1` groups argument tuples and
-  result values into work items. Constructing a new pool per call repeats
-  worker start-up for every call.
+  `ProcessPoolExecutor.map` with `chunksize > 1` submits each chunk of input
+  argument tuples as one task and yields results in input order. Constructing a
+  new pool per call repeats worker start-up for every call.
 - **PEP 734 subinterpreters (Python 3.14+)**: CPU-bound pure Python
   with a cheaper start-up than processes. `concurrent.interpreters` and
   `InterpreterPoolExecutor` give a per-interpreter GIL with a single process.

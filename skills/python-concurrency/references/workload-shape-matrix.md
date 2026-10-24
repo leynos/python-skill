@@ -30,11 +30,11 @@ from the work's shape, not from convenience.
   replaced after that many tasks, so start-up recurs. In `ProcessPoolExecutor`,
   this setting defaults to `spawn` when `mp_context` is omitted and is
   incompatible with `fork`. Submitted work is pickled between processes and may
-  be batched; `map` with `chunksize > 1` groups argument tuples and result
-  values into work items. Batch the work or raise `chunksize` on `map` when
-  serialization dominates. If process start-up is the concern, use
-  subinterpreters: their start-up can be cheaper, but each interpreter still
-  imports its own modules.
+  be batched; `map` with `chunksize > 1` submits each chunk of input argument
+  tuples as one task and yields results in input order. Batch the work or raise
+  `chunksize` on `map` when serialization dominates. If process start-up is the
+  concern, use subinterpreters: their start-up can be cheaper, but each
+  interpreter still imports its own modules.
 - **Shared mutable state across threads without a lock.** Even
   primitive operations are not always atomic in CPython; use `queue.Queue`,
   `threading.Lock`, or atomic patterns (compare-and-swap via `Lock`).
