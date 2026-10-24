@@ -58,8 +58,7 @@ TypedDict guidance.
 CrossHair runs Python under symbolic execution backed by Z3. It explores
 reachable paths through a function, bounded by per-path timeouts, per-condition
 timeouts and a cap on consecutive iterations that make no progress, and reports
-counter-examples when contracts or assertions fail. Finding none within the
-budget does not prove the property.
+counter-examples when contracts or assertions fail.
 
 Modes:
 
@@ -69,8 +68,9 @@ Modes:
   unexplored branches; useful for filling coverage holes.
 - `crosshair diffbehavior old.f new.f` — find an input where two implementations
   disagree.
-- Hypothesis backend: `@given` strategies can dispatch to CrossHair as a
-  search engine when Hypothesis cannot find a falsifying example.
+- Hypothesis backend: `hypothesis-crosshair` lets a `@given` property use
+  CrossHair's symbolic path search rather than Hypothesis's usual example
+  generation and shrinking.
 
 Limits: pure Python only, slow on heap-heavy code, weak on string and float
 arithmetic, no support for `ctypes`, threads, or I/O. It pairs with mutmut

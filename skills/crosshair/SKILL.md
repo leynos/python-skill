@@ -95,9 +95,8 @@ unchanged within the limits of the search.
 
 ## Hypothesis backend
 
-`hypothesis-crosshair` registers CrossHair as a Hypothesis backend. Use it when
-Hypothesis cannot find a falsifying example and you suspect one exists in a
-narrow corner:
+`hypothesis-crosshair` registers CrossHair as a Hypothesis backend. Use it for
+a targeted property when symbolic path search complements generated examples:
 
 ```python
 from hypothesis import given, settings, strategies as st
@@ -108,8 +107,8 @@ def test_property(x: int) -> None:
     assert invariant(x)
 ```
 
-CrossHair explores more of the path space within the budget, at the cost of
-time. Use sparingly.
+This backend uses CrossHair's symbolic search under its configured limits. Use
+it for targeted properties, not as a guarantee of broader coverage.
 
 ## Limits
 
@@ -133,17 +132,19 @@ time. Use sparingly.
 
 ## Hard-won lessons
 
-- **Search budget matters.** A 30-second per-condition budget catches
-  the everyday bugs; longer budgets find rarer cases. Tune in `pyproject.toml`,
-  not per-run.
+- **Search budget matters.** Longer per-path and per-condition timeouts may
+  permit more path exploration, at a runtime cost. Tune them in
+  `pyproject.toml`, not per run.
 - **Pure functions only.** Wrapping an impure function in a "pretend
   pure" shell to make CrossHair work usually means the shell is the bug.
 - **`diffbehavior` after every non-trivial refactor.** It is the
   cheapest insurance against accidentally changing semantics during a
   "cosmetic" rewrite.
-- **CrossHair and Hypothesis are complements.** Hypothesis samples the vast
-  input space cheaply; CrossHair explores the narrow corners within its budget.
-  Finding no counter-example within the budget does not prove the property.
+- **CrossHair and Hypothesis are complements.** Hypothesis samples inputs and
+  shrinks failures; CrossHair searches feasible paths symbolically. Their
+  different strategies can produce different counter-examples, and neither is
+  generally more thorough. Finding no counter-example within CrossHair's budget
+  does not prove the property.
 
 ## References
 
