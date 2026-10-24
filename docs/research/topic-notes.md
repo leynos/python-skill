@@ -69,7 +69,7 @@ Modes:
 - `crosshair diffbehavior old.f new.f` — find an input where two implementations
   disagree.
 - Hypothesis backend: `hypothesis-crosshair` lets a `@given` property use
-  CrossHair's symbolic path search rather than Hypothesis's usual example
+  CrossHair's symbolic path search alongside Hypothesis's usual example
   generation and shrinking.
 
 Limits: pure Python only, slow on heap-heavy code, weak on string and float

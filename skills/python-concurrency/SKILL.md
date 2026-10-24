@@ -49,8 +49,10 @@ to keep state safe across it.
   worker start-up for every call.
 - **PEP 734 subinterpreters (Python 3.14+)**: CPU-bound pure Python
   with a cheaper start-up than processes. `concurrent.interpreters` and
-  `InterpreterPoolExecutor` give a per-interpreter GIL with a single process
-  and an explicit cross-interpreter `queue.Queue`; each fresh interpreter still
+  `InterpreterPoolExecutor` give a per-interpreter GIL with a single process.
+  `concurrent.interpreters.create_queue()` returns a cross-interpreter
+  `concurrent.interpreters.Queue`, which implements `queue.Queue` methods except
+  `task_done()`, `join()` and `shutdown()`. Each fresh interpreter still
   imports its own modules, so amortize that cost through a pool.
 - **Free-threaded CPython (PEP 703)**: experimental in 3.13, supported
   in 3.14. One interpreter, no GIL. Useful when C extensions are thread-safe
@@ -72,9 +74,9 @@ What changes versus a thread pool:
   Python scales.
 - No Python objects are shared. Arguments are serialized across the
   boundary; return values likewise.
-- `concurrent.interpreters.create_queue()` returns a cross-interpreter
-  `queue.Queue` implementation for streaming or fan-in/fan-out work when
-  futures are not enough.
+- `concurrent.interpreters.create_queue()` returns a
+  `concurrent.interpreters.Queue` for streaming or fan-in/fan-out when futures
+  are not enough.
 - C extensions must opt in to per-interpreter GIL support
   (`Py_mod_multiple_interpreters`); pure-Python work always works.
 
@@ -82,12 +84,13 @@ What changes versus a thread pool:
 
 - Default to `asyncio.TaskGroup` (3.11+) for fan-out. Structured
   concurrency means a non-cancellation failure cancels the siblings as soon as
-  the event loop observes it; concurrent failures race, so which one that is
-  depends on scheduling. Once every task has finished, the context manager
-  re-raises the non-cancellation failures grouped into a `BaseExceptionGroup`,
-  or an `ExceptionGroup` when every failure is an `Exception`.
-  `KeyboardInterrupt` and `SystemExit` cancel and await the siblings, then
-  re-raise directly rather than inside a group.
+  the event loop observes it; concurrent failures race to be observed first, so
+  scheduling determines which failure starts sibling cancellation, not which
+  failures are ultimately grouped. Once every task has finished, the context
+  manager groups other non-cancellation failures in a `BaseExceptionGroup`, or
+  an `ExceptionGroup` when every failure is an `Exception`. `KeyboardInterrupt`
+  and `SystemExit` cancel and await the siblings, then re-raise directly rather
+  than inside a group.
 - Reach for `asyncio.gather` only when the call is *tolerant fan-out*:
   pass `return_exceptions=True` and inspect the result list. Bare `gather(...)`
   leaks unfinished tasks on the first failure.
