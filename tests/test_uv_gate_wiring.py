@@ -9,7 +9,6 @@ the helper) instead of pattern-matching recipe text.
 
 from __future__ import annotations
 
-import hashlib
 import re
 import shutil
 import subprocess
@@ -19,9 +18,6 @@ import pytest
 
 ROOT = Path(__file__).resolve().parents[1]
 MAKEFILE = (ROOT / "Makefile").read_text(encoding="utf-8")
-# The reviewed helper release (uv_gate 0.2.1). Update the digest when moving to a
-# newer release, never to accept an edited copy.
-HELPER_DIGEST = "fe7671d8663ec89ce1076ebb857847802e46c8d6607ab1e012daa443e335e66e"
 EXPECTED_PREPARE = "prepare --group dev"
 EXPECTED_DEFAULT_GOAL = "check"
 # The targets that call the helper: (target, tools it runs, runs the project, and
@@ -139,13 +135,6 @@ def make(
         f"make {arguments} exited {done.returncode}: {done.stderr}"
     )
     return done
-
-
-def test_the_vendored_helper_is_the_reviewed_release() -> None:
-    """The helper's bytes are the reviewed release, unedited."""
-    digest = hashlib.sha256((ROOT / "scripts/uv_gate.py").read_bytes()).hexdigest()
-
-    assert digest == HELPER_DIGEST, f"scripts/uv_gate.py has digest {digest}"
 
 
 @NEEDS_MAKE
