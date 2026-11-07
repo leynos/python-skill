@@ -144,7 +144,10 @@ def test_lint_fails_when_skill_manifest_check_fails(
         cmd_mox.stub(tool).returns(exit_code=0)
 
     def uv_result(invocation: Invocation) -> tuple[str, str, int]:
+        """Answer each uv call; only the skills-ref validation fails."""
         if invocation.args[0] == "prepare":
+            return "", "", 0
+        if "interrogate" in invocation.args:
             return "", "", 0
         if invocation.args[4:5] == ["yamllint"]:
             return "", "", 0

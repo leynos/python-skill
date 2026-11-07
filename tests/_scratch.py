@@ -40,6 +40,7 @@ class ScratchRepo:
     """
 
     def __init__(self, path: Path) -> None:
+        """Remember the root directory of the scratch repository."""
         self.path = path
 
     def write(self, relative: str, content: str = "# heading\n") -> Path:
