@@ -27,6 +27,7 @@ SELF = "python-router"
 
 
 def _skill_dirs(repo_root: Path) -> list[Path]:
+    """Return the skill directories under ``skills/`` in sorted order."""
     return sorted(p for p in (repo_root / "skills").iterdir() if p.is_dir())
 
 
