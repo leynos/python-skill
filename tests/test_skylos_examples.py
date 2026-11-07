@@ -31,7 +31,7 @@ def _blocks(document: Path, lang: str) -> list[str]:
 
 
 def _only_block(document: Path, lang: str) -> str:
-    """Return the sole fenced block of ``lang`` in ``document``, or fail."""
+    """Return the body of the sole fenced block of ``lang`` in ``document``."""
     blocks = _blocks(document, lang)
     assert len(blocks) == 1, f"{document}: expected one {lang} block, got {len(blocks)}"
     return blocks[0]
