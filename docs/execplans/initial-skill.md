@@ -165,8 +165,8 @@ Update this plan after each milestone with:
   rules to 413, began formatting Markdown code blocks, and added native
   `ruff: ignore` suppression, all after the training cut-off of current models.
   Routing boundary recorded in
-  [ADR 0001](../adr/0001-ruff-skill-routing-boundary.md). Every factual claim
-  was sourced from upstream artefacts (the `astral-sh/ruff` changelogs, a
+  [ADR 0001](../adrs/adr-0001-ruff-skill-routing-boundary.md). Every factual
+  claim was sourced from upstream artefacts (the `astral-sh/ruff` changelogs, a
   `ruff.schema.json` diff across the 0.14.0/0.15.0/0.16.0 tags,
   `crates/ruff_linter/src/codes.rs` at 0.16.0, and a parse of the published
   default-rules page) rather than recollection. The schema diff caught one

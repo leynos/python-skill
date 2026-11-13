@@ -69,7 +69,7 @@ supporting material.
   `Makefile` gates, and what the test suite covers.
 - [Initial-skill execplan](execplans/initial-skill.md) — design,
   rationale, and the living progress log.
-- [ADR 0001](adr/0001-ruff-skill-routing-boundary.md) — why the Ruff
+- [ADR 0001](adrs/adr-0001-ruff-skill-routing-boundary.md) — why the Ruff
   skill is version-pinned and where its boundary with
   `python-errors-and-logging` sits.
 - [Research notes](research/topic-notes.md) — consolidated firecrawl
