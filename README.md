@@ -83,7 +83,7 @@ ______________________________________________________________________
   active and what is research input.
 - [Initial-skill execplan](docs/execplans/initial-skill.md) — design,
   rationale, and validation history for the catalogue.
-- [ADR 0001](docs/adr/0001-ruff-skill-routing-boundary.md) — why the
+- [ADR 0001](docs/adrs/adr-0001-ruff-skill-routing-boundary.md) — why the
   Ruff skill is version-pinned and where its routing boundary sits.
 - [Python router](skills/python-router/SKILL.md) — the main entry point.
 - [Types and APIs](skills/python-types-and-apis/SKILL.md) — generics,
